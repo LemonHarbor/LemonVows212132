@@ -1,0 +1,21 @@
+{
+  "welcome": "Welcome to LemonVows",
+  "rsvp": {
+    "title": "Guest Management",
+    "name": "Name",
+    "status": "Status",
+    "save": "Save"
+  },
+  "budget": {
+    "title": "Budget Planner",
+    "category": "Category",
+    "amount": "Amount",
+    "total": "Total"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password"
+  }
+}

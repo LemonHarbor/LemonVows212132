@@ -1,0 +1,15 @@
+{
+  "welcome": "Willkommen bei LemonVows",
+  "rsvp": {
+    "title": "Gästemanagement",
+    "name": "Name",
+    "status": "Status",
+    "save": "Speichern"
+  },
+  "budget": {
+    "title": "Budgetplaner",
+    "category": "Kategorie",
+    "amount": "Betrag",
+    "total": "Gesamt"
+  }
+}
