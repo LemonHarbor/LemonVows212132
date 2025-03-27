@@ -12,40 +12,54 @@
 - [x] Projektstruktur gemäß Dokumentation erstellen
 - [x] Supabase-Client einrichten
 - [x] i18n für Mehrsprachigkeit (DE, EN) einrichten
-- [ ] Git-Repository initialisieren
+- [x] Git-Repository initialisieren
 
 ## Kernfunktionen implementieren
-- [ ] Interaktiver Tischplan mit Drag & Drop
-- [ ] Gästeverwaltung mit RSVP-System
-- [ ] Budgetplaner
-- [ ] Moodboard
-- [ ] Foto-Galerie
-- [ ] Mehrsprachigkeit (DE, EN)
+- [x] Interaktiver Tischplan mit Drag & Drop
+- [x] Gästeverwaltung mit RSVP-System
+- [x] Budgetplaner
+- [x] Moodboard
+- [x] Foto-Galerie
+- [x] Mehrsprachigkeit (DE, EN)
 
 ## Admin-Dashboard erstellen
-- [ ] Benutzer-/Kundenverwaltung
-- [ ] Statistiken und Übersichten
-- [ ] Einstellungen und Konfiguration
-- [ ] Mehrsprachigkeit im Admin-Bereich
+- [x] Benutzer-/Kundenverwaltung
+- [x] Statistiken und Übersichten
+- [x] Hochzeitsverwaltung
+- [x] Zahlungsverwaltung
+- [x] Einstellungen
 
 ## Supabase-Backend einrichten
-- [ ] Datenmodell definieren
-- [ ] Tabellen erstellen
-- [ ] Berechtigungen konfigurieren
-- [ ] API-Endpunkte implementieren
-- [ ] Authentifizierung einrichten
+- [x] Datenmodell definieren
+- [x] Tabellen erstellen
+- [x] Authentifizierung implementieren
+- [x] API-Funktionen erstellen
+- [x] Daten-Synchronisation einrichten
+- [x] Berechtigungen konfigurieren
+- [x] API-Endpunkte implementieren
 
 ## Monetarisierung implementieren
-- [ ] Kostengünstigste Zahlungslösung recherchieren
-- [ ] Zahlungsanbieter integrieren
+- [x] Kostengünstigste Zahlungslösung recherchieren
+- [x] Zahlungsanbieter integrieren
+- [x] Preismodelle definieren
+- [x] Stripe-Integration implementieren
+- [x] Webhook-Handler erstellen
+- [x] Preisseite erstellen
 - [ ] Preismodelle implementieren (Free, Basic, Premium)
 - [ ] Checkout-Prozess implementieren
 
 ## Anwendung testen
-- [ ] Unit-Tests schreiben
-- [ ] Integrationstests durchführen
-- [ ] Benutzeroberfläche testen
-- [ ] Responsives Design überprüfen
+- [x] Tests für PricingPage erstellen
+- [x] Tests für TablePlanner erstellen
+- [x] Tests für GuestManagement erstellen
+- [x] Tests für BudgetPlanner erstellen
+- [x] Tests für Moodboard erstellen
+- [x] Tests für PhotoGallery erstellen
+- [x] Tests für AdminDashboard erstellen
+- [x] Unit-Tests schreiben
+- [x] Integrationstests durchführen
+- [x] Benutzeroberfläche testen
+- [x] Responsives Design überprüfen
 - [ ] Browserkompatibilität testen
 
 ## Deployment und GitHub-Integration
