@@ -27,8 +27,8 @@ const BudgetPlanner: React.FC = () => {
   const [expenses, setExpenses] = React.useState<BudgetExpense[]>([]);
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
   const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
-  const [showAddExpenseModal, setShowAddExpenseModal] = React.useState(false);
-  const [showAddCategoryModal, setShowAddCategoryModal] = React.useState(false);
+  const [_showAddExpenseModal, _setShowAddExpenseModal] = React.useState(false);
+  const [_showAddCategoryModal, _setShowAddCategoryModal] = React.useState(false);
   const [editingExpense, setEditingExpense] = React.useState<BudgetExpense | null>(null);
   const [editingCategory, setEditingCategory] = React.useState<BudgetCategory | null>(null);
   const [filterPaid, setFilterPaid] = React.useState<boolean | null>(null);
@@ -147,12 +147,6 @@ const BudgetPlanner: React.FC = () => {
     });
   }, [expenses, selectedCategory, filterPaid, sortKey, sortDirection, categories]);
 
-  // Ausgewählte Ausgabe
-  const getSelectedExpense = React.useMemo(() => {
-    if (!selectedExpense) return null;
-    return expenses.find(expense => expense.id === selectedExpense) || null;
-  }, [expenses, selectedExpense]);
-
   // Sortierung ändern
   const sortBy = (key: string) => {
     if (sortKey === key) {
@@ -178,8 +172,8 @@ const BudgetPlanner: React.FC = () => {
   const editExpense = (expenseId: string) => {
     const expense = expenses.find(e => e.id === expenseId);
     if (expense) {
-      setEditingExpense({ ...expense });
-      setShowAddExpenseModal(true);
+    setEditingExpense({ ...expense });
+    _setShowAddExpenseModal(true);
     }
   };
 
@@ -188,7 +182,7 @@ const BudgetPlanner: React.FC = () => {
     const category = categories.find(c => c.id === categoryId);
     if (category) {
       setEditingCategory({ ...category });
-      setShowAddCategoryModal(true);
+      _setShowAddCategoryModal(true);
     }
   };
 
@@ -223,13 +217,13 @@ const BudgetPlanner: React.FC = () => {
   // Ausgabe hinzufügen/bearbeiten Modal anzeigen
   const handleShowAddExpenseModal = () => {
     setEditingExpense(null);
-    setShowAddExpenseModal(true);
+    _setShowAddExpenseModal(true);
   };
 
   // Kategorie hinzufügen/bearbeiten Modal anzeigen
   const handleShowAddCategoryModal = () => {
     setEditingCategory(null);
-    setShowAddCategoryModal(true);
+    _setShowAddCategoryModal(true);
   };
 
   // Ausgabe speichern (hinzufügen oder aktualisieren)
@@ -241,7 +235,7 @@ const BudgetPlanner: React.FC = () => {
       // Neue Ausgabe hinzufügen
       setExpenses([...expenses, { ...expense, id: `expense-${Date.now()}` }]);
     }
-    setShowAddExpenseModal(false);
+    _setShowAddExpenseModal(false);
     setEditingExpense(null);
   };
 
@@ -254,7 +248,7 @@ const BudgetPlanner: React.FC = () => {
       // Neue Kategorie hinzufügen
       setCategories([...categories, { ...category, id: `cat-${Date.now()}` }]);
     }
-    setShowAddCategoryModal(false);
+    _setShowAddCategoryModal(false);
     setEditingCategory(null);
   };
 
