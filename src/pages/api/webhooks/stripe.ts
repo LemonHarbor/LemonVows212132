@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { stripe, stripeApi } from '@/lib/monetization';
+import { stripe, stripeApi } from '../../../lib/monetization';
 import { buffer } from 'micro';
 
 // Stripe webhook secret
