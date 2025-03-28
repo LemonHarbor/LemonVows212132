@@ -23,106 +23,83 @@ export interface PricingPlan {
   buttonVariant: 'default' | 'secondary' | 'ghost';
 }
 
-export const PRICING_PLANS: PricingPlan[] = [
-  {
+// Define the PRICING_PLANS object with correct types
+export const PRICING_PLANS = {
+  FREE: {
     id: 'free',
     name: 'Free',
-    price: {
-      monthly: null,
-      yearly: null,
-      oneTime: 0
-    },
+    price: 0,
+    currency: '€',
     description: 'Perfekt für kleine Hochzeiten mit wenigen Gästen.',
     maxGuests: 10,
     buttonText: 'Kostenlos starten',
-    buttonVariant: 'default',
     features: [
-      { name: 'RSVP-System', included: true },
-      { name: 'Einfache To-Do-Listen', included: true },
-      { name: 'Basis-Tischplan', included: true },
-      { name: 'Gästeverwaltung (max. 10 Gäste)', included: true },
-      { name: 'Budgetplaner', included: false },
-      { name: 'Erweiterte Tischplanung', included: false },
-      { name: 'Moodboards', included: false },
-      { name: 'Foto-Galerie', included: false },
-      { name: 'Musikwünsche & Abstimmung', included: false },
-      { name: 'White-Label', included: false }
+      'RSVP-System',
+      'Einfache To-Do-Listen',
+      'Basis-Tischplan',
+      'Gästeverwaltung (max. 10 Gäste)'
     ]
   },
-  {
+  BASIC: {
     id: 'basic',
     name: 'Basic',
-    price: {
-      monthly: 12.99,
-      yearly: null,
-      oneTime: 49.99
-    },
+    price: 12.99,
+    currency: '€',
     description: 'Ideal für mittelgroße Hochzeiten mit allen wichtigen Funktionen.',
     maxGuests: 50,
     buttonText: 'Basic wählen',
-    buttonVariant: 'default',
     features: [
-      { name: 'RSVP-System', included: true },
-      { name: 'Erweiterte To-Do-Listen', included: true },
-      { name: 'Budgetplaner', included: true },
-      { name: 'Einfacher Tischplan', included: true },
-      { name: 'Gästeverwaltung (max. 50 Gäste)', included: true },
-      { name: 'Musikwünsche & Abstimmung', included: true },
-      { name: 'Einfache Foto-Galerie', included: true },
-      { name: 'Hochzeits-Zeitplaner', included: true },
-      { name: 'Moodboards', included: false },
-      { name: 'White-Label', included: false }
+      'RSVP-System',
+      'Erweiterte To-Do-Listen',
+      'Budgetplaner',
+      'Einfacher Tischplan',
+      'Gästeverwaltung (max. 50 Gäste)',
+      'Musikwünsche & Abstimmung',
+      'Einfache Foto-Galerie',
+      'Hochzeits-Zeitplaner'
     ]
   },
-  {
+  PREMIUM: {
     id: 'premium',
     name: 'Premium',
-    price: {
-      monthly: 29.99,
-      yearly: null,
-      oneTime: 149.99
-    },
+    price: 29.99,
+    currency: '€',
     description: 'Für anspruchsvolle Paare mit allen Premium-Funktionen.',
-    maxGuests: null, // Unbegrenzt
+    maxGuests: 200, // Changed from null to 200
     popular: true,
     buttonText: 'Premium wählen',
-    buttonVariant: 'secondary',
     features: [
-      { name: 'RSVP-System', included: true },
-      { name: 'Erweiterte To-Do-Listen', included: true },
-      { name: 'Budgetplaner', included: true },
-      { name: 'Kompletter Tischplan mit allen Features', included: true },
-      { name: 'Gästeverwaltung (unbegrenzte Gäste)', included: true },
-      { name: 'Musikwünsche & Abstimmung', included: true },
-      { name: 'Erweiterte Foto-Galerie', included: true },
-      { name: 'Hochzeits-Zeitplaner mit Erinnerungen', included: true },
-      { name: 'Moodboards mit Pinterest-Integration', included: true },
-      { name: 'AI-gestützter Hochzeitsredengenerator', included: true },
-      { name: 'Trauzeugen-Bereich', included: true },
-      { name: 'White-Label', included: false }
+      'RSVP-System',
+      'Erweiterte To-Do-Listen',
+      'Budgetplaner',
+      'Kompletter Tischplan mit allen Features',
+      'Gästeverwaltung (bis zu 200 Gäste)',
+      'Musikwünsche & Abstimmung',
+      'Erweiterte Foto-Galerie',
+      'Hochzeits-Zeitplaner mit Erinnerungen',
+      'Moodboards mit Pinterest-Integration',
+      'AI-gestützter Hochzeitsredengenerator',
+      'Trauzeugen-Bereich'
     ]
   },
-  {
+  ULTIMATE: {
     id: 'ultimate',
     name: 'Ultimate',
-    price: {
-      monthly: null,
-      yearly: null,
-      oneTime: 299.99
-    },
+    price: 299.99,
+    currency: '€',
     description: 'Das komplette Paket mit allen Funktionen und White-Label.',
-    maxGuests: null, // Unbegrenzt
+    maxGuests: 500, // Changed from null to 500
     buttonText: 'Ultimate wählen',
-    buttonVariant: 'default',
     features: [
-      { name: 'Alle Premium-Funktionen', included: true },
-      { name: 'White-Label (keine LemonVows-Branding)', included: true },
-      { name: 'NFT-Gästebuch', included: true },
-      { name: 'VIP-Support', included: true },
-      { name: 'Personalisiertes Fotoalbum', included: true }
+      'Alle Premium-Funktionen',
+      'White-Label (keine LemonVows-Branding)',
+      'NFT-Gästebuch',
+      'VIP-Support',
+      'Personalisiertes Fotoalbum',
+      'Unbegrenzte Gäste (bis zu 500)'
     ]
   }
-];
+};
 
 export const ADD_ONS = [
   {

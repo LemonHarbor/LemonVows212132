@@ -1,6 +1,85 @@
+"use client";
+
 import React from 'react';
-import { PRICING_PLANS } from '@/lib/monetization';
 import { Button } from '@/components/ui/Button';
+
+// Define the pricing plans directly in this file to avoid TypeScript errors
+const PRICING_PLANS = {
+  FREE: {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    currency: '€',
+    description: 'Perfekt für kleine Hochzeiten mit wenigen Gästen.',
+    maxGuests: 10,
+    buttonText: 'Kostenlos starten',
+    features: [
+      'RSVP-System',
+      'Einfache To-Do-Listen',
+      'Basis-Tischplan',
+      'Gästeverwaltung (max. 10 Gäste)'
+    ]
+  },
+  BASIC: {
+    id: 'basic',
+    name: 'Basic',
+    price: 12.99,
+    currency: '€',
+    description: 'Ideal für mittelgroße Hochzeiten mit allen wichtigen Funktionen.',
+    maxGuests: 50,
+    buttonText: 'Basic wählen',
+    features: [
+      'RSVP-System',
+      'Erweiterte To-Do-Listen',
+      'Budgetplaner',
+      'Einfacher Tischplan',
+      'Gästeverwaltung (max. 50 Gäste)',
+      'Musikwünsche & Abstimmung',
+      'Einfache Foto-Galerie',
+      'Hochzeits-Zeitplaner'
+    ]
+  },
+  PREMIUM: {
+    id: 'premium',
+    name: 'Premium',
+    price: 29.99,
+    currency: '€',
+    description: 'Für anspruchsvolle Paare mit allen Premium-Funktionen.',
+    maxGuests: 200,
+    popular: true,
+    buttonText: 'Premium wählen',
+    features: [
+      'RSVP-System',
+      'Erweiterte To-Do-Listen',
+      'Budgetplaner',
+      'Kompletter Tischplan mit allen Features',
+      'Gästeverwaltung (bis zu 200 Gäste)',
+      'Musikwünsche & Abstimmung',
+      'Erweiterte Foto-Galerie',
+      'Hochzeits-Zeitplaner mit Erinnerungen',
+      'Moodboards mit Pinterest-Integration',
+      'AI-gestützter Hochzeitsredengenerator',
+      'Trauzeugen-Bereich'
+    ]
+  },
+  ULTIMATE: {
+    id: 'ultimate',
+    name: 'Ultimate',
+    price: 299.99,
+    currency: '€',
+    description: 'Das komplette Paket mit allen Funktionen und White-Label.',
+    maxGuests: 500,
+    buttonText: 'Ultimate wählen',
+    features: [
+      'Alle Premium-Funktionen',
+      'White-Label (keine LemonVows-Branding)',
+      'NFT-Gästebuch',
+      'VIP-Support',
+      'Personalisiertes Fotoalbum',
+      'Unbegrenzte Gäste (bis zu 500)'
+    ]
+  }
+};
 
 interface PricingCardProps {
   plan: {
@@ -9,7 +88,7 @@ interface PricingCardProps {
     price: number;
     currency: string;
     description: string;
-    maxGuests: number | null;
+    maxGuests: number;
     buttonText: string;
     features: string[];
     popular?: boolean;
@@ -72,22 +151,22 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentPlanId, onSelectPlan }
       </div>
       <div className="mt-12 grid gap-8 lg:grid-cols-4 md:grid-cols-2">
         <PricingCard 
-          plan={PRICING_PLANS.FREE} 
+          plan={PRICING_PLANS.FREE}
           isCurrentPlan={currentPlanId === PRICING_PLANS.FREE.id} 
           onSelectPlan={onSelectPlan} 
         />
         <PricingCard 
-          plan={PRICING_PLANS.BASIC} 
+          plan={PRICING_PLANS.BASIC}
           isCurrentPlan={currentPlanId === PRICING_PLANS.BASIC.id} 
           onSelectPlan={onSelectPlan} 
         />
         <PricingCard 
-          plan={PRICING_PLANS.PREMIUM} 
+          plan={PRICING_PLANS.PREMIUM}
           isCurrentPlan={currentPlanId === PRICING_PLANS.PREMIUM.id} 
           onSelectPlan={onSelectPlan} 
         />
         <PricingCard 
-          plan={PRICING_PLANS.ULTIMATE} 
+          plan={PRICING_PLANS.ULTIMATE}
           isCurrentPlan={currentPlanId === PRICING_PLANS.ULTIMATE.id} 
           onSelectPlan={onSelectPlan} 
         />
