@@ -1,51 +1,49 @@
 import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "underline-offset-4 hover:underline text-primary",
-      },
-      size: {
-        default: "h-10 py-2 px-4",
-        sm: "h-9 px-3 rounded-md",
-        lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
-
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'outline';
+  disabled?: boolean;
+  className?: string;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    return (
-      <button
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  onClick,
+  type = 'button',
+  variant = 'primary',
+  disabled = false,
+  className = '',
+}) => {
+  const baseStyles = 'inline-flex items-center justify-center px-4 py-2 border rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
+  
+  const variantStyles = {
+    primary: 'border-transparent text-white bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500',
+    secondary: 'border-transparent text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:ring-yellow-500',
+    outline: 'border-yellow-500 text-yellow-500 bg-transparent hover:bg-yellow-50 focus:ring-yellow-500',
+  };
+  
+  const disabledStyles = 'opacity-50 cursor-not-allowed';
+  
+  const buttonStyles = `
+    ${baseStyles}
+    ${variantStyles[variant]}
+    ${disabled ? disabledStyles : ''}
+    ${className}
+  `;
+  
+  return (
+    <button
+      type={type}
+      className={buttonStyles}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  );
+};
 
-Button.displayName = "Button";
-
-export { Button, buttonVariants };
+export default Button;

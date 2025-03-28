@@ -1,570 +1,464 @@
 import React from 'react';
-import { useTranslation } from 'next-i18next';
-import { Button } from '@/components/ui/Button';
 
-interface BudgetCategory {
-  id: string;
-  name: string;
-  plannedAmount: number;
-  color?: string;
+interface BudgetPlannerProps {
+  // Props can be added as needed
 }
 
-interface BudgetExpense {
-  id: string;
-  categoryId: string;
-  description: string;
-  amount: number;
-  date: string;
-  paid: boolean;
-  receipt?: string;
-  notes?: string;
-}
-
-const BudgetPlanner: React.FC = () => {
-  const { t } = useTranslation('common');
-  const [totalBudget, setTotalBudget] = React.useState(20000);
-  const [categories, setCategories] = React.useState<BudgetCategory[]>([]);
-  const [expenses, setExpenses] = React.useState<BudgetExpense[]>([]);
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
-  const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
-  const [_showAddExpenseModal, _setShowAddExpenseModal] = React.useState(false);
-  const [_showAddCategoryModal, _setShowAddCategoryModal] = React.useState(false);
-  const [editingExpense, setEditingExpense] = React.useState<BudgetExpense | null>(null);
-  const [editingCategory, setEditingCategory] = React.useState<BudgetCategory | null>(null);
-  const [filterPaid, setFilterPaid] = React.useState<boolean | null>(null);
-  const [sortKey, setSortKey] = React.useState('date');
-  const [sortDirection, setSortDirection] = React.useState('desc');
-
-  // Initialisiere Standardkategorien, wenn keine vorhanden sind
-  React.useEffect(() => {
-    if (categories.length === 0) {
-      const defaultCategories: BudgetCategory[] = [
-        { id: 'cat-1', name: t('budgetPlanner.categories.venue'), plannedAmount: 8000, color: '#FF5A5F' },
-        { id: 'cat-2', name: t('budgetPlanner.categories.catering'), plannedAmount: 5000, color: '#00A699' },
-        { id: 'cat-3', name: t('budgetPlanner.categories.attire'), plannedAmount: 2000, color: '#FC642D' },
-        { id: 'cat-4', name: t('budgetPlanner.categories.photography'), plannedAmount: 2500, color: '#767676' },
-        { id: 'cat-5', name: t('budgetPlanner.categories.music'), plannedAmount: 1000, color: '#FFBD00' },
-        { id: 'cat-6', name: t('budgetPlanner.categories.decoration'), plannedAmount: 800, color: '#7B0051' },
-        { id: 'cat-7', name: t('budgetPlanner.categories.invitations'), plannedAmount: 300, color: '#00D1C1' },
-        { id: 'cat-8', name: t('budgetPlanner.categories.transportation'), plannedAmount: 400, color: '#8CE071' },
-      ];
-      setCategories(defaultCategories);
-    }
-  }, [t]);
-
-  // Berechnete Werte
-  const totalSpent = React.useMemo(() => {
-    return expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  }, [expenses]);
-
-  const remainingBudget = totalBudget - totalSpent;
-  const budgetProgress = (totalSpent / totalBudget) * 100;
-  const isOverBudget = totalSpent > totalBudget;
-
-  // Ausgaben nach Kategorie
-  const expensesByCategory = React.useMemo(() => {
-    const result: Record<string, number> = {};
-    categories.forEach(category => {
-      result[category.id] = 0;
-    });
-    
-    expenses.forEach(expense => {
-      if (result[expense.categoryId] !== undefined) {
-        result[expense.categoryId] += expense.amount;
-      }
-    });
-    
-    return result;
-  }, [categories, expenses]);
-
-  // Kategorie-Fortschritt
-  const categoryProgress = React.useMemo(() => {
-    const result: Record<string, { spent: number, percentage: number, isOver: boolean }> = {};
-    
-    categories.forEach(category => {
-      const spent = expensesByCategory[category.id] || 0;
-      const percentage = category.plannedAmount > 0 
-        ? (spent / category.plannedAmount) * 100 
-        : 0;
-      
-      result[category.id] = {
-        spent,
-        percentage,
-        isOver: spent > category.plannedAmount
-      };
-    });
-    
-    return result;
-  }, [categories, expensesByCategory]);
-
-  // Gefilterte und sortierte Ausgaben
-  const filteredAndSortedExpenses = React.useMemo(() => {
-    let filtered = [...expenses];
-    
-    // Nach Kategorie filtern
-    if (selectedCategory) {
-      filtered = filtered.filter(expense => expense.categoryId === selectedCategory);
-    }
-    
-    // Nach Bezahlstatus filtern
-    if (filterPaid !== null) {
-      filtered = filtered.filter(expense => expense.paid === filterPaid);
-    }
-    
-    // Sortieren
-    return filtered.sort((a, b) => {
-      let valueA, valueB;
-      
-      switch (sortKey) {
-        case 'date':
-          valueA = new Date(a.date).getTime();
-          valueB = new Date(b.date).getTime();
-          break;
-        case 'amount':
-          valueA = a.amount;
-          valueB = b.amount;
-          break;
-        case 'description':
-          valueA = a.description.toLowerCase();
-          valueB = b.description.toLowerCase();
-          break;
-        case 'category':
-          const categoryA = categories.find(c => c.id === a.categoryId)?.name || '';
-          const categoryB = categories.find(c => c.id === b.categoryId)?.name || '';
-          valueA = categoryA.toLowerCase();
-          valueB = categoryB.toLowerCase();
-          break;
-        default:
-          valueA = new Date(a.date).getTime();
-          valueB = new Date(b.date).getTime();
-      }
-      
-      if (sortDirection === 'asc') {
-        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
-      } else {
-        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
-      }
-    });
-  }, [expenses, selectedCategory, filterPaid, sortKey, sortDirection, categories]);
-
-  // Sortierung ändern
-  const sortBy = (key: string) => {
-    if (sortKey === key) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortDirection('desc');
-    }
-  };
-
-  // Kategorie auswählen
-  const selectCategory = (categoryId: string | null) => {
-    setSelectedCategory(categoryId);
-    setSelectedExpense(null);
-  };
-
-  // Ausgabe auswählen
-  const selectExpense = (expenseId: string) => {
-    setSelectedExpense(expenseId);
-  };
-
-  // Ausgabe bearbeiten
-  const editExpense = (expenseId: string) => {
-    const expense = expenses.find(e => e.id === expenseId);
-    if (expense) {
-    setEditingExpense({ ...expense });
-    _setShowAddExpenseModal(true);
-    }
-  };
-
-  // Kategorie bearbeiten
-  const editCategory = (categoryId: string) => {
-    const category = categories.find(c => c.id === categoryId);
-    if (category) {
-      setEditingCategory({ ...category });
-      _setShowAddCategoryModal(true);
-    }
-  };
-
-  // Ausgabe löschen
-  const deleteExpense = (expenseId: string) => {
-    if (window.confirm(t('budgetPlanner.confirmDeleteExpense'))) {
-      setExpenses(expenses.filter(expense => expense.id !== expenseId));
-      if (selectedExpense === expenseId) {
-        setSelectedExpense(null);
-      }
-    }
-  };
-
-  // Kategorie löschen
-  const deleteCategory = (categoryId: string) => {
-    if (window.confirm(t('budgetPlanner.confirmDeleteCategory'))) {
-      // Prüfen, ob Ausgaben mit dieser Kategorie existieren
-      const hasExpenses = expenses.some(expense => expense.categoryId === categoryId);
-      
-      if (hasExpenses) {
-        alert(t('budgetPlanner.cannotDeleteCategoryWithExpenses'));
-        return;
-      }
-      
-      setCategories(categories.filter(category => category.id !== categoryId));
-      if (selectedCategory === categoryId) {
-        setSelectedCategory(null);
-      }
-    }
-  };
-
-  // Ausgabe hinzufügen/bearbeiten Modal anzeigen
-  const handleShowAddExpenseModal = () => {
-    setEditingExpense(null);
-    _setShowAddExpenseModal(true);
-  };
-
-  // Kategorie hinzufügen/bearbeiten Modal anzeigen
-  const handleShowAddCategoryModal = () => {
-    setEditingCategory(null);
-    _setShowAddCategoryModal(true);
-  };
-
-  // Ausgabe speichern (hinzufügen oder aktualisieren)
-  const saveExpense = (expense: BudgetExpense) => {
-    if (editingExpense) {
-      // Ausgabe aktualisieren
-      setExpenses(expenses.map(e => e.id === expense.id ? expense : e));
-    } else {
-      // Neue Ausgabe hinzufügen
-      setExpenses([...expenses, { ...expense, id: `expense-${Date.now()}` }]);
-    }
-    _setShowAddExpenseModal(false);
-    setEditingExpense(null);
-  };
-
-  // Kategorie speichern (hinzufügen oder aktualisieren)
-  const saveCategory = (category: BudgetCategory) => {
-    if (editingCategory) {
-      // Kategorie aktualisieren
-      setCategories(categories.map(c => c.id === category.id ? category : c));
-    } else {
-      // Neue Kategorie hinzufügen
-      setCategories([...categories, { ...category, id: `cat-${Date.now()}` }]);
-    }
-    _setShowAddCategoryModal(false);
-    setEditingCategory(null);
-  };
-
-  // Formatiere Währung
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('de-DE', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2
-    }).format(amount);
-  };
-
-  // Formatiere Datum
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('de-DE');
-  };
-
+export const BudgetPlanner: React.FC<BudgetPlannerProps> = () => {
   return (
     <div className="budget-planner">
-      <div className="budget-planner__header">
-        <h1>{t('budgetPlanner.title')}</h1>
-        <p>{t('budgetPlanner.description')}</p>
-        
-        <div className="budget-planner__controls">
-          <div className="budget-planner__total-budget">
-            <label>{t('budgetPlanner.totalBudget')}</label>
-            <input 
-              type="number"
-              value={totalBudget}
-              onChange={(e) => setTotalBudget(parseFloat(e.target.value) || 0)}
-              className="input"
-            />
-          </div>
-          
-          <Button onClick={handleShowAddExpenseModal}>
-            {t('budgetPlanner.addExpense')}
-          </Button>
-          
-          <Button 
-            variant="secondary"
-            onClick={handleShowAddCategoryModal}
-          >
-            {t('budgetPlanner.addCategory')}
-          </Button>
-        </div>
+      <div className="budget-planner__demo-notice">
+        <p>Dies ist eine Demo-Version des Budgetplaners. In der vollständigen Version können Sie:</p>
+        <ul>
+          <li>Gesamtbudget und Kategorien festlegen</li>
+          <li>Ausgaben in Echtzeit verfolgen</li>
+          <li>Visuelle Diagramme zur Budgetverteilung anzeigen</li>
+          <li>Belege hochladen und verwalten</li>
+          <li>Berichte exportieren</li>
+        </ul>
       </div>
       
       <div className="budget-planner__overview">
-        <div className="budget-planner__summary">
-          <div className="budget-planner__summary-item">
-            <div className="budget-planner__summary-label">{t('budgetPlanner.totalBudget')}</div>
-            <div className="budget-planner__summary-value">{formatCurrency(totalBudget)}</div>
+        <div className="budget-planner__total">
+          <div className="budget-planner__total-header">
+            <h3>Gesamtbudget</h3>
+            <div className="budget-planner__total-amount">€15.000</div>
           </div>
           
-          <div className="budget-planner__summary-item">
-            <div className="budget-planner__summary-label">{t('budgetPlanner.spent')}</div>
-            <div className="budget-planner__summary-value">{formatCurrency(totalSpent)}</div>
-          </div>
-          
-          <div className="budget-planner__summary-item">
-            <div className="budget-planner__summary-label">{t('budgetPlanner.remaining')}</div>
-            <div className={`budget-planner__summary-value ${isOverBudget ? 'over-budget' : ''}`}>
-              {formatCurrency(remainingBudget)}
+          <div className="budget-planner__progress">
+            <div className="budget-planner__progress-bar">
+              <div className="budget-planner__progress-fill" style={{ width: '65%' }}></div>
+            </div>
+            <div className="budget-planner__progress-labels">
+              <span>Ausgegeben: €9.750</span>
+              <span>Verbleibend: €5.250</span>
             </div>
           </div>
         </div>
         
-        <div className="budget-planner__progress">
-          <div className="budget-planner__progress-bar">
-            <div 
-              className={`budget-planner__progress-fill ${isOverBudget ? 'over-budget' : ''}`}
-              style={{ width: `${Math.min(budgetProgress, 100)}%` }}
-            ></div>
+        <div className="budget-planner__chart">
+          <div className="budget-planner__chart-placeholder">
+            <div className="budget-planner__pie-chart">
+              <div className="budget-planner__pie-segment budget-planner__pie-segment--1"></div>
+              <div className="budget-planner__pie-segment budget-planner__pie-segment--2"></div>
+              <div className="budget-planner__pie-segment budget-planner__pie-segment--3"></div>
+              <div className="budget-planner__pie-segment budget-planner__pie-segment--4"></div>
+              <div className="budget-planner__pie-segment budget-planner__pie-segment--5"></div>
+            </div>
           </div>
-          <div className="budget-planner__progress-label">
-            {budgetProgress.toFixed(1)}% {isOverBudget ? t('budgetPlanner.overBudget') : ''}
+          
+          <div className="budget-planner__chart-legend">
+            <div className="budget-planner__legend-item">
+              <span className="budget-planner__legend-color budget-planner__legend-color--1"></span>
+              <span className="budget-planner__legend-label">Location (30%)</span>
+            </div>
+            <div className="budget-planner__legend-item">
+              <span className="budget-planner__legend-color budget-planner__legend-color--2"></span>
+              <span className="budget-planner__legend-label">Catering (25%)</span>
+            </div>
+            <div className="budget-planner__legend-item">
+              <span className="budget-planner__legend-color budget-planner__legend-color--3"></span>
+              <span className="budget-planner__legend-label">Dekoration (15%)</span>
+            </div>
+            <div className="budget-planner__legend-item">
+              <span className="budget-planner__legend-color budget-planner__legend-color--4"></span>
+              <span className="budget-planner__legend-label">Kleidung (20%)</span>
+            </div>
+            <div className="budget-planner__legend-item">
+              <span className="budget-planner__legend-color budget-planner__legend-color--5"></span>
+              <span className="budget-planner__legend-label">Sonstiges (10%)</span>
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="budget-planner__content">
-        <div className="budget-planner__categories">
-          <h3>{t('budgetPlanner.categories')}</h3>
-          
-          <div className="budget-planner__category-list">
-            <div 
-              className={`budget-planner__category-item ${selectedCategory === null ? 'active' : ''}`}
-              onClick={() => selectCategory(null)}
-            >
-              <div className="budget-planner__category-name">{t('budgetPlanner.allCategories')}</div>
-              <div className="budget-planner__category-amount">
-                {formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-              </div>
-              <div className="budget-planner__category-progress">
-                <div className="budget-planner__category-progress-bar">
-                  <div 
-                    className={`budget-planner__category-progress-fill ${isOverBudget ? 'over-budget' : ''}`}
-                    style={{ width: `${Math.min(budgetProgress, 100)}%` }}
-                  ></div>
-                </div>
-              </div>
+      <div className="budget-planner__categories">
+        <h3>Kategorien</h3>
+        
+        <div className="budget-planner__category">
+          <div className="budget-planner__category-header">
+            <div className="budget-planner__category-name">Location</div>
+            <div className="budget-planner__category-amounts">
+              <span className="budget-planner__category-spent">€4.500</span>
+              <span className="budget-planner__category-separator">/</span>
+              <span className="budget-planner__category-budget">€4.500</span>
             </div>
-            
-            {categories.map(category => {
-              const progress = categoryProgress[category.id];
-              
-              return (
-                <div 
-                  key={category.id}
-                  className={`budget-planner__category-item ${selectedCategory === category.id ? 'active' : ''}`}
-                  onClick={() => selectCategory(category.id)}
-                >
-                  <div className="budget-planner__category-color" style={{ backgroundColor: category.color }}></div>
-                  <div className="budget-planner__category-name">{category.name}</div>
-                  <div className="budget-planner__category-amount">
-                    {formatCurrency(progress.spent)} / {formatCurrency(category.plannedAmount)}
-                  </div>
-                  <div className="budget-planner__category-progress">
-                    <div className="budget-planner__category-progress-bar">
-                      <div 
-                        className={`budget-planner__category-progress-fill ${progress.isOver ? 'over-budget' : ''}`}
-                        style={{ 
-                          width: `${Math.min(progress.percentage, 100)}%`,
-                          backgroundColor: category.color 
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="budget-planner__category-actions">
-                    <button 
-                      className="btn-icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        editCategory(category.id);
-                      }}
-                    >
-                      <span role="img" aria-label="Edit">✏️</span>
-                    </button>
-                    
-                    <button 
-                      className="btn-icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteCategory(category.id);
-                      }}
-                    >
-                      <span role="img" aria-label="Delete">🗑️</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+          </div>
+          
+          <div className="budget-planner__category-progress">
+            <div className="budget-planner__category-progress-bar">
+              <div className="budget-planner__category-progress-fill" style={{ width: '100%' }}></div>
+            </div>
           </div>
         </div>
         
-        <div className="budget-planner__expenses">
-          <div className="budget-planner__expenses-header">
-            <h3>
-              {selectedCategory 
-                ? `${t('budgetPlanner.expensesFor')} ${categories.find(c => c.id === selectedCategory)?.name}`
-                : t('budgetPlanner.allExpenses')
-              }
-            </h3>
-            
-            <div className="budget-planner__expenses-filters">
-              <div className="budget-planner__filter-group">
-                <label>{t('budgetPlanner.filterByStatus')}</label>
-                <select 
-                  value={filterPaid === null ? 'all' : filterPaid ? 'paid' : 'unpaid'}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFilterPaid(value === 'all' ? null : value === 'paid');
-                  }}
-                  className="select"
-                >
-                  <option value="all">{t('budgetPlanner.all')}</option>
-                  <option value="paid">{t('budgetPlanner.paid')}</option>
-                  <option value="unpaid">{t('budgetPlanner.unpaid')}</option>
-                </select>
-              </div>
-              
-              <Button 
-                variant="secondary"
-                onClick={handleShowAddExpenseModal}
-              >
-                {t('budgetPlanner.addExpense')}
-              </Button>
+        <div className="budget-planner__category">
+          <div className="budget-planner__category-header">
+            <div className="budget-planner__category-name">Catering</div>
+            <div className="budget-planner__category-amounts">
+              <span className="budget-planner__category-spent">€3.000</span>
+              <span className="budget-planner__category-separator">/</span>
+              <span className="budget-planner__category-budget">€3.750</span>
             </div>
           </div>
           
-          <div className="budget-planner__expenses-table-container">
-            <table className="budget-planner__expenses-table">
-              <thead>
-                <tr>
-                  <th onClick={() => sortBy('date')}>
-                    {t('budgetPlanner.date')}
-                    {sortKey === 'date' && (
-                      <span className="sort-icon">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => sortBy('description')}>
-                    {t('budgetPlanner.description')}
-                    {sortKey === 'description' && (
-                      <span className="sort-icon">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => sortBy('category')}>
-                    {t('budgetPlanner.category')}
-                    {sortKey === 'category' && (
-                      <span className="sort-icon">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => sortBy('amount')}>
-                    {t('budgetPlanner.amount')}
-                    {sortKey === 'amount' && (
-                      <span className="sort-icon">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th>{t('budgetPlanner.status')}</th>
-                  <th>{t('budgetPlanner.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAndSortedExpenses.length > 0 ? (
-                  filteredAndSortedExpenses.map(expense => {
-                    const category = categories.find(c => c.id === expense.categoryId);
-                    
-                    return (
-                      <tr 
-                        key={expense.id}
-                        onClick={() => selectExpense(expense.id)}
-                        className={selectedExpense === expense.id ? 'selected' : ''}
-                      >
-                        <td>{formatDate(expense.date)}</td>
-                        <td>{expense.description}</td>
-                        <td>
-                          {category && (
-                            <span 
-                              className="category-tag"
-                              style={{ backgroundColor: category.color }}
-                            >
-                              {category.name}
-                            </span>
-                          )}
-                        </td>
-                        <td>{formatCurrency(expense.amount)}</td>
-                        <td>
-                          <span className={`status-badge ${expense.paid ? 'paid' : 'unpaid'}`}>
-                            {expense.paid ? t('budgetPlanner.paid') : t('budgetPlanner.unpaid')}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="expense-actions">
-                            <button 
-                              className="btn-icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                editExpense(expense.id);
-                              }}
-                            >
-                              <span role="img" aria-label="Edit">✏️</span>
-                            </button>
-                            
-                            <button 
-                              className="btn-icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Toggle bezahlt-Status
-                                setExpenses(expenses.map(e => 
-                                  e.id === expense.id 
-                                    ? { ...e, paid: !e.paid } 
-                                    : e
-                                ));
-                              }}
-                            >
-                              <span role="img" aria-label="Toggle Paid">
-                                {expense.paid ? '❌' : '✅'}
-                              </span>
-                            </button>
-                            
-                            <button 
-                              className="btn-icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteExpense(expense.id);
-                              }}
-                            >
-                              <span role="img" aria-label="Delete">🗑️</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="empty-state">
-                      {t('budgetPlanner.noExpensesFound')}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="budget-planner__category-progress">
+            <div className="budget-planner__category-progress-bar">
+              <div className="budget-planner__category-progress-fill" style={{ width: '80%' }}></div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="budget-planner__category">
+          <div className="budget-planner__category-header">
+            <div className="budget-planner__category-name">Dekoration</div>
+            <div className="budget-planner__category-amounts">
+              <span className="budget-planner__category-spent">€1.500</span>
+              <span className="budget-planner__category-separator">/</span>
+              <span className="budget-planner__category-budget">€2.250</span>
+            </div>
+          </div>
+          
+          <div className="budget-planner__category-progress">
+            <div className="budget-planner__category-progress-bar">
+              <div className="budget-planner__category-progress-fill" style={{ width: '67%' }}></div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="budget-planner__category">
+          <div className="budget-planner__category-header">
+            <div className="budget-planner__category-name">Kleidung</div>
+            <div className="budget-planner__category-amounts">
+              <span className="budget-planner__category-spent">€2.500</span>
+              <span className="budget-planner__category-separator">/</span>
+              <span className="budget-planner__category-budget">€3.000</span>
+            </div>
+          </div>
+          
+          <div className="budget-planner__category-progress">
+            <div className="budget-planner__category-progress-bar">
+              <div className="budget-planner__category-progress-fill" style={{ width: '83%' }}></div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="budget-planner__category">
+          <div className="budget-planner__category-header">
+            <div className="budget-planner__category-name">Sonstiges</div>
+            <div className="budget-planner__category-amounts">
+              <span className="budget-planner__category-spent">€750</span>
+              <span className="budget-planner__category-separator">/</span>
+              <span className="budget-planner__category-budget">€1.500</span>
+            </div>
+          </div>
+          
+          <div className="budget-planner__category-progress">
+            <div className="budget-planner__category-progress-bar">
+              <div className="budget-planner__category-progress-fill" style={{ width: '50%' }}></div>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Hier könnten die Modals für Ausgabe hinzufügen/bearbeiten und Kategorie hinzufügen/bearbeiten implementiert werden */}
+      <div className="budget-planner__controls">
+        <button className="budget-planner__button budget-planner__button--disabled">Ausgabe hinzufügen</button>
+        <button className="budget-planner__button budget-planner__button--disabled">Kategorie hinzufügen</button>
+        <button className="budget-planner__button budget-planner__button--disabled">Bericht exportieren</button>
+      </div>
+      
+      <style jsx>{`
+        .budget-planner {
+          padding: 2rem;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+        }
+        
+        .budget-planner__demo-notice {
+          background-color: #fff3cd;
+          border: 1px solid #ffeeba;
+          border-radius: 4px;
+          padding: 1rem;
+          margin-bottom: 2rem;
+        }
+        
+        .budget-planner__demo-notice p {
+          margin-top: 0;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+        
+        .budget-planner__demo-notice ul {
+          margin: 0;
+          padding-left: 1.5rem;
+        }
+        
+        .budget-planner__overview {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 2rem;
+          margin-bottom: 2rem;
+        }
+        
+        .budget-planner__total {
+          flex: 1;
+          min-width: 300px;
+          background-color: white;
+          border-radius: 8px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .budget-planner__total-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+        }
+        
+        .budget-planner__total-header h3 {
+          margin: 0;
+          font-size: 1.2rem;
+          color: #333;
+        }
+        
+        .budget-planner__total-amount {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #333;
+        }
+        
+        .budget-planner__progress {
+          margin-bottom: 1rem;
+        }
+        
+        .budget-planner__progress-bar {
+          height: 10px;
+          background-color: #f0f0f0;
+          border-radius: 5px;
+          overflow: hidden;
+          margin-bottom: 0.5rem;
+        }
+        
+        .budget-planner__progress-fill {
+          height: 100%;
+          background-color: #ffbd00;
+          border-radius: 5px;
+        }
+        
+        .budget-planner__progress-labels {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.9rem;
+          color: #666;
+        }
+        
+        .budget-planner__chart {
+          flex: 1;
+          min-width: 300px;
+          background-color: white;
+          border-radius: 8px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .budget-planner__chart-placeholder {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 1.5rem;
+        }
+        
+        .budget-planner__pie-chart {
+          position: relative;
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
+          background-color: #f0f0f0;
+          overflow: hidden;
+        }
+        
+        .budget-planner__pie-segment {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          transform-origin: 50% 50%;
+        }
+        
+        .budget-planner__pie-segment--1 {
+          background-color: #ffbd00;
+          clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 60%, 50% 50%);
+        }
+        
+        .budget-planner__pie-segment--2 {
+          background-color: #ff9500;
+          clip-path: polygon(50% 50%, 100% 60%, 100% 100%, 60% 100%, 50% 50%);
+        }
+        
+        .budget-planner__pie-segment--3 {
+          background-color: #00a699;
+          clip-path: polygon(50% 50%, 60% 100%, 0% 100%, 0% 70%, 50% 50%);
+        }
+        
+        .budget-planner__pie-segment--4 {
+          background-color: #ff5a5f;
+          clip-path: polygon(50% 50%, 0% 70%, 0% 0%, 30% 0%, 50% 50%);
+        }
+        
+        .budget-planner__pie-segment--5 {
+          background-color: #7a5195;
+          clip-path: polygon(50% 50%, 30% 0%, 50% 0%, 50% 50%);
+        }
+        
+        .budget-planner__chart-legend {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+        }
+        
+        .budget-planner__legend-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+          color: #666;
+        }
+        
+        .budget-planner__legend-color {
+          width: 12px;
+          height: 12px;
+          border-radius: 2px;
+        }
+        
+        .budget-planner__legend-color--1 {
+          background-color: #ffbd00;
+        }
+        
+        .budget-planner__legend-color--2 {
+          background-color: #ff9500;
+        }
+        
+        .budget-planner__legend-color--3 {
+          background-color: #00a699;
+        }
+        
+        .budget-planner__legend-color--4 {
+          background-color: #ff5a5f;
+        }
+        
+        .budget-planner__legend-color--5 {
+          background-color: #7a5195;
+        }
+        
+        .budget-planner__categories {
+          background-color: white;
+          border-radius: 8px;
+          padding: 1.5rem;
+          margin-bottom: 2rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .budget-planner__categories h3 {
+          margin-top: 0;
+          margin-bottom: 1.5rem;
+          font-size: 1.2rem;
+          color: #333;
+        }
+        
+        .budget-planner__category {
+          margin-bottom: 1.5rem;
+        }
+        
+        .budget-planner__category:last-child {
+          margin-bottom: 0;
+        }
+        
+        .budget-planner__category-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+        }
+        
+        .budget-planner__category-name {
+          font-weight: 500;
+          color: #333;
+        }
+        
+        .budget-planner__category-amounts {
+          font-size: 0.9rem;
+          color: #666;
+        }
+        
+        .budget-planner__category-spent {
+          font-weight: 500;
+        }
+        
+        .budget-planner__category-separator {
+          margin: 0 0.25rem;
+          color: #ccc;
+        }
+        
+        .budget-planner__category-progress-bar {
+          height: 8px;
+          background-color: #f0f0f0;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        
+        .budget-planner__category-progress-fill {
+          height: 100%;
+          background-color: #ffbd00;
+          border-radius: 4px;
+        }
+        
+        .budget-planner__controls {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          background-color: white;
+          border-radius: 8px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .budget-planner__button {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 4px;
+          background-color: #ffbd00;
+          color: white;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
+        
+        .budget-planner__button:hover {
+          background-color: #e6a800;
+        }
+        
+        .budget-planner__button--disabled {
+          background-color: #ddd;
+          color: #666;
+          cursor: not-allowed;
+        }
+        
+        .budget-planner__button--disabled:hover {
+          background-color: #ddd;
+        }
+        
+        @media (max-width: 768px) {
+          .budget-planner__overview {
+            flex-direction: column;
+          }
+          
+          .budget-planner__controls {
+            flex-direction: column;
+          }
+        }
+      `}</style>
     </div>
   );
 };
