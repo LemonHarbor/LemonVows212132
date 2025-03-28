@@ -1,279 +1,140 @@
-import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
+// src/lib/monetization.ts
+// Pricing plans for LemonVows
 
-// Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export interface PricingFeature {
+  name: string;
+  included: boolean;
+  description?: string;
+}
 
-// Stripe client
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
-export const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
-});
+export interface PricingPlan {
+  id: string;
+  name: string;
+  price: {
+    monthly: number | null;
+    yearly: number | null;
+    oneTime: number | null;
+  };
+  description: string;
+  features: PricingFeature[];
+  popular?: boolean;
+  maxGuests: number;
+  buttonText: string;
+  buttonVariant: 'default' | 'secondary' | 'ghost';
+}
 
-// Preisdefinitionen
-export const PRICING_PLANS = {
-  FREE: {
+export const PRICING_PLANS: PricingPlan[] = [
+  {
     id: 'free',
     name: 'Free',
-    description: 'Für kleine Hochzeiten mit bis zu 10 Gästen',
-    price: 0,
-    currency: 'EUR',
-    features: [
-      'Gästeverwaltung (bis 10 Gäste)',
-      'Einfacher Tischplan',
-      'RSVP-Funktion',
-      'Einfache Budgetverwaltung',
-    ],
-    limits: {
-      guests: 10,
-      tables: 3,
-      budget_categories: 5,
-      photos: 20,
+    price: {
+      monthly: null,
+      yearly: null,
+      oneTime: 0
     },
-    stripe_price_id: null, // Kein Stripe-Preis für kostenlosen Plan
+    description: 'Perfekt für kleine Hochzeiten mit wenigen Gästen.',
+    maxGuests: 10,
+    buttonText: 'Kostenlos starten',
+    buttonVariant: 'default',
+    features: [
+      { name: 'RSVP-System', included: true },
+      { name: 'Einfache To-Do-Listen', included: true },
+      { name: 'Basis-Tischplan', included: true },
+      { name: 'Gästeverwaltung (max. 10 Gäste)', included: true },
+      { name: 'Budgetplaner', included: false },
+      { name: 'Erweiterte Tischplanung', included: false },
+      { name: 'Moodboards', included: false },
+      { name: 'Foto-Galerie', included: false },
+      { name: 'Musikwünsche & Abstimmung', included: false },
+      { name: 'White-Label', included: false }
+    ]
   },
-  BASIC: {
+  {
     id: 'basic',
     name: 'Basic',
-    description: 'Für mittelgroße Hochzeiten mit bis zu 50 Gästen',
-    price: 9.99,
-    currency: 'EUR',
-    features: [
-      'Gästeverwaltung (bis 50 Gäste)',
-      'Erweiterter Tischplan',
-      'RSVP-Funktion mit Menüauswahl',
-      'Detaillierte Budgetverwaltung',
-      'Einfaches Moodboard',
-      'Foto-Galerie (100 Fotos)',
-    ],
-    limits: {
-      guests: 50,
-      tables: 10,
-      budget_categories: 10,
-      photos: 100,
+    price: {
+      monthly: 12.99,
+      yearly: null,
+      oneTime: 49.99
     },
-    stripe_price_id: 'price_basic', // Wird später mit echtem Stripe-Preis ersetzt
+    description: 'Ideal für mittelgroße Hochzeiten mit allen wichtigen Funktionen.',
+    maxGuests: 50,
+    buttonText: 'Basic wählen',
+    buttonVariant: 'default',
+    features: [
+      { name: 'RSVP-System', included: true },
+      { name: 'Erweiterte To-Do-Listen', included: true },
+      { name: 'Budgetplaner', included: true },
+      { name: 'Einfacher Tischplan', included: true },
+      { name: 'Gästeverwaltung (max. 50 Gäste)', included: true },
+      { name: 'Musikwünsche & Abstimmung', included: true },
+      { name: 'Einfache Foto-Galerie', included: true },
+      { name: 'Hochzeits-Zeitplaner', included: true },
+      { name: 'Moodboards', included: false },
+      { name: 'White-Label', included: false }
+    ]
   },
-  PREMIUM: {
+  {
     id: 'premium',
     name: 'Premium',
-    description: 'Für größere Hochzeiten mit unbegrenzter Gästeanzahl',
-    price: 19.99,
-    currency: 'EUR',
-    features: [
-      'Unbegrenzte Gästeverwaltung',
-      'Professioneller Tischplan mit Konfliktwarnung',
-      'Erweiterte RSVP-Funktion mit Allergien und Übernachtungsbedarf',
-      'Umfassende Budgetverwaltung mit Echtzeit-Übersicht',
-      'Erweitertes Moodboard mit Pinterest-Integration',
-      'Foto-Galerie (500 Fotos)',
-      'Musikwünsche mit Voting-Funktion',
-      'Automatischer Hochzeits-Zeitplaner',
-    ],
-    limits: {
-      guests: -1, // Unbegrenzt
-      tables: -1, // Unbegrenzt
-      budget_categories: 20,
-      photos: 500,
+    price: {
+      monthly: 29.99,
+      yearly: null,
+      oneTime: 149.99
     },
-    stripe_price_id: 'price_premium', // Wird später mit echtem Stripe-Preis ersetzt
+    description: 'Für anspruchsvolle Paare mit allen Premium-Funktionen.',
+    maxGuests: null, // Unbegrenzt
+    popular: true,
+    buttonText: 'Premium wählen',
+    buttonVariant: 'secondary',
+    features: [
+      { name: 'RSVP-System', included: true },
+      { name: 'Erweiterte To-Do-Listen', included: true },
+      { name: 'Budgetplaner', included: true },
+      { name: 'Kompletter Tischplan mit allen Features', included: true },
+      { name: 'Gästeverwaltung (unbegrenzte Gäste)', included: true },
+      { name: 'Musikwünsche & Abstimmung', included: true },
+      { name: 'Erweiterte Foto-Galerie', included: true },
+      { name: 'Hochzeits-Zeitplaner mit Erinnerungen', included: true },
+      { name: 'Moodboards mit Pinterest-Integration', included: true },
+      { name: 'AI-gestützter Hochzeitsredengenerator', included: true },
+      { name: 'Trauzeugen-Bereich', included: true },
+      { name: 'White-Label', included: false }
+    ]
   },
-  ULTIMATE: {
+  {
     id: 'ultimate',
     name: 'Ultimate',
-    description: 'Die komplette Lösung mit White-Labeling und allen Funktionen',
-    price: 29.99,
-    currency: 'EUR',
-    features: [
-      'Alle Premium-Funktionen',
-      'White-Labeling (eigenes Logo und Farben)',
-      'Unbegrenzte Fotos und Dateien',
-      'Prioritäts-Support',
-      'Erweiterte Statistiken und Berichte',
-      'Mehrsprachige Gästeansicht (DE, EN, FR, ES)',
-      'Eigene Domain-Integration',
-    ],
-    limits: {
-      guests: -1, // Unbegrenzt
-      tables: -1, // Unbegrenzt
-      budget_categories: -1, // Unbegrenzt
-      photos: -1, // Unbegrenzt
+    price: {
+      monthly: null,
+      yearly: null,
+      oneTime: 299.99
     },
-    stripe_price_id: 'price_ultimate', // Wird später mit echtem Stripe-Preis ersetzt
-  },
-};
+    description: 'Das komplette Paket mit allen Funktionen und White-Label.',
+    maxGuests: null, // Unbegrenzt
+    buttonText: 'Ultimate wählen',
+    buttonVariant: 'default',
+    features: [
+      { name: 'Alle Premium-Funktionen', included: true },
+      { name: 'White-Label (keine LemonVows-Branding)', included: true },
+      { name: 'NFT-Gästebuch', included: true },
+      { name: 'VIP-Support', included: true },
+      { name: 'Personalisiertes Fotoalbum', included: true }
+    ]
+  }
+];
 
-// Funktionen für die Stripe-Integration
-export const stripeApi = {
-  // Checkout-Session erstellen
-  createCheckoutSession: async (userId: string, planId: string, successUrl: string, cancelUrl: string) => {
-    const plan = PRICING_PLANS[planId.toUpperCase()];
-    
-    if (!plan || !plan.stripe_price_id) {
-      throw new Error('Ungültiger Plan oder kostenloser Plan');
-    }
-    
-    try {
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price: plan.stripe_price_id,
-            quantity: 1,
-          },
-        ],
-        mode: 'subscription',
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        client_reference_id: userId,
-        metadata: {
-          userId,
-          planId,
-        },
-      });
-      
-      return { sessionId: session.id, url: session.url };
-    } catch (error) {
-      console.error('Fehler beim Erstellen der Checkout-Session:', error);
-      throw error;
-    }
+export const ADD_ONS = [
+  {
+    id: 'white-label',
+    name: 'White Label',
+    price: 49.99,
+    description: 'Entfernen Sie das LemonVows-Branding und nutzen Sie Ihre eigene Marke.'
   },
-  
-  // Abonnement verwalten
-  createPortalSession: async (customerId: string, returnUrl: string) => {
-    try {
-      const session = await stripe.billingPortal.sessions.create({
-        customer: customerId,
-        return_url: returnUrl,
-      });
-      
-      return { url: session.url };
-    } catch (error) {
-      console.error('Fehler beim Erstellen der Portal-Session:', error);
-      throw error;
-    }
-  },
-  
-  // Webhook-Handler für Stripe-Events
-  handleWebhookEvent: async (event: any) => {
-    const { type, data } = event;
-    
-    switch (type) {
-      case 'checkout.session.completed': {
-        const session = data.object;
-        const { userId, planId } = session.metadata;
-        
-        // Benutzer-Abonnement in der Datenbank aktualisieren
-        await supabase
-          .from('subscriptions')
-          .upsert({
-            user_id: userId,
-            plan_id: planId,
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
-            status: 'active',
-            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 Tage ab jetzt
-          });
-        
-        break;
-      }
-      
-      case 'customer.subscription.updated': {
-        const subscription = data.object;
-        
-        // Abonnement in der Datenbank aktualisieren
-        const { data: subscriptionData, error } = await supabase
-          .from('subscriptions')
-          .select('user_id')
-          .eq('stripe_subscription_id', subscription.id)
-          .single();
-        
-        if (error || !subscriptionData) {
-          console.error('Abonnement nicht gefunden:', error);
-          break;
-        }
-        
-        await supabase
-          .from('subscriptions')
-          .update({
-            status: subscription.status,
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-          })
-          .eq('stripe_subscription_id', subscription.id);
-        
-        break;
-      }
-      
-      case 'customer.subscription.deleted': {
-        const subscription = data.object;
-        
-        // Abonnement in der Datenbank als gekündigt markieren
-        await supabase
-          .from('subscriptions')
-          .update({
-            status: 'canceled',
-          })
-          .eq('stripe_subscription_id', subscription.id);
-        
-        break;
-      }
-    }
-  },
-};
-
-// Funktionen für die Abonnementverwaltung
-export const subscriptionApi = {
-  // Aktuellen Plan eines Benutzers abrufen
-  getUserPlan: async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .single();
-      
-      if (error || !data) {
-        // Wenn kein aktives Abonnement gefunden wurde, wird der kostenlose Plan zurückgegeben
-        return PRICING_PLANS.FREE;
-      }
-      
-      return PRICING_PLANS[data.plan_id.toUpperCase()] || PRICING_PLANS.FREE;
-    } catch (error) {
-      console.error('Fehler beim Abrufen des Benutzerplans:', error);
-      return PRICING_PLANS.FREE;
-    }
-  },
-  
-  // Prüfen, ob ein Benutzer ein bestimmtes Feature nutzen darf
-  canUseFeature: async (userId: string, feature: string) => {
-    const plan = await subscriptionApi.getUserPlan(userId);
-    
-    // Hier können spezifische Feature-Prüfungen implementiert werden
-    // Für jetzt geben wir einfach true zurück, wenn der Benutzer einen Premium- oder Ultimate-Plan hat
-    return plan.id === 'premium' || plan.id === 'ultimate';
-  },
-  
-  // Prüfen, ob ein Benutzer ein bestimmtes Limit überschritten hat
-  checkLimit: async (userId: string, limitType: string, currentCount: number) => {
-    const plan = await subscriptionApi.getUserPlan(userId);
-    const limit = plan.limits[limitType];
-    
-    // -1 bedeutet unbegrenzt
-    if (limit === -1) {
-      return true;
-    }
-    
-    return currentCount < limit;
-  },
-};
-
-export default {
-  supabase,
-  stripe,
-  PRICING_PLANS,
-  stripeApi,
-  subscriptionApi,
-};
+  {
+    id: 'mobile-app',
+    name: 'Mobile App',
+    price: 29.99,
+    description: 'Erhalten Sie Zugriff auf die native mobile App für iOS und Android.'
+  }
+];
