@@ -6,7 +6,8 @@
   NODE_VERSION = "20.18.0"
   NEXT_PRIVATE_TARGET = "static"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Remove the redirect that's causing issues with Next.js routing
+# [[redirects]]
+#   from = "/*"
+#   to = "/index.html"
+#   status = 200
