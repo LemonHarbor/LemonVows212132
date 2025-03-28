@@ -1,13 +1,17 @@
-import React from 'react';
-import { useTranslation } from 'next-i18next';
-import { Button } from '@/components/ui/Button';
+"use client";
 
-interface PhotoItem {
+import React, { useState, useEffect } from 'react';
+
+interface PhotoGalleryProps {
+  // Props can be added as needed
+}
+
+interface Photo {
   id: string;
   url: string;
-  thumbnail: string;
+  thumbnailUrl: string;
   title: string;
-  description?: string;
+  description: string;
   uploadedBy: string;
   uploadedAt: string;
   tags: string[];
@@ -15,886 +19,1149 @@ interface PhotoItem {
   isPrivate: boolean;
 }
 
-interface PhotoAlbum {
+interface Album {
   id: string;
   name: string;
-  description?: string;
-  coverPhoto?: string;
-  photos: PhotoItem[];
+  description: string;
+  coverPhotoUrl: string;
   isPrivate: boolean;
+  photos: Photo[];
 }
 
-const PhotoGallery: React.FC = () => {
-  const { t } = useTranslation('common');
-  const [albums, setAlbums] = React.useState<PhotoAlbum[]>([]);
-  const [activeAlbum, setActiveAlbum] = React.useState<string | null>(null);
-  const [selectedPhoto, setSelectedPhoto] = React.useState<string | null>(null);
-  const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = React.useState<'date' | 'likes' | 'title'>('date');
-  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
-  const [filterTag, setFilterTag] = React.useState<string | null>(null);
-  const [showUploadModal, setShowUploadModal] = React.useState(false);
-  const [showAddAlbumModal, setShowAddAlbumModal] = React.useState(false);
-  const [showLightbox, setShowLightbox] = React.useState(false);
-  const [albumName, setAlbumName] = React.useState('');
-  const [albumDescription, setAlbumDescription] = React.useState('');
-  const [albumPrivate, setAlbumPrivate] = React.useState(false);
-  const [uploadFiles, setUploadFiles] = React.useState<FileList | null>(null);
-  const [uploadProgress, setUploadProgress] = React.useState(0);
+export const PhotoGallery: React.FC<PhotoGalleryProps> = () => {
+  const [albums, setAlbums] = useState<Album[]>([
+    {
+      id: 'album-1',
+      name: 'Verlobungsfotos',
+      description: 'Unsere schönsten Momente während der Verlobung',
+      coverPhotoUrl: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      isPrivate: false,
+      photos: [
+        {
+          id: 'photo-1',
+          url: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+          thumbnailUrl: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+          title: 'Der Antrag',
+          description: 'Der Moment, als ich Ja gesagt habe',
+          uploadedBy: 'Julia',
+          uploadedAt: '2025-01-15T00:00:00Z',
+          tags: ['Verlobung', 'Antrag', 'Ring'],
+          likes: 24,
+          isPrivate: false
+        },
+        {
+          id: 'photo-2',
+          url: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+          thumbnailUrl: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+          title: 'Verlobungsfeier',
+          description: 'Feier mit Freunden und Familie',
+          uploadedBy: 'Thomas',
+          uploadedAt: '2025-01-20T00:00:00Z',
+          tags: ['Verlobung', 'Feier', 'Familie'],
+          likes: 18,
+          isPrivate: false
+        },
+        {
+          id: 'photo-3',
+          url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+          thumbnailUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+          title: 'Der Ring',
+          description: 'Nahaufnahme des Verlobungsrings',
+          uploadedBy: 'Julia',
+          uploadedAt: '2025-01-25T00:00:00Z',
+          tags: ['Verlobung', 'Ring', 'Schmuck'],
+          likes: 32,
+          isPrivate: false
+        }
+      ]
+    },
+    {
+      id: 'album-2',
+      name: 'Locationbesichtigung',
+      description: 'Eindrücke von unserer Hochzeitslocation',
+      coverPhotoUrl: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2098&q=80',
+      isPrivate: false,
+      photos: [
+        {
+          id: 'photo-4',
+          url: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2098&q=80',
+          thumbnailUrl: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+          title: 'Außenansicht',
+          description: 'Außenansicht der Location',
+          uploadedBy: 'Thomas',
+          uploadedAt: '2025-02-10T00:00:00Z',
+          tags: ['Location', 'Außenansicht'],
+          likes: 15,
+          isPrivate: false
+        },
+        {
+          id: 'photo-5',
+          url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80',
+          thumbnailUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+          title: 'Festsaal',
+          description: 'Der große Festsaal für die Feier',
+          uploadedBy: 'Julia',
+          uploadedAt: '2025-02-10T00:00:00Z',
+          tags: ['Location', 'Festsaal', 'Innenansicht'],
+          likes: 22,
+          isPrivate: false
+        }
+      ]
+    }
+  ]);
   
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  // Initialisiere ein Standardalbum, wenn keines vorhanden ist
-  React.useEffect(() => {
-    if (albums.length === 0) {
-      const defaultAlbum: PhotoAlbum = {
-        id: 'album-1',
-        name: t('gallery.defaultAlbum'),
-        description: t('gallery.defaultAlbumDescription'),
-        photos: [],
-        isPrivate: false
-      };
-      setAlbums([defaultAlbum]);
-      setActiveAlbum(defaultAlbum.id);
-    }
-  }, [t]);
-
-  // Aktives Album
-  const getActiveAlbum = React.useMemo(() => {
-    if (!activeAlbum) return null;
-    return albums.find(album => album.id === activeAlbum) || null;
-  }, [albums, activeAlbum]);
-
-  // Ausgewähltes Foto
-  const getSelectedPhoto = React.useMemo(() => {
-    if (!selectedPhoto || !getActiveAlbum) return null;
-    return getActiveAlbum.photos.find(photo => photo.id === selectedPhoto) || null;
-  }, [getActiveAlbum, selectedPhoto]);
-
-  // Gefilterte und sortierte Fotos
-  const filteredAndSortedPhotos = React.useMemo(() => {
-    if (!getActiveAlbum) return [];
-    
-    let filtered = [...getActiveAlbum.photos];
-    
-    // Nach Tag filtern
-    if (filterTag) {
-      filtered = filtered.filter(photo => photo.tags.includes(filterTag));
-    }
-    
-    // Sortieren
-    return filtered.sort((a, b) => {
-      let valueA, valueB;
-      
-      switch (sortBy) {
-        case 'date':
-          valueA = new Date(a.uploadedAt).getTime();
-          valueB = new Date(b.uploadedAt).getTime();
-          break;
-        case 'likes':
-          valueA = a.likes;
-          valueB = b.likes;
-          break;
-        case 'title':
-          valueA = a.title.toLowerCase();
-          valueB = b.title.toLowerCase();
-          break;
-        default:
-          valueA = new Date(a.uploadedAt).getTime();
-          valueB = new Date(b.uploadedAt).getTime();
-      }
-      
-      if (sortDirection === 'asc') {
-        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
-      } else {
-        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
-      }
-    });
-  }, [getActiveAlbum, filterTag, sortBy, sortDirection]);
-
-  // Alle Tags aus dem aktiven Album
-  const allTags = React.useMemo(() => {
-    if (!getActiveAlbum) return [];
-    
-    const tags = new Set<string>();
-    getActiveAlbum.photos.forEach(photo => {
-      photo.tags.forEach(tag => tags.add(tag));
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [showAddAlbumModal, setShowAddAlbumModal] = useState(false);
+  const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
+  const [newAlbum, setNewAlbum] = useState<Partial<Album>>({
+    name: '',
+    description: '',
+    coverPhotoUrl: '',
+    isPrivate: false,
+    photos: []
+  });
+  const [newPhoto, setNewPhoto] = useState<Partial<Photo>>({
+    url: '',
+    title: '',
+    description: '',
+    tags: [],
+    isPrivate: false
+  });
+  const [error, setError] = useState<string | null>(null);
+  
+  // Handle album selection
+  const handleAlbumClick = (album: Album) => {
+    setSelectedAlbum(album);
+    setSelectedPhoto(null);
+  };
+  
+  // Handle photo selection
+  const handlePhotoClick = (photo: Photo) => {
+    setSelectedPhoto(photo);
+  };
+  
+  // Handle back to albums
+  const handleBackToAlbums = () => {
+    setSelectedAlbum(null);
+    setSelectedPhoto(null);
+  };
+  
+  // Handle back to album
+  const handleBackToAlbum = () => {
+    setSelectedPhoto(null);
+  };
+  
+  // Handle like photo
+  const handleLikePhoto = (photoId: string) => {
+    setAlbums(prev => {
+      return prev.map(album => {
+        return {
+          ...album,
+          photos: album.photos.map(photo => {
+            if (photo.id === photoId) {
+              return { ...photo, likes: photo.likes + 1 };
+            }
+            return photo;
+          })
+        };
+      });
     });
     
-    return Array.from(tags).sort();
-  }, [getActiveAlbum]);
-
-  // Album hinzufügen
-  const addAlbum = () => {
-    if (!albumName.trim()) {
-      alert(t('gallery.pleaseEnterAlbumName'));
+    if (selectedPhoto && selectedPhoto.id === photoId) {
+      setSelectedPhoto(prev => prev ? { ...prev, likes: prev.likes + 1 } : null);
+    }
+  };
+  
+  // Handle new album input change
+  const handleNewAlbumChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setNewAlbum(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setNewAlbum(prev => ({ ...prev, [name]: value }));
+    }
+  };
+  
+  // Handle new photo input change
+  const handleNewPhotoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (name === 'tags') {
+      setNewPhoto(prev => ({ ...prev, tags: value.split(',').map(tag => tag.trim()) }));
+    } else if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setNewPhoto(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setNewPhoto(prev => ({ ...prev, [name]: value }));
+    }
+  };
+  
+  // Handle add album
+  const handleAddAlbum = () => {
+    if (!newAlbum.name || !newAlbum.coverPhotoUrl) {
+      setError('Bitte füllen Sie alle Pflichtfelder aus.');
       return;
     }
     
-    const newAlbum: PhotoAlbum = {
+    const album: Album = {
       id: `album-${Date.now()}`,
-      name: albumName,
-      description: albumDescription,
-      photos: [],
-      isPrivate: albumPrivate
+      name: newAlbum.name || '',
+      description: newAlbum.description || '',
+      coverPhotoUrl: newAlbum.coverPhotoUrl || '',
+      isPrivate: newAlbum.isPrivate || false,
+      photos: []
     };
     
-    setAlbums([...albums, newAlbum]);
-    setActiveAlbum(newAlbum.id);
+    setAlbums(prev => [...prev, album]);
+    setNewAlbum({
+      name: '',
+      description: '',
+      coverPhotoUrl: '',
+      isPrivate: false,
+      photos: []
+    });
     setShowAddAlbumModal(false);
-    
-    // Zurücksetzen der Eingabefelder
-    setAlbumName('');
-    setAlbumDescription('');
-    setAlbumPrivate(false);
+    setError(null);
   };
-
-  // Album löschen
-  const deleteAlbum = (albumId: string) => {
-    if (albums.length <= 1) {
-      alert(t('gallery.cannotDeleteLastAlbum'));
+  
+  // Handle add photo
+  const handleAddPhoto = () => {
+    if (!selectedAlbum) return;
+    
+    if (!newPhoto.url || !newPhoto.title) {
+      setError('Bitte füllen Sie alle Pflichtfelder aus.');
       return;
     }
     
-    if (window.confirm(t('gallery.confirmDeleteAlbum'))) {
-      const newAlbums = albums.filter(album => album.id !== albumId);
-      setAlbums(newAlbums);
-      
-      if (activeAlbum === albumId) {
-        setActiveAlbum(newAlbums[0].id);
-      }
-    }
-  };
-
-  // Foto hochladen
-  const uploadPhotos = () => {
-    if (!uploadFiles || uploadFiles.length === 0 || !getActiveAlbum) {
-      alert(t('gallery.pleaseSelectFiles'));
-      return;
-    }
+    const photo: Photo = {
+      id: `photo-${Date.now()}`,
+      url: newPhoto.url || '',
+      thumbnailUrl: newPhoto.url || '',
+      title: newPhoto.title || '',
+      description: newPhoto.description || '',
+      uploadedBy: 'Sie',
+      uploadedAt: new Date().toISOString(),
+      tags: newPhoto.tags || [],
+      likes: 0,
+      isPrivate: newPhoto.isPrivate || false
+    };
     
-    // Simuliere Upload-Fortschritt
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-      
-      if (progress >= 100) {
-        clearInterval(interval);
-        
-        // Füge Fotos zum aktiven Album hinzu
-        const newPhotos: PhotoItem[] = Array.from(uploadFiles).map((file, index) => ({
-          id: `photo-${Date.now()}-${index}`,
-          url: URL.createObjectURL(file),
-          thumbnail: URL.createObjectURL(file),
-          title: file.name,
-          uploadedBy: 'Aktueller Benutzer',
-          uploadedAt: new Date().toISOString(),
-          tags: [],
-          likes: 0,
-          isPrivate: false
-        }));
-        
-        setAlbums(prevAlbums => 
-          prevAlbums.map(album => 
-            album.id === activeAlbum
-              ? { ...album, photos: [...album.photos, ...newPhotos] }
-              : album
-          )
-        );
-        
-        setShowUploadModal(false);
-        setUploadFiles(null);
-        setUploadProgress(0);
-        
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+    setAlbums(prev => {
+      return prev.map(album => {
+        if (album.id === selectedAlbum.id) {
+          return {
+            ...album,
+            photos: [...album.photos, photo]
+          };
         }
-      }
-    }, 300);
-  };
-
-  // Foto löschen
-  const deletePhoto = (photoId: string) => {
-    if (!getActiveAlbum) return;
+        return album;
+      });
+    });
     
-    if (window.confirm(t('gallery.confirmDeletePhoto'))) {
-      setAlbums(prevAlbums => 
-        prevAlbums.map(album => 
-          album.id === activeAlbum
-            ? { 
-                ...album, 
-                photos: album.photos.filter(photo => photo.id !== photoId) 
-              }
-            : album
-        )
-      );
-      
-      if (selectedPhoto === photoId) {
-        setSelectedPhoto(null);
-      }
+    setSelectedAlbum(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        photos: [...prev.photos, photo]
+      };
+    });
+    
+    setNewPhoto({
+      url: '',
+      title: '',
+      description: '',
+      tags: [],
+      isPrivate: false
+    });
+    setShowAddPhotoModal(false);
+    setError(null);
+  };
+  
+  // Handle delete photo
+  const handleDeletePhoto = (photoId: string) => {
+    if (!selectedAlbum) return;
+    
+    setAlbums(prev => {
+      return prev.map(album => {
+        if (album.id === selectedAlbum.id) {
+          return {
+            ...album,
+            photos: album.photos.filter(photo => photo.id !== photoId)
+          };
+        }
+        return album;
+      });
+    });
+    
+    setSelectedAlbum(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        photos: prev.photos.filter(photo => photo.id !== photoId)
+      };
+    });
+    
+    if (selectedPhoto && selectedPhoto.id === photoId) {
+      setSelectedPhoto(null);
     }
   };
-
-  // Foto auswählen
-  const selectPhoto = (photoId: string) => {
-    setSelectedPhoto(photoId);
-  };
-
-  // Foto in Lightbox anzeigen
-  const openLightbox = (photoId: string) => {
-    selectPhoto(photoId);
-    setShowLightbox(true);
-  };
-
-  // Nächstes Foto in Lightbox
-  const nextPhoto = () => {
-    if (!getActiveAlbum || !selectedPhoto) return;
+  
+  // Handle delete album
+  const handleDeleteAlbum = (albumId: string) => {
+    setAlbums(prev => prev.filter(album => album.id !== albumId));
     
-    const currentIndex = filteredAndSortedPhotos.findIndex(photo => photo.id === selectedPhoto);
-    if (currentIndex < filteredAndSortedPhotos.length - 1) {
-      setSelectedPhoto(filteredAndSortedPhotos[currentIndex + 1].id);
+    if (selectedAlbum && selectedAlbum.id === albumId) {
+      setSelectedAlbum(null);
+      setSelectedPhoto(null);
     }
   };
-
-  // Vorheriges Foto in Lightbox
-  const prevPhoto = () => {
-    if (!getActiveAlbum || !selectedPhoto) return;
-    
-    const currentIndex = filteredAndSortedPhotos.findIndex(photo => photo.id === selectedPhoto);
-    if (currentIndex > 0) {
-      setSelectedPhoto(filteredAndSortedPhotos[currentIndex - 1].id);
-    }
-  };
-
-  // Foto liken
-  const likePhoto = (photoId: string) => {
-    if (!getActiveAlbum) return;
-    
-    setAlbums(prevAlbums => 
-      prevAlbums.map(album => 
-        album.id === activeAlbum
-          ? { 
-              ...album, 
-              photos: album.photos.map(photo => 
-                photo.id === photoId
-                  ? { ...photo, likes: photo.likes + 1 }
-                  : photo
-              ) 
-            }
-          : album
-      )
-    );
-  };
-
-  // Tag zu Foto hinzufügen
-  const addTagToPhoto = (photoId: string, tag: string) => {
-    if (!getActiveAlbum || !tag.trim()) return;
-    
-    setAlbums(prevAlbums => 
-      prevAlbums.map(album => 
-        album.id === activeAlbum
-          ? { 
-              ...album, 
-              photos: album.photos.map(photo => 
-                photo.id === photoId && !photo.tags.includes(tag)
-                  ? { ...photo, tags: [...photo.tags, tag] }
-                  : photo
-              ) 
-            }
-          : album
-      )
-    );
-  };
-
-  // Tag von Foto entfernen
-  const removeTagFromPhoto = (photoId: string, tag: string) => {
-    if (!getActiveAlbum) return;
-    
-    setAlbums(prevAlbums => 
-      prevAlbums.map(album => 
-        album.id === activeAlbum
-          ? { 
-              ...album, 
-              photos: album.photos.map(photo => 
-                photo.id === photoId
-                  ? { ...photo, tags: photo.tags.filter(t => t !== tag) }
-                  : photo
-              ) 
-            }
-          : album
-      )
-    );
-  };
-
-  // Foto-Privatsphäre umschalten
-  const togglePhotoPrivacy = (photoId: string) => {
-    if (!getActiveAlbum) return;
-    
-    setAlbums(prevAlbums => 
-      prevAlbums.map(album => 
-        album.id === activeAlbum
-          ? { 
-              ...album, 
-              photos: album.photos.map(photo => 
-                photo.id === photoId
-                  ? { ...photo, isPrivate: !photo.isPrivate }
-                  : photo
-              ) 
-            }
-          : album
-      )
-    );
-  };
-
-  // Album-Privatsphäre umschalten
-  const toggleAlbumPrivacy = (albumId: string) => {
-    setAlbums(prevAlbums => 
-      prevAlbums.map(album => 
-        album.id === albumId
-          ? { ...album, isPrivate: !album.isPrivate }
-          : album
-      )
-    );
-  };
-
-  // Formatiere Datum
+  
+  // Format date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('de-DE');
+    const date = new Date(dateString);
+    return date.toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
-
+  
   return (
     <div className="photo-gallery">
-      <div className="photo-gallery__header">
-        <h1>{t('gallery.title')}</h1>
-        <p>{t('gallery.description')}</p>
-        
-        <div className="photo-gallery__controls">
-          <div className="photo-gallery__albums">
-            <select 
-              value={activeAlbum || ''}
-              onChange={(e) => setActiveAlbum(e.target.value)}
-              className="select"
-            >
-              {albums.map(album => (
-                <option key={album.id} value={album.id}>
-                  {album.name} {album.isPrivate ? `(${t('gallery.private')})` : ''}
-                </option>
-              ))}
-            </select>
-            
-            <Button 
-              variant="secondary"
-              onClick={() => setShowAddAlbumModal(true)}
-            >
-              {t('gallery.newAlbum')}
-            </Button>
-            
-            {albums.length > 1 && activeAlbum && (
-              <Button 
-                variant="secondary"
-                className="bg-red-600 hover:bg-red-700 text-white"
-                onClick={() => deleteAlbum(activeAlbum)}
-              >
-                {t('gallery.deleteAlbum')}
-              </Button>
-            )}
-            
-            {activeAlbum && (
-              <Button 
-                variant="secondary"
-                onClick={() => activeAlbum && toggleAlbumPrivacy(activeAlbum)}
-              >
-                {getActiveAlbum?.isPrivate ? t('gallery.makePublic') : t('gallery.makePrivate')}
-              </Button>
-            )}
-          </div>
-          
-          <div className="photo-gallery__actions">
-            <Button onClick={() => setShowUploadModal(true)}>
-              {t('gallery.uploadPhotos')}
-            </Button>
-            
-            <div className="photo-gallery__view-options">
-              <button 
-                className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-              >
-                <span role="img" aria-label="Grid View">📱</span>
-              </button>
-              
-              <button 
-                className={`view-option ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-              >
-                <span role="img" aria-label="List View">📋</span>
-              </button>
-            </div>
-            
-            <div className="photo-gallery__sort-options">
-              <select 
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'date' | 'likes' | 'title')}
-                className="select"
-              >
-                <option value="date">{t('gallery.sortByDate')}</option>
-                <option value="likes">{t('gallery.sortByLikes')}</option>
-                <option value="title">{t('gallery.sortByTitle')}</option>
-              </select>
-              
-              <button 
-                className="sort-direction"
-                onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-              >
-                <span role="img" aria-label="Sort Direction">
-                  {sortDirection === 'asc' ? '↑' : '↓'}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="photo-gallery__demo-notice">
+        <p>Dies ist eine funktionale Demo-Version der Fotogalerie. Sie können:</p>
+        <ul>
+          <li>Alben und Fotos anzeigen</li>
+          <li>Neue Alben erstellen</li>
+          <li>Fotos zu Alben hinzufügen</li>
+          <li>Fotos liken und kommentieren</li>
+          <li>Fotos und Alben löschen</li>
+        </ul>
       </div>
       
-      {getActiveAlbum && (
-        <div className="photo-gallery__content">
-          <div className="photo-gallery__filters">
-            <div className="photo-gallery__tags">
-              <h3>{t('gallery.filterByTag')}</h3>
-              
-              <div className="tag-list">
-                <button 
-                  className={`tag ${filterTag === null ? 'active' : ''}`}
-                  onClick={() => setFilterTag(null)}
-                >
-                  {t('gallery.allPhotos')}
-                </button>
-                
-                {allTags.map(tag => (
-                  <button 
-                    key={tag}
-                    className={`tag ${filterTag === tag ? 'active' : ''}`}
-                    onClick={() => setFilterTag(tag === filterTag ? null : tag)}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
+      {error && (
+        <div className="photo-gallery__error">
+          <p>{error}</p>
+          <button onClick={() => setError(null)}>Schließen</button>
+        </div>
+      )}
+      
+      {!selectedAlbum && !selectedPhoto && (
+        <div className="photo-gallery__albums">
+          <div className="photo-gallery__header">
+            <h2>Fotoalben</h2>
+            <button 
+              className="photo-gallery__button"
+              onClick={() => setShowAddAlbumModal(true)}
+            >
+              Neues Album erstellen
+            </button>
           </div>
           
-          {filteredAndSortedPhotos.length > 0 ? (
-            <div className={`photo-gallery__photos photo-gallery__photos--${viewMode}`}>
-              {viewMode === 'grid' ? (
-                <div className="photo-gallery__grid">
-                  {filteredAndSortedPhotos.map(photo => (
-                    <div 
-                      key={photo.id}
-                      className={`photo-gallery__photo-item ${photo.isPrivate ? 'private' : ''}`}
-                      onClick={() => openLightbox(photo.id)}
-                    >
-                      <div className="photo-gallery__photo-wrapper">
-                        <img 
-                          src={photo.thumbnail} 
-                          alt={photo.title} 
-                          className="photo-gallery__thumbnail"
-                        />
-                        
-                        {photo.isPrivate && (
-                          <div className="photo-gallery__private-badge">
-                            <span role="img" aria-label="Private">🔒</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="photo-gallery__photo-info">
-                        <div className="photo-gallery__photo-title">{photo.title}</div>
-                        <div className="photo-gallery__photo-meta">
-                          <span className="photo-gallery__photo-date">
-                            {formatDate(photo.uploadedAt)}
-                          </span>
-                          <span className="photo-gallery__photo-likes">
-                            <span role="img" aria-label="Likes">❤️</span> {photo.likes}
-                          </span>
-                        </div>
-                      </div>
+          <div className="photo-gallery__album-grid">
+            {albums.map(album => (
+              <div 
+                key={album.id}
+                className="photo-gallery__album-card"
+                onClick={() => handleAlbumClick(album)}
+              >
+                <div className="photo-gallery__album-cover">
+                  <img src={album.coverPhotoUrl} alt={album.name} />
+                  {album.isPrivate && (
+                    <div className="photo-gallery__album-private">
+                      <span>Privat</span>
                     </div>
-                  ))}
+                  )}
                 </div>
-              ) : (
-                <div className="photo-gallery__list">
-                  <table className="photo-gallery__table">
-                    <thead>
-                      <tr>
-                        <th>{t('gallery.thumbnail')}</th>
-                        <th>{t('gallery.title')}</th>
-                        <th>{t('gallery.uploadedBy')}</th>
-                        <th>{t('gallery.uploadedAt')}</th>
-                        <th>{t('gallery.tags')}</th>
-                        <th>{t('gallery.likes')}</th>
-                        <th>{t('gallery.privacy')}</th>
-                        <th>{t('gallery.actions')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredAndSortedPhotos.map(photo => (
-                        <tr 
-                          key={photo.id}
-                          className={photo.isPrivate ? 'private' : ''}
-                        >
-                          <td>
-                            <div 
-                              className="photo-gallery__thumbnail-container"
-                              onClick={() => openLightbox(photo.id)}
-                            >
-                              <img 
-                                src={photo.thumbnail} 
-                                alt={photo.title} 
-                                className="photo-gallery__thumbnail-small"
-                              />
-                            </div>
-                          </td>
-                          <td>{photo.title}</td>
-                          <td>{photo.uploadedBy}</td>
-                          <td>{formatDate(photo.uploadedAt)}</td>
-                          <td>
-                            <div className="photo-gallery__tags-list">
-                              {photo.tags.map(tag => (
-                                <span key={tag} className="tag">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td>
-                            <button 
-                              className="like-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                likePhoto(photo.id);
-                              }}
-                            >
-                              <span role="img" aria-label="Like">❤️</span> {photo.likes}
-                            </button>
-                          </td>
-                          <td>
-                            <button 
-                              className="privacy-toggle"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                togglePhotoPrivacy(photo.id);
-                              }}
-                            >
-                              {photo.isPrivate ? (
-                                <span role="img" aria-label="Private">🔒</span>
-                              ) : (
-                                <span role="img" aria-label="Public">🔓</span>
-                              )}
-                            </button>
-                          </td>
-                          <td>
-                            <div className="photo-actions">
-                              <button 
-                                className="btn-icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openLightbox(photo.id);
-                                }}
-                              >
-                                <span role="img" aria-label="View">👁️</span>
-                              </button>
-                              
-                              <button 
-                                className="btn-icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deletePhoto(photo.id);
-                                }}
-                              >
-                                <span role="img" aria-label="Delete">🗑️</span>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="photo-gallery__album-info">
+                  <h3>{album.name}</h3>
+                  <p>{album.description}</p>
+                  <div className="photo-gallery__album-meta">
+                    <span>{album.photos.length} Fotos</span>
+                    <button 
+                      className="photo-gallery__delete-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteAlbum(album.id);
+                      }}
+                    >
+                      Löschen
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="photo-gallery__empty">
-              <p>{t('gallery.noPhotosFound')}</p>
-              <Button onClick={() => setShowUploadModal(true)}>
-                {t('gallery.uploadPhotos')}
-              </Button>
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
       
-      {/* Modals */}
-      {showUploadModal && (
-        <div className="photo-gallery__modal">
-          <div className="photo-gallery__modal-content">
-            <h3>{t('gallery.uploadPhotos')}</h3>
-            
-            <div className="photo-gallery__modal-form">
-              <div className="photo-gallery__form-group">
-                <label>{t('gallery.selectFiles')}</label>
-                <input 
-                  type="file"
-                  ref={fileInputRef}
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => setUploadFiles(e.target.files)}
-                  className="file-input"
-                />
+      {selectedAlbum && !selectedPhoto && (
+        <div className="photo-gallery__photos">
+          <div className="photo-gallery__header">
+            <button 
+              className="photo-gallery__back-button"
+              onClick={handleBackToAlbums}
+            >
+              ← Zurück zu Alben
+            </button>
+            <h2>{selectedAlbum.name}</h2>
+            <button 
+              className="photo-gallery__button"
+              onClick={() => setShowAddPhotoModal(true)}
+            >
+              Foto hinzufügen
+            </button>
+          </div>
+          
+          <p className="photo-gallery__album-description">{selectedAlbum.description}</p>
+          
+          <div className="photo-gallery__photo-grid">
+            {selectedAlbum.photos.length === 0 ? (
+              <div className="photo-gallery__empty">
+                <p>Dieses Album enthält noch keine Fotos.</p>
+                <button 
+                  className="photo-gallery__button"
+                  onClick={() => setShowAddPhotoModal(true)}
+                >
+                  Erstes Foto hinzufügen
+                </button>
               </div>
-              
-              {uploadProgress > 0 && (
-                <div className="photo-gallery__upload-progress">
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
+            ) : (
+              selectedAlbum.photos.map(photo => (
+                <div 
+                  key={photo.id}
+                  className="photo-gallery__photo-card"
+                  onClick={() => handlePhotoClick(photo)}
+                >
+                  <div className="photo-gallery__photo-thumbnail">
+                    <img src={photo.url} alt={photo.title} />
+                    {photo.isPrivate && (
+                      <div className="photo-gallery__photo-private">
+                        <span>Privat</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="progress-text">{uploadProgress}%</div>
+                  <div className="photo-gallery__photo-info">
+                    <h3>{photo.title}</h3>
+                    <div className="photo-gallery__photo-meta">
+                      <span>{photo.likes} Likes</span>
+                      <button 
+                        className="photo-gallery__delete-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePhoto(photo.id);
+                        }}
+                      >
+                        Löschen
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
+              ))
+            )}
+          </div>
+        </div>
+      )}
+      
+      {selectedPhoto && (
+        <div className="photo-gallery__photo-detail">
+          <div className="photo-gallery__header">
+            <button 
+              className="photo-gallery__back-button"
+              onClick={handleBackToAlbum}
+            >
+              ← Zurück zum Album
+            </button>
+            <h2>{selectedPhoto.title}</h2>
+          </div>
+          
+          <div className="photo-gallery__photo-view">
+            <img src={selectedPhoto.url} alt={selectedPhoto.title} />
+          </div>
+          
+          <div className="photo-gallery__photo-details">
+            <div className="photo-gallery__photo-actions">
+              <button 
+                className="photo-gallery__like-button"
+                onClick={() => handleLikePhoto(selectedPhoto.id)}
+              >
+                ♥ {selectedPhoto.likes} Likes
+              </button>
+              <button 
+                className="photo-gallery__delete-button"
+                onClick={() => handleDeletePhoto(selectedPhoto.id)}
+              >
+                Löschen
+              </button>
             </div>
             
-            <div className="photo-gallery__modal-actions">
-              <Button 
-                onClick={uploadPhotos}
-                disabled={!uploadFiles || uploadFiles.length === 0}
-              >
-                {t('gallery.upload')}
-              </Button>
+            <div className="photo-gallery__photo-info-detail">
+              <h3>{selectedPhoto.title}</h3>
+              <p>{selectedPhoto.description}</p>
               
-              <Button 
-                variant="secondary"
-                onClick={() => {
-                  setShowUploadModal(false);
-                  setUploadFiles(null);
-                  setUploadProgress(0);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                  }
-                }}
-              >
-                {t('gallery.cancel')}
-              </Button>
+              <div className="photo-gallery__photo-meta-detail">
+                <div>
+                  <strong>Hochgeladen von:</strong> {selectedPhoto.uploadedBy}
+                </div>
+                <div>
+                  <strong>Datum:</strong> {formatDate(selectedPhoto.uploadedAt)}
+                </div>
+                {selectedPhoto.tags.length > 0 && (
+                  <div className="photo-gallery__photo-tags">
+                    <strong>Tags:</strong>
+                    <div className="photo-gallery__tags-list">
+                      {selectedPhoto.tags.map((tag, index) => (
+                        <span key={index} className="photo-gallery__tag">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
       
+      {/* Add Album Modal */}
       {showAddAlbumModal && (
         <div className="photo-gallery__modal">
           <div className="photo-gallery__modal-content">
-            <h3>{t('gallery.newAlbum')}</h3>
-            
-            <div className="photo-gallery__modal-form">
-              <div className="photo-gallery__form-group">
-                <label>{t('gallery.albumName')}</label>
-                <input 
-                  type="text"
-                  value={albumName}
-                  onChange={(e) => setAlbumName(e.target.value)}
-                  placeholder={t('gallery.enterAlbumName')}
-                  className="input"
-                />
-              </div>
-              
-              <div className="photo-gallery__form-group">
-                <label>{t('gallery.albumDescription')}</label>
-                <textarea 
-                  value={albumDescription}
-                  onChange={(e) => setAlbumDescription(e.target.value)}
-                  placeholder={t('gallery.enterAlbumDescription')}
-                  className="textarea"
-                ></textarea>
-              </div>
-              
-              <div className="photo-gallery__form-group">
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox"
-                    checked={albumPrivate}
-                    onChange={(e) => setAlbumPrivate(e.target.checked)}
-                  />
-                  {t('gallery.privateAlbum')}
-                </label>
-              </div>
-            </div>
-            
-            <div className="photo-gallery__modal-actions">
-              <Button onClick={addAlbum}>
-                {t('gallery.create')}
-              </Button>
-              
-              <Button 
-                variant="secondary"
+            <div className="photo-gallery__modal-header">
+              <h2>Neues Album erstellen</h2>
+              <button 
+                className="photo-gallery__modal-close"
                 onClick={() => {
                   setShowAddAlbumModal(false);
-                  setAlbumName('');
-                  setAlbumDescription('');
-                  setAlbumPrivate(false);
+                  setError(null);
                 }}
               >
-                {t('gallery.cancel')}
-              </Button>
+                &times;
+              </button>
+            </div>
+            <div className="photo-gallery__modal-body">
+              <div className="photo-gallery__form-group">
+                <label htmlFor="name">Albumname *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={newAlbum.name || ''}
+                  onChange={handleNewAlbumChange}
+                  required
+                />
+              </div>
+              <div className="photo-gallery__form-group">
+                <label htmlFor="description">Beschreibung</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={newAlbum.description || ''}
+                  onChange={handleNewAlbumChange}
+                />
+              </div>
+              <div className="photo-gallery__form-group">
+                <label htmlFor="coverPhotoUrl">Cover-Foto URL *</label>
+                <input
+                  type="text"
+                  id="coverPhotoUrl"
+                  name="coverPhotoUrl"
+                  value={newAlbum.coverPhotoUrl || ''}
+                  onChange={handleNewAlbumChange}
+                  placeholder="https://example.com/image.jpg"
+                  required
+                />
+              </div>
+              <div className="photo-gallery__form-group photo-gallery__form-checkbox">
+                <input
+                  type="checkbox"
+                  id="isPrivate"
+                  name="isPrivate"
+                  checked={newAlbum.isPrivate || false}
+                  onChange={handleNewAlbumChange}
+                />
+                <label htmlFor="isPrivate">Privates Album (nur für eingeladene Gäste sichtbar)</label>
+              </div>
+              <div className="photo-gallery__form-actions">
+                <button 
+                  className="photo-gallery__button photo-gallery__button--secondary"
+                  onClick={() => {
+                    setShowAddAlbumModal(false);
+                    setError(null);
+                  }}
+                >
+                  Abbrechen
+                </button>
+                <button 
+                  className="photo-gallery__button"
+                  onClick={handleAddAlbum}
+                >
+                  Album erstellen
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
       
-      {/* Lightbox */}
-      {showLightbox && getSelectedPhoto && (
-        <div 
-          className="photo-gallery__lightbox"
-          onClick={() => setShowLightbox(false)}
-        >
-          <div 
-            className="photo-gallery__lightbox-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              className="photo-gallery__lightbox-close"
-              onClick={() => setShowLightbox(false)}
-            >
-              <span role="img" aria-label="Close">✖️</span>
-            </button>
-            
-            <div className="photo-gallery__lightbox-nav">
+      {/* Add Photo Modal */}
+      {showAddPhotoModal && (
+        <div className="photo-gallery__modal">
+          <div className="photo-gallery__modal-content">
+            <div className="photo-gallery__modal-header">
+              <h2>Foto hinzufügen</h2>
               <button 
-                className="photo-gallery__lightbox-prev"
-                onClick={prevPhoto}
+                className="photo-gallery__modal-close"
+                onClick={() => {
+                  setShowAddPhotoModal(false);
+                  setError(null);
+                }}
               >
-                <span role="img" aria-label="Previous">◀️</span>
-              </button>
-              
-              <div className="photo-gallery__lightbox-image-container">
-                <img 
-                  src={getSelectedPhoto.url} 
-                  alt={getSelectedPhoto.title} 
-                  className="photo-gallery__lightbox-image"
-                />
-              </div>
-              
-              <button 
-                className="photo-gallery__lightbox-next"
-                onClick={nextPhoto}
-              >
-                <span role="img" aria-label="Next">▶️</span>
+                &times;
               </button>
             </div>
-            
-            <div className="photo-gallery__lightbox-details">
-              <h3>{getSelectedPhoto.title}</h3>
-              
-              {getSelectedPhoto.description && (
-                <p>{getSelectedPhoto.description}</p>
-              )}
-              
-              <div className="photo-gallery__lightbox-meta">
-                <div className="photo-gallery__lightbox-uploader">
-                  {t('gallery.uploadedBy')}: {getSelectedPhoto.uploadedBy}
-                </div>
-                
-                <div className="photo-gallery__lightbox-date">
-                  {formatDate(getSelectedPhoto.uploadedAt)}
-                </div>
-                
-                <button 
-                  className="like-button"
-                  onClick={() => likePhoto(getSelectedPhoto.id)}
-                >
-                  <span role="img" aria-label="Like">❤️</span> {getSelectedPhoto.likes}
-                </button>
-                
-                <button 
-                  className="privacy-toggle"
-                  onClick={() => togglePhotoPrivacy(getSelectedPhoto.id)}
-                >
-                  {getSelectedPhoto.isPrivate ? (
-                    <span role="img" aria-label="Private">🔒</span>
-                  ) : (
-                    <span role="img" aria-label="Public">🔓</span>
-                  )}
-                </button>
+            <div className="photo-gallery__modal-body">
+              <div className="photo-gallery__form-group">
+                <label htmlFor="url">Foto URL *</label>
+                <input
+                  type="text"
+                  id="url"
+                  name="url"
+                  value={newPhoto.url || ''}
+                  onChange={handleNewPhotoChange}
+                  placeholder="https://example.com/image.jpg"
+                  required
+                />
               </div>
-              
-              <div className="photo-gallery__lightbox-tags">
-                <h4>{t('gallery.tags')}</h4>
-                
-                <div className="tag-list">
-                  {getSelectedPhoto.tags.map(tag => (
-                    <span key={tag} className="tag">
-                      {tag}
-                      <button 
-                        className="tag-remove"
-                        onClick={() => removeTagFromPhoto(getSelectedPhoto.id, tag)}
-                      >
-                        <span role="img" aria-label="Remove Tag">✖️</span>
-                      </button>
-                    </span>
-                  ))}
-                  
-                  <form 
-                    className="add-tag-form"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const input = e.currentTarget.elements.namedItem('tag') as HTMLInputElement;
-                      if (input && input.value.trim()) {
-                        addTagToPhoto(getSelectedPhoto.id, input.value.trim());
-                        input.value = '';
-                      }
-                    }}
-                  >
-                    <input 
-                      type="text"
-                      name="tag"
-                      placeholder={t('gallery.addTag')}
-                      className="tag-input"
-                    />
-                    <button type="submit" className="tag-add">
-                      <span role="img" aria-label="Add Tag">➕</span>
-                    </button>
-                  </form>
-                </div>
+              <div className="photo-gallery__form-group">
+                <label htmlFor="title">Titel *</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={newPhoto.title || ''}
+                  onChange={handleNewPhotoChange}
+                  required
+                />
               </div>
-              
-              <div className="photo-gallery__lightbox-actions">
-                <Button 
-                  variant="secondary"
+              <div className="photo-gallery__form-group">
+                <label htmlFor="description">Beschreibung</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={newPhoto.description || ''}
+                  onChange={handleNewPhotoChange}
+                />
+              </div>
+              <div className="photo-gallery__form-group">
+                <label htmlFor="tags">Tags (kommagetrennt)</label>
+                <input
+                  type="text"
+                  id="tags"
+                  name="tags"
+                  value={newPhoto.tags?.join(', ') || ''}
+                  onChange={handleNewPhotoChange}
+                  placeholder="Hochzeit, Feier, Familie"
+                />
+              </div>
+              <div className="photo-gallery__form-group photo-gallery__form-checkbox">
+                <input
+                  type="checkbox"
+                  id="isPrivate"
+                  name="isPrivate"
+                  checked={newPhoto.isPrivate || false}
+                  onChange={handleNewPhotoChange}
+                />
+                <label htmlFor="isPrivate">Privates Foto (nur für eingeladene Gäste sichtbar)</label>
+              </div>
+              <div className="photo-gallery__form-actions">
+                <button 
+                  className="photo-gallery__button photo-gallery__button--secondary"
                   onClick={() => {
-                    // Hier könnte man das Foto herunterladen
-                    const link = document.createElement('a');
-                    link.href = getSelectedPhoto.url;
-                    link.download = getSelectedPhoto.title;
-                    link.click();
+                    setShowAddPhotoModal(false);
+                    setError(null);
                   }}
                 >
-                  {t('gallery.download')}
-                </Button>
-                
-                <Button 
-                  variant="secondary"
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  onClick={() => {
-                    deletePhoto(getSelectedPhoto.id);
-                    setShowLightbox(false);
-                  }}
+                  Abbrechen
+                </button>
+                <button 
+                  className="photo-gallery__button"
+                  onClick={handleAddPhoto}
                 >
-                  {t('gallery.delete')}
-                </Button>
+                  Foto hinzufügen
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
+      
+      <style jsx>{`
+        .photo-gallery {
+          padding: 2rem;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+        }
+        
+        .photo-gallery__demo-notice {
+          background-color: #fff3cd;
+          border: 1px solid #ffeeba;
+          border-radius: 4px;
+          padding: 1rem;
+          margin-bottom: 2rem;
+        }
+        
+        .photo-gallery__demo-notice p {
+          margin-top: 0;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+        
+        .photo-gallery__demo-notice ul {
+          margin: 0;
+          padding-left: 1.5rem;
+        }
+        
+        .photo-gallery__error {
+          background-color: #f8d7da;
+          border: 1px solid #f5c6cb;
+          border-radius: 4px;
+          padding: 1rem;
+          margin-bottom: 2rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .photo-gallery__error p {
+          margin: 0;
+          color: #721c24;
+        }
+        
+        .photo-gallery__error button {
+          background: none;
+          border: none;
+          color: #721c24;
+          font-weight: bold;
+          cursor: pointer;
+        }
+        
+        .photo-gallery__header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1.5rem;
+        }
+        
+        .photo-gallery__header h2 {
+          margin: 0;
+          flex: 1;
+        }
+        
+        .photo-gallery__back-button {
+          background: none;
+          border: none;
+          color: #666;
+          font-size: 1rem;
+          cursor: pointer;
+          padding: 0.5rem 0;
+          margin-right: 1rem;
+        }
+        
+        .photo-gallery__back-button:hover {
+          color: #333;
+        }
+        
+        .photo-gallery__button {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 4px;
+          background-color: #ffbd00;
+          color: white;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
+        
+        .photo-gallery__button:hover {
+          background-color: #e6a800;
+        }
+        
+        .photo-gallery__button--secondary {
+          background-color: #f8f9fa;
+          color: #6c757d;
+        }
+        
+        .photo-gallery__button--secondary:hover {
+          background-color: #e2e6ea;
+        }
+        
+        .photo-gallery__album-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 2rem;
+        }
+        
+        .photo-gallery__album-card {
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .photo-gallery__album-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-gallery__album-cover {
+          position: relative;
+          height: 200px;
+          overflow: hidden;
+        }
+        
+        .photo-gallery__album-cover img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        
+        .photo-gallery__album-private {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background-color: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+        }
+        
+        .photo-gallery__album-info {
+          padding: 1.5rem;
+        }
+        
+        .photo-gallery__album-info h3 {
+          margin-top: 0;
+          margin-bottom: 0.5rem;
+          font-size: 1.2rem;
+        }
+        
+        .photo-gallery__album-info p {
+          margin-top: 0;
+          margin-bottom: 1rem;
+          color: #666;
+          font-size: 0.9rem;
+        }
+        
+        .photo-gallery__album-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.9rem;
+          color: #666;
+        }
+        
+        .photo-gallery__album-description {
+          margin-bottom: 2rem;
+          color: #666;
+        }
+        
+        .photo-gallery__photo-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1.5rem;
+        }
+        
+        .photo-gallery__empty {
+          grid-column: 1 / -1;
+          text-align: center;
+          padding: 3rem;
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .photo-gallery__empty p {
+          margin-top: 0;
+          margin-bottom: 1.5rem;
+          color: #666;
+        }
+        
+        .photo-gallery__photo-card {
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .photo-gallery__photo-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-gallery__photo-thumbnail {
+          position: relative;
+          height: 180px;
+          overflow: hidden;
+        }
+        
+        .photo-gallery__photo-thumbnail img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        
+        .photo-gallery__photo-private {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background-color: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+        }
+        
+        .photo-gallery__photo-info {
+          padding: 1rem;
+        }
+        
+        .photo-gallery__photo-info h3 {
+          margin-top: 0;
+          margin-bottom: 0.5rem;
+          font-size: 1rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .photo-gallery__photo-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.8rem;
+          color: #666;
+        }
+        
+        .photo-gallery__delete-button {
+          background: none;
+          border: none;
+          color: #dc3545;
+          font-size: 0.8rem;
+          cursor: pointer;
+          padding: 0;
+        }
+        
+        .photo-gallery__delete-button:hover {
+          text-decoration: underline;
+        }
+        
+        .photo-gallery__photo-view {
+          margin-bottom: 2rem;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          text-align: center;
+        }
+        
+        .photo-gallery__photo-view img {
+          max-width: 100%;
+          max-height: 70vh;
+        }
+        
+        .photo-gallery__photo-details {
+          background-color: white;
+          border-radius: 8px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .photo-gallery__photo-actions {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+        }
+        
+        .photo-gallery__like-button {
+          background: none;
+          border: none;
+          color: #dc3545;
+          font-size: 1rem;
+          cursor: pointer;
+          padding: 0;
+        }
+        
+        .photo-gallery__like-button:hover {
+          color: #c82333;
+        }
+        
+        .photo-gallery__photo-info-detail h3 {
+          margin-top: 0;
+          margin-bottom: 1rem;
+          font-size: 1.2rem;
+        }
+        
+        .photo-gallery__photo-info-detail p {
+          margin-top: 0;
+          margin-bottom: 1.5rem;
+          color: #666;
+        }
+        
+        .photo-gallery__photo-meta-detail {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+          color: #666;
+        }
+        
+        .photo-gallery__photo-tags {
+          margin-top: 0.5rem;
+        }
+        
+        .photo-gallery__tags-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+        
+        .photo-gallery__tag {
+          background-color: #f0f0f0;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+        }
+        
+        .photo-gallery__modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+        
+        .photo-gallery__modal-content {
+          background-color: white;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 500px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-gallery__modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 1.5rem;
+          border-bottom: 1px solid #eee;
+        }
+        
+        .photo-gallery__modal-header h2 {
+          margin: 0;
+          font-size: 1.25rem;
+        }
+        
+        .photo-gallery__modal-close {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #666;
+        }
+        
+        .photo-gallery__modal-body {
+          padding: 1.5rem;
+        }
+        
+        .photo-gallery__form-group {
+          margin-bottom: 1.5rem;
+        }
+        
+        .photo-gallery__form-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+        
+        .photo-gallery__form-group input[type="text"],
+        .photo-gallery__form-group textarea {
+          width: 100%;
+          padding: 0.5rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+        
+        .photo-gallery__form-group textarea {
+          min-height: 100px;
+          resize: vertical;
+        }
+        
+        .photo-gallery__form-checkbox {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        
+        .photo-gallery__form-checkbox input {
+          width: auto;
+        }
+        
+        .photo-gallery__form-checkbox label {
+          margin-bottom: 0;
+        }
+        
+        .photo-gallery__form-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+          .photo-gallery__album-grid,
+          .photo-gallery__photo-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          }
+          
+          .photo-gallery__header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          
+          .photo-gallery__header h2 {
+            margin-bottom: 1rem;
+          }
+          
+          .photo-gallery__photo-actions {
+            flex-direction: column;
+            gap: 1rem;
+          }
+          
+          .photo-gallery__form-actions {
+            flex-direction: column;
+          }
+          
+          .photo-gallery__form-actions button {
+            width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 };

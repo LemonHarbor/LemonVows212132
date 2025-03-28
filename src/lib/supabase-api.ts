@@ -1,890 +1,530 @@
 import { createClient } from '@supabase/supabase-js';
+import { Database } from '../types/supabase';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Erstelle einen Typ für die Supabase-Datenbank
+// Diese Typen werden normalerweise mit dem Supabase CLI generiert
+// Für die Demo verwenden wir eine vereinfachte Version
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase URL or Anon Key is missing. Please check your environment variables.');
-}
+// Supabase-Client erstellen
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://demo-lemonvows.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'demo-key';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-// Authentifizierungsfunktionen
-export const auth = {
-  // Registrierung mit E-Mail und Passwort
-  signUp: async (email: string, password: string, userData: any) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: userData,
-      },
-    });
-    return { data, error };
+// Demo-Daten für die Entwicklung
+export const demoData = {
+  // Benutzer
+  currentUser: {
+    id: 'demo-user-id',
+    email: 'demo@example.com',
+    name: 'Demo User',
+    role: 'customer',
+    createdAt: '2025-01-01T00:00:00Z',
+    lastLogin: '2025-03-28T00:00:00Z',
+    status: 'active',
+    avatarUrl: null
   },
-
-  // Anmeldung mit E-Mail und Passwort
-  signIn: async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { data, error };
+  
+  // Hochzeit
+  wedding: {
+    id: 'demo-wedding-id',
+    name: 'Julia & Thomas Hochzeit',
+    date: '2025-08-15',
+    userId: 'demo-user-id',
+    plan: 'premium',
+    status: 'active',
+    guestCount: 120,
+    createdAt: '2025-01-15T00:00:00Z',
+    lastActive: '2025-03-28T00:00:00Z',
+    customDomain: null,
+    customColors: null
   },
-
-  // Abmeldung
-  signOut: async () => {
-    const { error } = await supabase.auth.signOut();
-    return { error };
-  },
-
-  // Aktuellen Benutzer abrufen
-  getCurrentUser: async () => {
-    const { data, error } = await supabase.auth.getUser();
-    return { data, error };
-  },
-
-  // Sitzung abrufen
-  getSession: async () => {
-    const { data, error } = await supabase.auth.getSession();
-    return { data, error };
-  },
-
-  // Passwort zurücksetzen
-  resetPassword: async (email: string) => {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    return { data, error };
-  },
-
-  // Passwort aktualisieren
-  updatePassword: async (newPassword: string) => {
-    const { data, error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-    return { data, error };
-  },
+  
+  // Gäste
+  guests: [
+    {
+      id: 'guest-1',
+      weddingId: 'demo-wedding-id',
+      firstName: 'Julia',
+      lastName: 'Schmidt',
+      email: 'julia@example.com',
+      phone: '+49123456789',
+      groupName: 'Familie Braut',
+      rsvpStatus: 'confirmed',
+      dietaryRestrictions: ['Nüsse'],
+      plusOne: false,
+      plusOneName: null,
+      accommodationNeeded: true,
+      notes: '',
+      createdAt: '2025-01-20T00:00:00Z',
+      updatedAt: '2025-01-20T00:00:00Z'
+    },
+    {
+      id: 'guest-2',
+      weddingId: 'demo-wedding-id',
+      firstName: 'Thomas',
+      lastName: 'Müller',
+      email: 'thomas@example.com',
+      phone: '+49123456780',
+      groupName: 'Freunde',
+      rsvpStatus: 'confirmed',
+      dietaryRestrictions: [],
+      plusOne: false,
+      plusOneName: null,
+      accommodationNeeded: true,
+      notes: '',
+      createdAt: '2025-01-20T00:00:00Z',
+      updatedAt: '2025-01-20T00:00:00Z'
+    },
+    {
+      id: 'guest-3',
+      weddingId: 'demo-wedding-id',
+      firstName: 'Sarah',
+      lastName: 'Weber',
+      email: 'sarah@example.com',
+      phone: '+49123456781',
+      groupName: 'Kollegen',
+      rsvpStatus: 'pending',
+      dietaryRestrictions: [],
+      plusOne: false,
+      plusOneName: null,
+      accommodationNeeded: false,
+      notes: '',
+      createdAt: '2025-01-20T00:00:00Z',
+      updatedAt: '2025-01-20T00:00:00Z'
+    },
+    {
+      id: 'guest-4',
+      weddingId: 'demo-wedding-id',
+      firstName: 'Michael',
+      lastName: 'König',
+      email: 'michael@example.com',
+      phone: '+49123456782',
+      groupName: 'Familie Bräutigam',
+      rsvpStatus: 'declined',
+      dietaryRestrictions: [],
+      plusOne: false,
+      plusOneName: null,
+      accommodationNeeded: false,
+      notes: 'Ist im Urlaub',
+      createdAt: '2025-01-20T00:00:00Z',
+      updatedAt: '2025-01-20T00:00:00Z'
+    },
+    {
+      id: 'guest-5',
+      weddingId: 'demo-wedding-id',
+      firstName: 'Anna',
+      lastName: 'Schneider',
+      email: 'anna@example.com',
+      phone: '+49123456783',
+      groupName: 'Freunde',
+      rsvpStatus: 'confirmed',
+      dietaryRestrictions: ['Laktose'],
+      plusOne: false,
+      plusOneName: null,
+      accommodationNeeded: true,
+      notes: '',
+      createdAt: '2025-01-20T00:00:00Z',
+      updatedAt: '2025-01-20T00:00:00Z'
+    }
+  ],
+  
+  // Tische
+  tables: [
+    {
+      id: 'table-1',
+      weddingId: 'demo-wedding-id',
+      name: 'Tisch 1',
+      shape: 'round',
+      capacity: 8,
+      rotation: 0,
+      positionX: 100,
+      positionY: 100,
+      createdAt: '2025-01-25T00:00:00Z',
+      updatedAt: '2025-01-25T00:00:00Z'
+    },
+    {
+      id: 'table-2',
+      weddingId: 'demo-wedding-id',
+      name: 'Tisch 2',
+      shape: 'rectangular',
+      capacity: 6,
+      rotation: 0,
+      positionX: 300,
+      positionY: 100,
+      createdAt: '2025-01-25T00:00:00Z',
+      updatedAt: '2025-01-25T00:00:00Z'
+    }
+  ],
+  
+  // Sitzplätze
+  seats: [
+    // Tisch 1
+    { id: 'seat-1-1', tableId: 'table-1', guestId: 'guest-1', position: 1 },
+    { id: 'seat-1-2', tableId: 'table-1', guestId: 'guest-2', position: 2 },
+    { id: 'seat-1-3', tableId: 'table-1', guestId: 'guest-3', position: 3 },
+    { id: 'seat-1-4', tableId: 'table-1', guestId: null, position: 4 },
+    { id: 'seat-1-5', tableId: 'table-1', guestId: 'guest-4', position: 5 },
+    { id: 'seat-1-6', tableId: 'table-1', guestId: 'guest-5', position: 6 },
+    { id: 'seat-1-7', tableId: 'table-1', guestId: null, position: 7 },
+    { id: 'seat-1-8', tableId: 'table-1', guestId: 'guest-6', position: 8 },
+    
+    // Tisch 2
+    { id: 'seat-2-1', tableId: 'table-2', guestId: 'guest-7', position: 1 },
+    { id: 'seat-2-2', tableId: 'table-2', guestId: 'guest-8', position: 2 },
+    { id: 'seat-2-3', tableId: 'table-2', guestId: null, position: 3 },
+    { id: 'seat-2-4', tableId: 'table-2', guestId: 'guest-9', position: 4 },
+    { id: 'seat-2-5', tableId: 'table-2', guestId: 'guest-10', position: 5 },
+    { id: 'seat-2-6', tableId: 'table-2', guestId: 'guest-11', position: 6 }
+  ],
+  
+  // Budget-Kategorien
+  budgetCategories: [
+    {
+      id: 'category-1',
+      weddingId: 'demo-wedding-id',
+      name: 'Location',
+      plannedAmount: 4500,
+      color: '#FF5733',
+      createdAt: '2025-01-30T00:00:00Z',
+      updatedAt: '2025-01-30T00:00:00Z'
+    },
+    {
+      id: 'category-2',
+      weddingId: 'demo-wedding-id',
+      name: 'Catering',
+      plannedAmount: 3750,
+      color: '#33FF57',
+      createdAt: '2025-01-30T00:00:00Z',
+      updatedAt: '2025-01-30T00:00:00Z'
+    },
+    {
+      id: 'category-3',
+      weddingId: 'demo-wedding-id',
+      name: 'Dekoration',
+      plannedAmount: 2250,
+      color: '#3357FF',
+      createdAt: '2025-01-30T00:00:00Z',
+      updatedAt: '2025-01-30T00:00:00Z'
+    },
+    {
+      id: 'category-4',
+      weddingId: 'demo-wedding-id',
+      name: 'Kleidung',
+      plannedAmount: 3000,
+      color: '#F033FF',
+      createdAt: '2025-01-30T00:00:00Z',
+      updatedAt: '2025-01-30T00:00:00Z'
+    },
+    {
+      id: 'category-5',
+      weddingId: 'demo-wedding-id',
+      name: 'Sonstiges',
+      plannedAmount: 1500,
+      color: '#FF33A8',
+      createdAt: '2025-01-30T00:00:00Z',
+      updatedAt: '2025-01-30T00:00:00Z'
+    }
+  ],
+  
+  // Budget-Ausgaben
+  budgetExpenses: [
+    {
+      id: 'expense-1',
+      categoryId: 'category-1',
+      description: 'Anzahlung Location',
+      amount: 2000,
+      date: '2025-02-01',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-02-01T00:00:00Z',
+      updatedAt: '2025-02-01T00:00:00Z'
+    },
+    {
+      id: 'expense-2',
+      categoryId: 'category-1',
+      description: 'Restzahlung Location',
+      amount: 2500,
+      date: '2025-07-15',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-02-01T00:00:00Z',
+      updatedAt: '2025-02-01T00:00:00Z'
+    },
+    {
+      id: 'expense-3',
+      categoryId: 'category-2',
+      description: 'Anzahlung Catering',
+      amount: 1500,
+      date: '2025-02-15',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-02-15T00:00:00Z',
+      updatedAt: '2025-02-15T00:00:00Z'
+    },
+    {
+      id: 'expense-4',
+      categoryId: 'category-2',
+      description: 'Weinlieferung',
+      amount: 1500,
+      date: '2025-03-01',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-03-01T00:00:00Z',
+      updatedAt: '2025-03-01T00:00:00Z'
+    },
+    {
+      id: 'expense-5',
+      categoryId: 'category-3',
+      description: 'Blumendekoration',
+      amount: 1500,
+      date: '2025-03-15',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-03-15T00:00:00Z',
+      updatedAt: '2025-03-15T00:00:00Z'
+    },
+    {
+      id: 'expense-6',
+      categoryId: 'category-4',
+      description: 'Brautkleid',
+      amount: 2000,
+      date: '2025-02-20',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-02-20T00:00:00Z',
+      updatedAt: '2025-02-20T00:00:00Z'
+    },
+    {
+      id: 'expense-7',
+      categoryId: 'category-4',
+      description: 'Anzug Bräutigam',
+      amount: 500,
+      date: '2025-02-25',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-02-25T00:00:00Z',
+      updatedAt: '2025-02-25T00:00:00Z'
+    },
+    {
+      id: 'expense-8',
+      categoryId: 'category-5',
+      description: 'Einladungskarten',
+      amount: 350,
+      date: '2025-01-10',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-01-10T00:00:00Z',
+      updatedAt: '2025-01-10T00:00:00Z'
+    },
+    {
+      id: 'expense-9',
+      categoryId: 'category-5',
+      description: 'DJ',
+      amount: 400,
+      date: '2025-03-10',
+      paid: true,
+      receiptUrl: null,
+      notes: '',
+      createdAt: '2025-03-10T00:00:00Z',
+      updatedAt: '2025-03-10T00:00:00Z'
+    }
+  ],
+  
+  // Zahlungen
+  payments: [
+    {
+      id: 'payment-1',
+      userId: 'demo-user-id',
+      weddingId: 'demo-wedding-id',
+      amount: 29.99,
+      currency: 'EUR',
+      status: 'completed',
+      method: 'credit_card',
+      date: '2025-01-01T00:00:00Z',
+      plan: 'premium',
+      duration: 'monthly',
+      invoiceUrl: null,
+      receiptUrl: null
+    }
+  ]
 };
 
-// Benutzer-API
-export const usersApi = {
-  // Benutzer abrufen
-  getUser: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    return { data, error };
-  },
-
-  // Benutzer aktualisieren
-  updateUser: async (userId: string, userData: any) => {
-    const { data, error } = await supabase
-      .from('users')
-      .update(userData)
-      .eq('id', userId);
-    return { data, error };
-  },
-
-  // Alle Benutzer abrufen (nur für Admins)
-  getAllUsers: async () => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('created_at', { ascending: false });
-    return { data, error };
-  },
-
-  // Benutzer löschen
-  deleteUser: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', userId);
-    return { data, error };
-  },
-};
-
-// Hochzeits-API
-export const weddingsApi = {
-  // Hochzeit erstellen
-  createWedding: async (weddingData: any) => {
-    const { data, error } = await supabase
-      .from('weddings')
-      .insert([weddingData])
-      .select();
-    return { data, error };
-  },
-
-  // Hochzeit abrufen
-  getWedding: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('weddings')
-      .select('*')
-      .eq('id', weddingId)
-      .single();
-    return { data, error };
-  },
-
-  // Hochzeit aktualisieren
-  updateWedding: async (weddingId: string, weddingData: any) => {
-    const { data, error } = await supabase
-      .from('weddings')
-      .update(weddingData)
-      .eq('id', weddingId);
-    return { data, error };
-  },
-
-  // Hochzeit löschen
-  deleteWedding: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('weddings')
-      .delete()
-      .eq('id', weddingId);
-    return { data, error };
-  },
-
-  // Hochzeiten eines Benutzers abrufen
-  getUserWeddings: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('weddings')
-      .select('*')
-      .eq('user_id', userId)
-      .order('date', { ascending: true });
-    return { data, error };
-  },
-
-  // Alle Hochzeiten abrufen (nur für Admins)
-  getAllWeddings: async () => {
-    const { data, error } = await supabase
-      .from('weddings')
-      .select('*')
-      .order('date', { ascending: true });
-    return { data, error };
-  },
-};
-
-// Gäste-API
-export const guestsApi = {
-  // Gast erstellen
-  createGuest: async (guestData: any) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .insert([guestData])
-      .select();
-    return { data, error };
-  },
-
-  // Gast abrufen
-  getGuest: async (guestId: string) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .select('*')
-      .eq('id', guestId)
-      .single();
-    return { data, error };
-  },
-
-  // Gast aktualisieren
-  updateGuest: async (guestId: string, guestData: any) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .update(guestData)
-      .eq('id', guestId);
-    return { data, error };
-  },
-
-  // Gast löschen
-  deleteGuest: async (guestId: string) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .delete()
-      .eq('id', guestId);
-    return { data, error };
-  },
-
-  // Gäste einer Hochzeit abrufen
-  getWeddingGuests: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .select('*')
-      .eq('wedding_id', weddingId)
-      .order('last_name', { ascending: true });
-    return { data, error };
-  },
-
-  // RSVP-Status aktualisieren
-  updateRsvpStatus: async (guestId: string, rsvpStatus: string) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .update({ rsvp_status: rsvpStatus })
-      .eq('id', guestId);
-    return { data, error };
-  },
-};
-
-// Tisch-API
-export const tablesApi = {
-  // Tisch erstellen
-  createTable: async (tableData: any) => {
-    const { data, error } = await supabase
-      .from('tables')
-      .insert([tableData])
-      .select();
-    return { data, error };
-  },
-
-  // Tisch abrufen
-  getTable: async (tableId: string) => {
-    const { data, error } = await supabase
-      .from('tables')
-      .select('*')
-      .eq('id', tableId)
-      .single();
-    return { data, error };
-  },
-
-  // Tisch aktualisieren
-  updateTable: async (tableId: string, tableData: any) => {
-    const { data, error } = await supabase
-      .from('tables')
-      .update(tableData)
-      .eq('id', tableId);
-    return { data, error };
-  },
-
-  // Tisch löschen
-  deleteTable: async (tableId: string) => {
-    const { data, error } = await supabase
-      .from('tables')
-      .delete()
-      .eq('id', tableId);
-    return { data, error };
-  },
-
-  // Tische einer Hochzeit abrufen
-  getWeddingTables: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('tables')
-      .select('*')
-      .eq('wedding_id', weddingId);
-    return { data, error };
-  },
-};
-
-// Sitzplatz-API
-export const seatsApi = {
-  // Sitzplatz erstellen
-  createSeat: async (seatData: any) => {
-    const { data, error } = await supabase
-      .from('seats')
-      .insert([seatData])
-      .select();
-    return { data, error };
-  },
-
-  // Sitzplatz aktualisieren
-  updateSeat: async (seatId: string, seatData: any) => {
-    const { data, error } = await supabase
-      .from('seats')
-      .update(seatData)
-      .eq('id', seatId);
-    return { data, error };
-  },
-
-  // Sitzplatz löschen
-  deleteSeat: async (seatId: string) => {
-    const { data, error } = await supabase
-      .from('seats')
-      .delete()
-      .eq('id', seatId);
-    return { data, error };
-  },
-
-  // Sitzplätze eines Tisches abrufen
-  getTableSeats: async (tableId: string) => {
-    const { data, error } = await supabase
-      .from('seats')
-      .select('*, guests(*)')
-      .eq('table_id', tableId)
-      .order('position', { ascending: true });
-    return { data, error };
-  },
-
-  // Gast einem Sitzplatz zuweisen
-  assignGuestToSeat: async (seatId: string, guestId: string) => {
-    const { data, error } = await supabase
-      .from('seats')
-      .update({ guest_id: guestId })
-      .eq('id', seatId);
-    return { data, error };
-  },
-
-  // Gast von einem Sitzplatz entfernen
-  removeGuestFromSeat: async (seatId: string) => {
-    const { data, error } = await supabase
-      .from('seats')
-      .update({ guest_id: null })
-      .eq('id', seatId);
-    return { data, error };
-  },
-};
-
-// Budget-API
-export const budgetApi = {
-  // Kategorie erstellen
-  createCategory: async (categoryData: any) => {
-    const { data, error } = await supabase
-      .from('budget_categories')
-      .insert([categoryData])
-      .select();
-    return { data, error };
-  },
-
-  // Kategorie aktualisieren
-  updateCategory: async (categoryId: string, categoryData: any) => {
-    const { data, error } = await supabase
-      .from('budget_categories')
-      .update(categoryData)
-      .eq('id', categoryId);
-    return { data, error };
-  },
-
-  // Kategorie löschen
-  deleteCategory: async (categoryId: string) => {
-    const { data, error } = await supabase
-      .from('budget_categories')
-      .delete()
-      .eq('id', categoryId);
-    return { data, error };
-  },
-
-  // Kategorien einer Hochzeit abrufen
-  getWeddingCategories: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('budget_categories')
-      .select('*')
-      .eq('wedding_id', weddingId);
-    return { data, error };
-  },
-
-  // Ausgabe erstellen
-  createExpense: async (expenseData: any) => {
-    const { data, error } = await supabase
-      .from('budget_expenses')
-      .insert([expenseData])
-      .select();
-    return { data, error };
-  },
-
-  // Ausgabe aktualisieren
-  updateExpense: async (expenseId: string, expenseData: any) => {
-    const { data, error } = await supabase
-      .from('budget_expenses')
-      .update(expenseData)
-      .eq('id', expenseId);
-    return { data, error };
-  },
-
-  // Ausgabe löschen
-  deleteExpense: async (expenseId: string) => {
-    const { data, error } = await supabase
-      .from('budget_expenses')
-      .delete()
-      .eq('id', expenseId);
-    return { data, error };
-  },
-
-  // Ausgaben einer Kategorie abrufen
-  getCategoryExpenses: async (categoryId: string) => {
-    const { data, error } = await supabase
-      .from('budget_expenses')
-      .select('*')
-      .eq('category_id', categoryId)
-      .order('date', { ascending: false });
-    return { data, error };
-  },
-
-  // Alle Ausgaben einer Hochzeit abrufen
-  getWeddingExpenses: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('budget_expenses')
-      .select('*, budget_categories!inner(*)')
-      .eq('budget_categories.wedding_id', weddingId)
-      .order('date', { ascending: false });
-    return { data, error };
-  },
-};
-
-// Moodboard-API
-export const moodboardApi = {
-  // Sammlung erstellen
-  createCollection: async (collectionData: any) => {
-    const { data, error } = await supabase
-      .from('moodboard_collections')
-      .insert([collectionData])
-      .select();
-    return { data, error };
-  },
-
-  // Sammlung aktualisieren
-  updateCollection: async (collectionId: string, collectionData: any) => {
-    const { data, error } = await supabase
-      .from('moodboard_collections')
-      .update(collectionData)
-      .eq('id', collectionId);
-    return { data, error };
-  },
-
-  // Sammlung löschen
-  deleteCollection: async (collectionId: string) => {
-    const { data, error } = await supabase
-      .from('moodboard_collections')
-      .delete()
-      .eq('id', collectionId);
-    return { data, error };
-  },
-
-  // Sammlungen einer Hochzeit abrufen
-  getWeddingCollections: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('moodboard_collections')
-      .select('*')
-      .eq('wedding_id', weddingId);
-    return { data, error };
-  },
-
-  // Element erstellen
-  createItem: async (itemData: any) => {
-    const { data, error } = await supabase
-      .from('moodboard_items')
-      .insert([itemData])
-      .select();
-    return { data, error };
-  },
-
-  // Element aktualisieren
-  updateItem: async (itemId: string, itemData: any) => {
-    const { data, error } = await supabase
-      .from('moodboard_items')
-      .update(itemData)
-      .eq('id', itemId);
-    return { data, error };
-  },
-
-  // Element löschen
-  deleteItem: async (itemId: string) => {
-    const { data, error } = await supabase
-      .from('moodboard_items')
-      .delete()
-      .eq('id', itemId);
-    return { data, error };
-  },
-
-  // Elemente einer Sammlung abrufen
-  getCollectionItems: async (collectionId: string) => {
-    const { data, error } = await supabase
-      .from('moodboard_items')
-      .select('*')
-      .eq('collection_id', collectionId)
-      .order('z_index', { ascending: true });
-    return { data, error };
-  },
-};
-
-// Foto-Galerie-API
-export const photoApi = {
-  // Album erstellen
-  createAlbum: async (albumData: any) => {
-    const { data, error } = await supabase
-      .from('photo_albums')
-      .insert([albumData])
-      .select();
-    return { data, error };
-  },
-
-  // Album aktualisieren
-  updateAlbum: async (albumId: string, albumData: any) => {
-    const { data, error } = await supabase
-      .from('photo_albums')
-      .update(albumData)
-      .eq('id', albumId);
-    return { data, error };
-  },
-
-  // Album löschen
-  deleteAlbum: async (albumId: string) => {
-    const { data, error } = await supabase
-      .from('photo_albums')
-      .delete()
-      .eq('id', albumId);
-    return { data, error };
-  },
-
-  // Alben einer Hochzeit abrufen
-  getWeddingAlbums: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('photo_albums')
-      .select('*')
-      .eq('wedding_id', weddingId);
-    return { data, error };
-  },
-
-  // Foto hochladen
-  uploadPhoto: async (file: File, path: string) => {
-    const { data, error } = await supabase.storage
-      .from('photos')
-      .upload(path, file);
-    return { data, error };
-  },
-
-  // Foto-URL abrufen
-  getPhotoUrl: async (path: string) => {
-    const { data } = supabase.storage
-      .from('photos')
-      .getPublicUrl(path);
-    return data.publicUrl;
-  },
-
-  // Foto erstellen
-  createPhoto: async (photoData: any) => {
-    const { data, error } = await supabase
-      .from('photos')
-      .insert([photoData])
-      .select();
-    return { data, error };
-  },
-
-  // Foto aktualisieren
-  updatePhoto: async (photoId: string, photoData: any) => {
-    const { data, error } = await supabase
-      .from('photos')
-      .update(photoData)
-      .eq('id', photoId);
-    return { data, error };
-  },
-
-  // Foto löschen
-  deletePhoto: async (photoId: string, path: string) => {
-    // Foto aus der Datenbank löschen
-    const { error: dbError } = await supabase
-      .from('photos')
-      .delete()
-      .eq('id', photoId);
-    
-    // Foto aus dem Speicher löschen
-    const { error: storageError } = await supabase.storage
-      .from('photos')
-      .remove([path]);
-    
-    return { dbError, storageError };
-  },
-
-  // Fotos eines Albums abrufen
-  getAlbumPhotos: async (albumId: string) => {
-    const { data, error } = await supabase
-      .from('photos')
-      .select('*')
-      .eq('album_id', albumId)
-      .order('uploaded_at', { ascending: false });
-    return { data, error };
-  },
-
-  // Foto liken
-  likePhoto: async (photoId: string) => {
-    // Zuerst das aktuelle Foto abrufen
-    const { data: photo, error: fetchError } = await supabase
-      .from('photos')
-      .select('likes')
-      .eq('id', photoId)
-      .single();
-    
-    if (fetchError) return { data: null, error: fetchError };
-    
-    // Likes inkrementieren
-    const { data, error } = await supabase
-      .from('photos')
-      .update({ likes: (photo.likes || 0) + 1 })
-      .eq('id', photoId);
-    
-    return { data, error };
-  },
-};
-
-// Zahlungs-API
-export const paymentsApi = {
-  // Zahlung erstellen
-  createPayment: async (paymentData: any) => {
-    const { data, error } = await supabase
-      .from('payments')
-      .insert([paymentData])
-      .select();
-    return { data, error };
-  },
-
-  // Zahlung abrufen
-  getPayment: async (paymentId: string) => {
-    const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('id', paymentId)
-      .single();
-    return { data, error };
-  },
-
-  // Zahlung aktualisieren
-  updatePayment: async (paymentId: string, paymentData: any) => {
-    const { data, error } = await supabase
-      .from('payments')
-      .update(paymentData)
-      .eq('id', paymentId);
-    return { data, error };
-  },
-
-  // Zahlungen eines Benutzers abrufen
-  getUserPayments: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('user_id', userId)
-      .order('date', { ascending: false });
-    return { data, error };
-  },
-
-  // Zahlungen einer Hochzeit abrufen
-  getWeddingPayments: async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('wedding_id', weddingId)
-      .order('date', { ascending: false });
-    return { data, error };
-  },
-
-  // Alle Zahlungen abrufen (nur für Admins)
-  getAllPayments: async () => {
-    const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .order('date', { ascending: false });
-    return { data, error };
-  },
-};
-
-// RSVP-API
-export const rsvpApi = {
-  // RSVP-Token erstellen
-  createRsvpToken: async (guestId: string) => {
-    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // Token ist 30 Tage gültig
-    
-    const { data, error } = await supabase
-      .from('rsvp_tokens')
-      .insert([{
-        guest_id: guestId,
-        token,
-        expires_at: expiresAt.toISOString(),
-      }])
-      .select();
-    
-    return { data, error };
-  },
-
-  // RSVP-Token validieren
-  validateRsvpToken: async (token: string) => {
-    const { data, error } = await supabase
-      .from('rsvp_tokens')
-      .select('*, guests(*)')
-      .eq('token', token)
-      .gt('expires_at', new Date().toISOString())
-      .single();
-    
-    return { data, error };
-  },
-
-  // RSVP-Status aktualisieren
-  updateRsvpStatus: async (guestId: string, rsvpStatus: string, additionalData: any = {}) => {
-    const { data, error } = await supabase
-      .from('guests')
-      .update({
-        rsvp_status: rsvpStatus,
-        ...additionalData,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', guestId);
-    
-    return { data, error };
-  },
-};
-
-// Einstellungs-API
-export const settingsApi = {
-  // Einstellung abrufen
-  getSetting: async (key: string) => {
-    const { data, error } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', key)
-      .single();
-    
-    return { data: data?.value, error };
-  },
-
-  // Einstellung aktualisieren oder erstellen
-  setSetting: async (key: string, value: any) => {
-    // Prüfen, ob die Einstellung bereits existiert
-    const { data: existingSetting } = await supabase
-      .from('settings')
-      .select('id')
-      .eq('key', key)
-      .single();
-    
-    if (existingSetting) {
-      // Einstellung aktualisieren
-      const { data, error } = await supabase
-        .from('settings')
-        .update({
-          value,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('key', key);
+// Hilfsfunktionen für die Demo-Daten
+export const demoApi = {
+  // Gäste-Funktionen
+  guests: {
+    getAll: async () => {
+      return { data: demoData.guests, error: null };
+    },
+    getById: async (id: string) => {
+      const guest = demoData.guests.find(g => g.id === id);
+      return { data: guest || null, error: guest ? null : new Error('Guest not found') };
+    },
+    create: async (guest: any) => {
+      const newGuest = {
+        ...guest,
+        id: `guest-${demoData.guests.length + 1}`,
+        weddingId: 'demo-wedding-id',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      demoData.guests.push(newGuest);
+      return { data: newGuest, error: null };
+    },
+    update: async (id: string, updates: any) => {
+      const index = demoData.guests.findIndex(g => g.id === id);
+      if (index === -1) return { data: null, error: new Error('Guest not found') };
       
-      return { data, error };
-    } else {
-      // Neue Einstellung erstellen
-      const { data, error } = await supabase
-        .from('settings')
-        .insert([{
-          key,
-          value,
-        }])
-        .select();
+      const updatedGuest = {
+        ...demoData.guests[index],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      demoData.guests[index] = updatedGuest;
+      return { data: updatedGuest, error: null };
+    },
+    delete: async (id: string) => {
+      const index = demoData.guests.findIndex(g => g.id === id);
+      if (index === -1) return { data: null, error: new Error('Guest not found') };
       
-      return { data, error };
+      const deletedGuest = demoData.guests[index];
+      demoData.guests.splice(index, 1);
+      return { data: deletedGuest, error: null };
     }
   },
-
-  // Mehrere Einstellungen abrufen
-  getSettings: async (keys: string[]) => {
-    const { data, error } = await supabase
-      .from('settings')
-      .select('key, value')
-      .in('key', keys);
-    
-    // Umwandeln in ein Objekt mit key-value Paaren
-    const settings = data?.reduce((acc: any, setting) => {
-      acc[setting.key] = setting.value;
-      return acc;
-    }, {});
-    
-    return { data: settings, error };
+  
+  // Tisch-Funktionen
+  tables: {
+    getAll: async () => {
+      return { data: demoData.tables, error: null };
+    },
+    getById: async (id: string) => {
+      const table = demoData.tables.find(t => t.id === id);
+      return { data: table || null, error: table ? null : new Error('Table not found') };
+    },
+    create: async (table: any) => {
+      const newTable = {
+        ...table,
+        id: `table-${demoData.tables.length + 1}`,
+        weddingId: 'demo-wedding-id',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      demoData.tables.push(newTable);
+      return { data: newTable, error: null };
+    },
+    update: async (id: string, updates: any) => {
+      const index = demoData.tables.findIndex(t => t.id === id);
+      if (index === -1) return { data: null, error: new Error('Table not found') };
+      
+      const updatedTable = {
+        ...demoData.tables[index],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      demoData.tables[index] = updatedTable;
+      return { data: updatedTable, error: null };
+    },
+    delete: async (id: string) => {
+      const index = demoData.tables.findIndex(t => t.id === id);
+      if (index === -1) return { data: null, error: new Error('Table not found') };
+      
+      const deletedTable = demoData.tables[index];
+      demoData.tables.splice(index, 1);
+      return { data: deletedTable, error: null };
+    }
   },
-};
-
-// Echtzeit-Abonnements
-export const realtime = {
-  // Gästeänderungen abonnieren
-  subscribeToGuests: (weddingId: string, callback: (payload: any) => void) => {
-    return supabase
-      .channel('guests-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'guests',
-          filter: `wedding_id=eq.${weddingId}`,
-        },
-        callback
-      )
-      .subscribe();
+  
+  // Budget-Funktionen
+  budget: {
+    getCategories: async () => {
+      return { data: demoData.budgetCategories, error: null };
+    },
+    getExpenses: async () => {
+      return { data: demoData.budgetExpenses, error: null };
+    },
+    createCategory: async (category: any) => {
+      const newCategory = {
+        ...category,
+        id: `category-${demoData.budgetCategories.length + 1}`,
+        weddingId: 'demo-wedding-id',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      demoData.budgetCategories.push(newCategory);
+      return { data: newCategory, error: null };
+    },
+    createExpense: async (expense: any) => {
+      const newExpense = {
+        ...expense,
+        id: `expense-${demoData.budgetExpenses.length + 1}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      demoData.budgetExpenses.push(newExpense);
+      return { data: newExpense, error: null };
+    },
+    updateCategory: async (id: string, updates: any) => {
+      const index = demoData.budgetCategories.findIndex(c => c.id === id);
+      if (index === -1) return { data: null, error: new Error('Category not found') };
+      
+      const updatedCategory = {
+        ...demoData.budgetCategories[index],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      demoData.budgetCategories[index] = updatedCategory;
+      return { data: updatedCategory, error: null };
+    },
+    updateExpense: async (id: string, updates: any) => {
+      const index = demoData.budgetExpenses.findIndex(e => e.id === id);
+      if (index === -1) return { data: null, error: new Error('Expense not found') };
+      
+      const updatedExpense = {
+        ...demoData.budgetExpenses[index],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      demoData.budgetExpenses[index] = updatedExpense;
+      return { data: updatedExpense, error: null };
+    }
   },
-
-  // Tischänderungen abonnieren
-  subscribeToTables: (weddingId: string, callback: (payload: any) => void) => {
-    return supabase
-      .channel('tables-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tables',
-          filter: `wedding_id=eq.${weddingId}`,
-        },
-        callback
-      )
-      .subscribe();
+  
+  // Benutzer-Funktionen
+  auth: {
+    signIn: async (email: string, password: string) => {
+      if (email === 'demo@example.com' && password === 'password') {
+        return { data: { user: demoData.currentUser, session: { access_token: 'demo-token' } }, error: null };
+      }
+      return { data: null, error: new Error('Invalid credentials') };
+    },
+    signUp: async (email: string, password: string, metadata: any) => {
+      return { data: { user: { ...demoData.currentUser, email, ...metadata }, session: { access_token: 'demo-token' } }, error: null };
+    },
+    signOut: async () => {
+      return { error: null };
+    },
+    getUser: async () => {
+      return { data: { user: demoData.currentUser }, error: null };
+    }
   },
-
-  // Sitzplatzänderungen abonnieren
-  subscribeToSeats: (tableIds: string[], callback: (payload: any) => void) => {
-    return supabase
-      .channel('seats-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'seats',
-          filter: `table_id=in.(${tableIds.join(',')})`,
-        },
-        callback
-      )
-      .subscribe();
-  },
-
-  // Budgetänderungen abonnieren
-  subscribeToBudget: (weddingId: string, callback: (payload: any) => void) => {
-    return supabase
-      .channel('budget-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'budget_categories',
-          filter: `wedding_id=eq.${weddingId}`,
-        },
-        callback
-      )
-      .subscribe();
-  },
-
-  // Fotoänderungen abonnieren
-  subscribeToPhotos: (albumIds: string[], callback: (payload: any) => void) => {
-    return supabase
-      .channel('photos-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'photos',
-          filter: `album_id=in.(${albumIds.join(',')})`,
-        },
-        callback
-      )
-      .subscribe();
-  },
-};
-
-export default {
-  supabase,
-  auth,
-  usersApi,
-  weddingsApi,
-  guestsApi,
-  tablesApi,
-  seatsApi,
-  budgetApi,
-  moodboardApi,
-  photoApi,
-  paymentsApi,
-  rsvpApi,
-  settingsApi,
-  realtime,
+  
+  // Zahlungs-Funktionen
+  payments: {
+    createCheckoutSession: async (priceId: string) => {
+      return { data: { sessionId: 'demo-session-id', url: 'https://example.com/checkout' }, error: null };
+    },
+    getSubscription: async () => {
+      return { data: { status: 'active', plan: 'premium', current_period_end: '2025-04-01T00:00:00Z' }, error: null };
+    }
+  }
 };
