@@ -3,7 +3,17 @@ import { PRICING_PLANS } from '@/lib/monetization';
 import { Button } from '@/components/ui/Button';
 
 interface PricingCardProps {
-  plan: typeof PRICING_PLANS.FREE;
+  plan: {
+    id: string;
+    name: string;
+    price: number;
+    currency: string;
+    description: string;
+    maxGuests: number | null;
+    buttonText: string;
+    features: string[];
+    popular?: boolean;
+  };
   isCurrentPlan: boolean;
   onSelectPlan: (planId: string) => void;
 }

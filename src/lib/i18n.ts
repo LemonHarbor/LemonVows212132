@@ -1,13 +1,14 @@
-import { createI18nClient } from 'next-i18next';
+import { useTranslation as useTranslationOriginal } from 'next-i18next';
 
 export const i18nConfig = {
-  defaultLocale: 'de',
-  locales: ['de', 'en'],
+  i18n: {
+    defaultLocale: 'de',
+    locales: ['de', 'en'],
+  },
   localePath: './public/locales',
 };
 
-export const i18n = createI18nClient({
-  ...i18nConfig,
-});
+// Re-export useTranslation from next-i18next
+export const useTranslation = useTranslationOriginal;
 
 export default i18nConfig;

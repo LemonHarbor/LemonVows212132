@@ -18,7 +18,7 @@ export interface PricingPlan {
   description: string;
   features: PricingFeature[];
   popular?: boolean;
-  maxGuests: number;
+  maxGuests: number | null;
   buttonText: string;
   buttonVariant: 'default' | 'secondary' | 'ghost';
 }

@@ -5,6 +5,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Exclude demo pages from the build
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js']
 }
 
 module.exports = nextConfig
