@@ -387,7 +387,8 @@ const Moodboard: React.FC = () => {
             
             {collections.length > 1 && (
               <Button 
-                variant="destructive"
+                variant="secondary"
+                className="bg-red-600 hover:bg-red-700 text-white"
                 onClick={() => activeCollection && deleteCollection(activeCollection)}
               >
                 {t('moodboard.deleteCollection')}

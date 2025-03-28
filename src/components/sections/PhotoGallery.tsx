@@ -392,7 +392,8 @@ const PhotoGallery: React.FC = () => {
             
             {albums.length > 1 && activeAlbum && (
               <Button 
-                variant="destructive"
+                variant="secondary"
+                className="bg-red-600 hover:bg-red-700 text-white"
                 onClick={() => deleteAlbum(activeAlbum)}
               >
                 {t('gallery.deleteAlbum')}
@@ -880,7 +881,8 @@ const PhotoGallery: React.FC = () => {
                 </Button>
                 
                 <Button 
-                  variant="destructive"
+                  variant="secondary"
+                  className="bg-red-600 hover:bg-red-700 text-white"
                   onClick={() => {
                     deletePhoto(getSelectedPhoto.id);
                     setShowLightbox(false);
