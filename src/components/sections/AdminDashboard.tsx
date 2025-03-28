@@ -1050,7 +1050,8 @@ const AdminDashboard: React.FC = () => {
                     </Button>
                     
                     <Button 
-                      variant="destructive"
+                      variant="secondary"
+                      className="bg-red-600 hover:bg-red-700 text-white"
                       onClick={() => handleDeleteWedding(getSelectedWedding.id)}
                     >
                       {t('admin.deleteWedding')}
