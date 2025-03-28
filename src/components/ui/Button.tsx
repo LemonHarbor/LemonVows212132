@@ -4,7 +4,7 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'destructive' | 'default' | 'ghost';
   disabled?: boolean;
   className?: string;
 }
@@ -23,13 +23,16 @@ export const Button: React.FC<ButtonProps> = ({
     primary: 'border-transparent text-white bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500',
     secondary: 'border-transparent text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:ring-yellow-500',
     outline: 'border-yellow-500 text-yellow-500 bg-transparent hover:bg-yellow-50 focus:ring-yellow-500',
+    destructive: 'border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500',
+    default: 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-yellow-500',
+    ghost: 'border-transparent text-gray-700 bg-transparent hover:bg-gray-100 focus:ring-yellow-500'
   };
   
   const disabledStyles = 'opacity-50 cursor-not-allowed';
   
   const buttonStyles = `
     ${baseStyles}
-    ${variantStyles[variant]}
+    ${variantStyles[variant as keyof typeof variantStyles] || variantStyles.primary}
     ${disabled ? disabledStyles : ''}
     ${className}
   `;
