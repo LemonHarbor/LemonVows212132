@@ -1,11 +1,12 @@
 [build]
   command = "npm install && npm run build"
-  publish = ".next"
+  publish = "out"
 [build.environment]
   NODE_VERSION = "20.18.0"
-  NEXT_PRIVATE_TARGET = "server"
-  NETLIFY_NEXT_PLUGIN_SKIP = "false"
+  NEXT_PRIVATE_TARGET = "static"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = true
