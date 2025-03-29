@@ -1,134 +1,108 @@
-# LemonVows - Hochzeitsplanungs-WebApp
+# LemonVows - Hochzeitsplanungs-App
 
-LemonVows ist eine umfassende Hochzeitsplanungs-WebApp, die Brautpaaren hilft, ihre Hochzeit einfach und stressfrei zu planen. Die Anwendung bietet verschiedene Funktionen wie einen interaktiven Tischplan, Gästeverwaltung, Budgetplaner, Moodboard und eine Foto-Galerie.
+Eine vollständig funktionsfähige Web-App für Hochzeitsplanung mit mehrsprachiger Unterstützung, interaktiven Features und No-Code-Anpassbarkeit.
 
-## Features
+## Überblick
 
-- **Interaktiver Tischplan** mit Drag & Drop-Funktionalität
-- **Gästeverwaltung** mit RSVP-System und Allergien-Tracking
-- **Budgetplaner** mit Kategorien und Echtzeit-Übersicht
-- **Moodboard** für Inspirationen und Farbschemata
-- **Foto-Galerie** mit Privatsphäre-Einstellungen
-- **Admin-Dashboard** für die Verwaltung von Benutzern und Hochzeiten
-- **Mehrsprachigkeit** (Deutsch und Englisch)
-- **Responsive Design** für alle Geräte
+LemonVows ist eine umfassende Hochzeitsplanungs-Plattform, die es Brautpaaren ermöglicht, ihre Hochzeit interaktiv zu planen und zu verwalten. Die App bietet mehrsprachige Unterstützung, ein interaktives Musikabstimmungssystem, ein spezielles Trauzeugen-Portal und vieles mehr.
 
-## Technologien
+## Hauptfunktionen
 
-- **Frontend**: Next.js mit TypeScript und Tailwind CSS
-- **Backend**: Supabase (Authentifizierung, Datenbank, Speicher)
-- **Zahlungsabwicklung**: Stripe
-- **Deployment**: Vercel
+- **Mehrsprachige Unterstützung**: Deutsch, Englisch, Französisch und Spanisch für internationale Hochzeiten
+- **Interaktiver Tischplaner**: Drag & Drop-Funktionalität für die Sitzplatzplanung
+- **Gästemanagement**: RSVP-System, Diätanforderungen und Kontaktverwaltung
+- **Musikabstimmung**: Gäste können per Up- und Downvote über die Playlist abstimmen
+- **Trauzeugen-Portal**: Spezieller Bereich für die Planung mit Trauzeugen
+- **Budget-Planer**: Verwaltung und Verfolgung aller Hochzeitsausgaben
+- **Checklisten**: Anpassbare To-Do-Listen für die Hochzeitsplanung
+- **No-Code Admin-Dashboard**: Einfache Verwaltung ohne Programmierkenntnisse
+- **Developer-Modus**: Erweiterte Funktionen für technisch versierte Nutzer
+- **Mobile-First Design**: Optimiert für alle Geräte mit Dark Mode
 
-## Preismodelle
+## Technologie-Stack
 
-- **Free**: Bis zu 10 Gäste, grundlegende Funktionen
-- **Basic**: Bis zu 50 Gäste, erweiterte Funktionen (9,99 € / Monat)
-- **Premium**: Unbegrenzte Gäste, alle Funktionen (19,99 € / Monat)
-- **Ultimate**: White-Labeling und alle Funktionen (29,99 € / Monat)
-
-## Installation und Einrichtung
-
-### Voraussetzungen
-
-- Node.js 18 oder höher
-- npm oder yarn
-- Supabase-Konto
-- Stripe-Konto (für Zahlungsabwicklung)
-
-### Lokale Entwicklung
-
-1. Repository klonen:
-   ```bash
-   git clone https://github.com/LemonHarbor/LemonVows.git
-   cd lemonvows
-   ```
-
-2. Abhängigkeiten installieren:
-   ```bash
-   npm install
-   ```
-
-3. Umgebungsvariablen einrichten:
-   Erstelle eine `.env.local`-Datei im Hauptverzeichnis mit folgenden Variablen:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=deine-supabase-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=dein-supabase-anon-key
-   STRIPE_SECRET_KEY=dein-stripe-secret-key
-   STRIPE_WEBHOOK_SECRET=dein-stripe-webhook-secret
-   ```
-
-4. Entwicklungsserver starten:
-   ```bash
-   npm run dev
-   ```
-
-5. Öffne [http://localhost:3000](http://localhost:3000) im Browser.
-
-### Supabase-Einrichtung
-
-1. Erstelle ein neues Projekt in Supabase.
-2. Führe die SQL-Skripte aus der Datei `src/db/schema.sql` in der Supabase SQL-Konsole aus.
-3. Konfiguriere die Authentifizierung und die Speicherregeln gemäß der Dokumentation.
-
-### Stripe-Einrichtung
-
-1. Erstelle ein Stripe-Konto und konfiguriere die Produkte und Preise.
-2. Aktualisiere die `stripe_price_id`-Werte in der Datei `src/lib/monetization.ts`.
-3. Richte einen Webhook für Ereignisse wie `checkout.session.completed` ein.
-
-## Deployment
-
-Die Anwendung kann auf Vercel oder einem anderen Hosting-Dienst für Next.js-Anwendungen bereitgestellt werden.
-
-1. Vercel-CLI installieren:
-   ```bash
-   npm install -g vercel
-   ```
-
-2. Deployment starten:
-   ```bash
-   vercel
-   ```
-
-3. Folge den Anweisungen zur Konfiguration des Deployments.
+- **Frontend**: React mit TypeScript und Vite
+- **Backend**: Supabase für Datenbank und Authentifizierung
+- **Styling**: CSS-in-JS mit responsivem Design
+- **Mehrsprachigkeit**: i18n-Implementierung mit Sprachumschalter
+- **Deployment**: Netlify für kontinuierliche Bereitstellung
 
 ## Projektstruktur
 
 ```
-lemonvows/
-├── public/               # Statische Dateien
-│   ├── images/           # Bilder
-│   ├── fonts/            # Schriftarten
-│   └── locales/          # Übersetzungsdateien
-├── src/                  # Quellcode
-│   ├── app/              # Next.js App Router
-│   ├── components/       # React-Komponenten
-│   │   ├── ui/           # UI-Komponenten
-│   │   ├── sections/     # Sektionskomponenten
-│   │   └── shared/       # Gemeinsame Komponenten
-│   ├── config/           # Konfigurationsdateien
-│   ├── db/               # Datenbankschema und Migrationen
-│   ├── lib/              # Bibliotheken und Hilfsfunktionen
-│   ├── styles/           # Globale Stile
-│   └── types/            # TypeScript-Typdefinitionen
-├── .env.local            # Lokale Umgebungsvariablen
-├── .gitignore            # Git-Ignorierte Dateien
-├── next.config.js        # Next.js-Konfiguration
-├── package.json          # Projektabhängigkeiten
-├── README.md             # Projektdokumentation
-├── tailwind.config.js    # Tailwind CSS-Konfiguration
-└── tsconfig.json         # TypeScript-Konfiguration
+LemonVows/
+├── implementation/
+│   ├── admin-dashboard/       # Admin-Dashboard für No-Code-Verwaltung
+│   ├── core-features/         # Kernfunktionen der App
+│   │   ├── budget-planner/    # Budget-Planungs-Komponenten
+│   │   ├── checklists/        # Checklisten-Funktionalität
+│   │   ├── guest-management/  # Gästeverwaltung und RSVP
+│   │   └── table-planner/     # Tischplaner-Komponenten
+│   ├── couple-management/     # Brautpaar-Verwaltungssystem
+│   ├── demo-area/             # Demo-Bereich für die Landingpage
+│   │   ├── landing-page/      # Landingpage-Komponenten
+│   │   └── table-planner-demo/# Interaktive Demo des Tischplaners
+│   ├── i18n/                  # Mehrsprachigkeits-Implementierung
+│   ├── responsive/            # Responsive Design-Utilities
+│   ├── styles/                # Globale Styles und Themes
+│   └── theme/                 # Theme-Provider und Dark Mode
+├── marketing/                 # Marketing-Strategie und Monetarisierungsplan
+├── research/                  # Wettbewerbsanalyse und Marktforschung
+└── todo/                      # Projektfortschritt und To-Do-Liste
 ```
+
+## Installation und Entwicklung
+
+1. Repository klonen:
+```bash
+git clone https://github.com/LemonHarbor/LemonVows.git
+cd LemonVows
+```
+
+2. Abhängigkeiten installieren:
+```bash
+npm install
+```
+
+3. Entwicklungsserver starten:
+```bash
+npm run dev
+```
+
+4. Build erstellen:
+```bash
+npm run build
+```
+
+## Monetarisierungsmodell
+
+LemonVows verwendet ein Freemium-Modell mit verschiedenen Abonnement-Stufen:
+
+- **Lemon Basic** (Kostenlos): Grundlegende Funktionen für kleine Hochzeiten
+- **Lemon Plus** (9,99€/Monat): Erweiterte Funktionen und zweisprachige Unterstützung
+- **Lemon Gold** (19,99€/Monat): Vollständige Funktionalität mit viersprachiger Unterstützung
+- **Lemon Pro** (49,99€/Monat): Business-Tier für Hochzeitsplaner mit White-Label-Option
+
+Zusätzliche Einnahmequellen umfassen In-App-Käufe, Affiliate-Marketing und gesponserte Inhalte.
+
+## Marketingstrategie
+
+Die Marketingstrategie konzentriert sich auf:
+
+1. **Digitale Werbekampagnen**: Google Ads, Social Media Ads und Retargeting
+2. **Partnerschaften**: Mit Hochzeitslocations und -dienstleistern
+3. **Content-Marketing**: SEO-optimierte Artikel zu internationalen Hochzeiten
+4. **Social Media**: Instagram, Pinterest, TikTok und Facebook-Gruppen
+5. **E-Mail-Marketing**: Automatisierte Sequenzen basierend auf dem Hochzeitsdatum
 
 ## Beitragen
 
-Wir freuen uns über Beiträge zur Verbesserung von LemonVows! Bitte erstelle einen Pull Request oder eröffne ein Issue für Vorschläge und Fehlerbehebungen.
+Wir freuen uns über Beiträge zur Verbesserung von LemonVows! Bitte erstellen Sie einen Pull Request oder eröffnen Sie ein Issue für Vorschläge und Fehlermeldungen.
 
 ## Lizenz
 
-Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE)-Datei für Details.
+Dieses Projekt ist urheberrechtlich geschützt und darf nur mit ausdrücklicher Genehmigung verwendet werden.
 
 ## Kontakt
 
-Bei Fragen oder Anregungen kontaktiere uns unter [info@lemonharbor.com](mailto:info@lemonharbor.com).
+Bei Fragen oder Anregungen kontaktieren Sie uns bitte unter info@lemonvows.com.
