@@ -28,7 +28,7 @@ interface ApiGuest {
   dietaryRestrictions: string[];
   plusOne: boolean;
   notes: string;
-  tableAssignment?: string;
+  tableAssignment?: string | null;
   group?: string;
 }
 
@@ -82,7 +82,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
   }, [guests]);
   
   // Convert API guest format to our internal Guest format
-  const convertApiGuest = (apiGuest: ApiGuest): Guest => {
+  const convertApiGuest = (apiGuest: any): Guest => {
     return {
       id: apiGuest.id,
       firstName: apiGuest.firstName,
@@ -109,7 +109,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
       // Handle null data by providing an empty array as fallback
       // Convert API response to our internal Guest format
       const guestData = data || [];
-      const convertedGuests = guestData.map(convertApiGuest);
+      const convertedGuests = guestData.map((apiGuest: any) => convertApiGuest(apiGuest));
       setGuests(convertedGuests);
     } catch (err) {
       setError('Failed to load guests');
