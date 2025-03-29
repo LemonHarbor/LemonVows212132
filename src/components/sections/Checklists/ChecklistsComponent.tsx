@@ -30,7 +30,8 @@ const ChecklistsComponent: React.FC = () => {
     const fetchItems = async () => {
       const { data, error } = await demoApi.checklists.getItems();
       if (data && !error) {
-        setItems(data);
+        // Type assertion to ensure data matches the ChecklistItem[] type
+        setItems(data as unknown as ChecklistItem[]);
       }
     };
 
@@ -76,13 +77,13 @@ const ChecklistsComponent: React.FC = () => {
       // Update existing item
       const { data, error } = await demoApi.checklists.updateItem(currentItem.id, currentItem);
       if (data && !error) {
-        setItems(items.map(item => item.id === currentItem.id ? data as ChecklistItem : item));
+        setItems(items.map(item => item.id === currentItem.id ? data as unknown as ChecklistItem : item));
       }
     } else {
       // Add new item
       const { data, error } = await demoApi.checklists.addItem(currentItem as ChecklistItem);
       if (data && !error) {
-        setItems([...items, data as ChecklistItem]);
+        setItems([...items, data as unknown as ChecklistItem]);
       }
     }
     
