@@ -1,0 +1,171 @@
+{
+  "common": {
+    "appName": "LemonVows",
+    "tagline": "Hochzeitsplanung leicht gemacht",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "search": "Suchen",
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Erfolgreich gespeichert",
+    "required": "Pflichtfeld"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "guests": "Gäste",
+    "tableplan": "Tischplan",
+    "budget": "Budget",
+    "tasks": "Aufgaben",
+    "music": "Musikwünsche",
+    "gallery": "Foto-Galerie",
+    "settings": "Einstellungen"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "logout": "Abmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Bereits ein Konto?"
+  },
+  "dashboard": {
+    "welcome": "Willkommen bei Ihrer Hochzeitsplanung",
+    "daysLeft": "Tage bis zur Hochzeit",
+    "quickAccess": "Schnellzugriff",
+    "recentActivity": "Letzte Aktivitäten",
+    "upcomingTasks": "Anstehende Aufgaben"
+  },
+  "guests": {
+    "title": "Gästeverwaltung",
+    "totalGuests": "Gesamtzahl der Gäste",
+    "confirmed": "Zugesagt",
+    "pending": "Ausstehend",
+    "declined": "Abgesagt",
+    "addGuest": "Gast hinzufügen",
+    "importGuests": "Gäste importieren",
+    "exportGuests": "Gäste exportieren",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "status": "Status",
+    "plusOne": "Begleitperson",
+    "dietary": "Ernährungshinweise",
+    "allergies": "Allergien",
+    "accommodation": "Übernachtung",
+    "notes": "Notizen"
+  },
+  "tableplan": {
+    "title": "Tischplan",
+    "tables": "Tische",
+    "addTable": "Tisch hinzufügen",
+    "tableName": "Tischname",
+    "tableSize": "Tischgröße",
+    "tableShape": "Tischform",
+    "assignGuests": "Gäste zuweisen",
+    "unassignedGuests": "Nicht zugewiesene Gäste",
+    "saveLayout": "Layout speichern",
+    "exportPDF": "Als PDF exportieren",
+    "conflicts": "Konflikte",
+    "noConflicts": "Keine Konflikte gefunden"
+  },
+  "budget": {
+    "title": "Budgetplaner",
+    "totalBudget": "Gesamtbudget",
+    "spent": "Ausgegeben",
+    "remaining": "Verbleibend",
+    "addExpense": "Ausgabe hinzufügen",
+    "category": "Kategorie",
+    "amount": "Betrag",
+    "date": "Datum",
+    "paid": "Bezahlt",
+    "vendor": "Anbieter",
+    "categories": {
+      "venue": "Location",
+      "catering": "Catering",
+      "attire": "Kleidung",
+      "photography": "Fotografie",
+      "music": "Musik",
+      "flowers": "Blumen",
+      "invitations": "Einladungen",
+      "transportation": "Transport",
+      "honeymoon": "Flitterwochen",
+      "other": "Sonstiges"
+    }
+  },
+  "tasks": {
+    "title": "Aufgaben",
+    "addTask": "Aufgabe hinzufügen",
+    "completed": "Erledigt",
+    "pending": "Ausstehend",
+    "dueDate": "Fälligkeitsdatum",
+    "priority": "Priorität",
+    "assignedTo": "Zugewiesen an",
+    "description": "Beschreibung",
+    "markComplete": "Als erledigt markieren",
+    "priorities": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    }
+  },
+  "music": {
+    "title": "Musikwünsche",
+    "addSong": "Lied hinzufügen",
+    "songTitle": "Titel",
+    "artist": "Künstler",
+    "addedBy": "Hinzugefügt von",
+    "votes": "Stimmen",
+    "upvote": "Dafür stimmen",
+    "downvote": "Dagegen stimmen",
+    "playlist": "Playlist",
+    "exportPlaylist": "Playlist exportieren"
+  },
+  "gallery": {
+    "title": "Foto-Galerie",
+    "upload": "Fotos hochladen",
+    "shared": "Geteilte Fotos",
+    "private": "Private Fotos",
+    "download": "Herunterladen",
+    "share": "Teilen",
+    "delete": "Löschen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "profile": "Profil",
+    "account": "Konto",
+    "notifications": "Benachrichtigungen",
+    "language": "Sprache",
+    "theme": "Design",
+    "privacy": "Datenschutz",
+    "exportData": "Daten exportieren",
+    "deleteAccount": "Konto löschen",
+    "weddingDetails": "Hochzeitsdetails",
+    "weddingDate": "Hochzeitsdatum",
+    "weddingLocation": "Hochzeitsort",
+    "partnerDetails": "Partnerdetails"
+  },
+  "admin": {
+    "title": "Admin-Bereich",
+    "users": "Benutzer",
+    "statistics": "Statistiken",
+    "customization": "Anpassung",
+    "templates": "Vorlagen",
+    "support": "Support"
+  },
+  "landing": {
+    "hero": "Planen Sie Ihre perfekte Hochzeit mit unserer All-in-One-Plattform",
+    "features": "Funktionen",
+    "pricing": "Preise",
+    "testimonials": "Kundenstimmen",
+    "faq": "Häufige Fragen",
+    "contact": "Kontakt",
+    "getStarted": "Jetzt starten",
+    "learnMore": "Mehr erfahren"
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "common": {
+    "appName": "LemonVows",
+    "tagline": "Wedding planning made easy",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Successfully saved",
+    "required": "Required field"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "guests": "Guests",
+    "tableplan": "Table Plan",
+    "budget": "Budget",
+    "tasks": "Tasks",
+    "music": "Music Requests",
+    "gallery": "Photo Gallery",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "dashboard": {
+    "welcome": "Welcome to your wedding planning",
+    "daysLeft": "Days until the wedding",
+    "quickAccess": "Quick access",
+    "recentActivity": "Recent activity",
+    "upcomingTasks": "Upcoming tasks"
+  },
+  "guests": {
+    "title": "Guest Management",
+    "totalGuests": "Total guests",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "declined": "Declined",
+    "addGuest": "Add guest",
+    "importGuests": "Import guests",
+    "exportGuests": "Export guests",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "status": "Status",
+    "plusOne": "Plus one",
+    "dietary": "Dietary requirements",
+    "allergies": "Allergies",
+    "accommodation": "Accommodation",
+    "notes": "Notes"
+  },
+  "tableplan": {
+    "title": "Table Plan",
+    "tables": "Tables",
+    "addTable": "Add table",
+    "tableName": "Table name",
+    "tableSize": "Table size",
+    "tableShape": "Table shape",
+    "assignGuests": "Assign guests",
+    "unassignedGuests": "Unassigned guests",
+    "saveLayout": "Save layout",
+    "exportPDF": "Export as PDF",
+    "conflicts": "Conflicts",
+    "noConflicts": "No conflicts found"
+  },
+  "budget": {
+    "title": "Budget Planner",
+    "totalBudget": "Total budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "addExpense": "Add expense",
+    "category": "Category",
+    "amount": "Amount",
+    "date": "Date",
+    "paid": "Paid",
+    "vendor": "Vendor",
+    "categories": {
+      "venue": "Venue",
+      "catering": "Catering",
+      "attire": "Attire",
+      "photography": "Photography",
+      "music": "Music",
+      "flowers": "Flowers",
+      "invitations": "Invitations",
+      "transportation": "Transportation",
+      "honeymoon": "Honeymoon",
+      "other": "Other"
+    }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "addTask": "Add task",
+    "completed": "Completed",
+    "pending": "Pending",
+    "dueDate": "Due date",
+    "priority": "Priority",
+    "assignedTo": "Assigned to",
+    "description": "Description",
+    "markComplete": "Mark as complete",
+    "priorities": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    }
+  },
+  "music": {
+    "title": "Music Requests",
+    "addSong": "Add song",
+    "songTitle": "Title",
+    "artist": "Artist",
+    "addedBy": "Added by",
+    "votes": "Votes",
+    "upvote": "Upvote",
+    "downvote": "Downvote",
+    "playlist": "Playlist",
+    "exportPlaylist": "Export playlist"
+  },
+  "gallery": {
+    "title": "Photo Gallery",
+    "upload": "Upload photos",
+    "shared": "Shared photos",
+    "private": "Private photos",
+    "download": "Download",
+    "share": "Share",
+    "delete": "Delete"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "notifications": "Notifications",
+    "language": "Language",
+    "theme": "Theme",
+    "privacy": "Privacy",
+    "exportData": "Export data",
+    "deleteAccount": "Delete account",
+    "weddingDetails": "Wedding details",
+    "weddingDate": "Wedding date",
+    "weddingLocation": "Wedding location",
+    "partnerDetails": "Partner details"
+  },
+  "admin": {
+    "title": "Admin Area",
+    "users": "Users",
+    "statistics": "Statistics",
+    "customization": "Customization",
+    "templates": "Templates",
+    "support": "Support"
+  },
+  "landing": {
+    "hero": "Plan your perfect wedding with our all-in-one platform",
+    "features": "Features",
+    "pricing": "Pricing",
+    "testimonials": "Testimonials",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "getStarted": "Get started",
+    "learnMore": "Learn more"
+  }
+}

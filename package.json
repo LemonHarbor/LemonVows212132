@@ -1,0 +1,47 @@
+{
+  "name": "lemonvows",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LemonHarbor/LemonVows.git"
+  },
+  "keywords": [
+    "wedding",
+    "planning",
+    "hochzeit",
+    "lemonvows"
+  ],
+  "author": "LemonHarbor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LemonHarbor/LemonVows/issues"
+  },
+  "homepage": "https://github.com/LemonHarbor/LemonVows#readme",
+  "description": "Hochzeitsplanungs-App für Brautpaare",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "i18next": "^23.10.1",
+    "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.1.0",
+    "react-router-dom": "^6.22.3",
+    "styled-components": "^6.1.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.67",
+    "@types/react-beautiful-dnd": "^13.1.8",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react-swc": "^3.6.0",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
+  }
+}
