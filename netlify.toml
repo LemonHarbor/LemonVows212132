@@ -1,14 +1,11 @@
 [build]
   command = "npm install && npm run build"
-  publish = "out"
-
+  publish = ".next"
 [build.environment]
   NODE_VERSION = "20.18.0"
-  NEXT_PRIVATE_TARGET = "static"
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"
-
-# Remove the redirect that's causing issues with Next.js routing
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
+  NEXT_PRIVATE_TARGET = "server"
+  NETLIFY_NEXT_PLUGIN_SKIP = "false"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
