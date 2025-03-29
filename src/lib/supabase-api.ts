@@ -1,530 +1,826 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../types/supabase';
 
-// Erstelle einen Typ für die Supabase-Datenbank
-// Diese Typen werden normalerweise mit dem Supabase CLI generiert
-// Für die Demo verwenden wir eine vereinfachte Version
+// Supabase configuration
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jodqliylhmwgpurfzxm.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjIxNmpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJleHAiOjE3MTYyMTZJmpvZHFsaXlsaG13Z3B1cmZ6eG0ifQ.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjIxNmpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJleHAiOjE3MTYyMTZJmpvZHFsaXlsaG13Z3B1cmZ6eG0ifQ';
 
-// Supabase-Client erstellen
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://demo-lemonvows.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'demo-key';
+// Initialize Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-
-// Demo-Daten für die Entwicklung
-export const demoData = {
-  // Benutzer
-  currentUser: {
-    id: 'demo-user-id',
-    email: 'demo@example.com',
-    name: 'Demo User',
-    role: 'customer',
-    createdAt: '2025-01-01T00:00:00Z',
-    lastLogin: '2025-03-28T00:00:00Z',
-    status: 'active',
-    avatarUrl: null
-  },
-  
-  // Hochzeit
-  wedding: {
-    id: 'demo-wedding-id',
-    name: 'Julia & Thomas Hochzeit',
-    date: '2025-08-15',
-    userId: 'demo-user-id',
-    plan: 'premium',
-    status: 'active',
-    guestCount: 120,
-    createdAt: '2025-01-15T00:00:00Z',
-    lastActive: '2025-03-28T00:00:00Z',
-    customDomain: null,
-    customColors: null
-  },
-  
-  // Gäste
-  guests: [
-    {
-      id: 'guest-1',
-      weddingId: 'demo-wedding-id',
-      firstName: 'Julia',
-      lastName: 'Schmidt',
-      email: 'julia@example.com',
-      phone: '+49123456789',
-      groupName: 'Familie Braut',
-      rsvpStatus: 'confirmed',
-      dietaryRestrictions: ['Nüsse'],
-      plusOne: false,
-      plusOneName: null,
-      accommodationNeeded: true,
-      notes: '',
-      createdAt: '2025-01-20T00:00:00Z',
-      updatedAt: '2025-01-20T00:00:00Z'
-    },
-    {
-      id: 'guest-2',
-      weddingId: 'demo-wedding-id',
-      firstName: 'Thomas',
-      lastName: 'Müller',
-      email: 'thomas@example.com',
-      phone: '+49123456780',
-      groupName: 'Freunde',
-      rsvpStatus: 'confirmed',
-      dietaryRestrictions: [],
-      plusOne: false,
-      plusOneName: null,
-      accommodationNeeded: true,
-      notes: '',
-      createdAt: '2025-01-20T00:00:00Z',
-      updatedAt: '2025-01-20T00:00:00Z'
-    },
-    {
-      id: 'guest-3',
-      weddingId: 'demo-wedding-id',
-      firstName: 'Sarah',
-      lastName: 'Weber',
-      email: 'sarah@example.com',
-      phone: '+49123456781',
-      groupName: 'Kollegen',
-      rsvpStatus: 'pending',
-      dietaryRestrictions: [],
-      plusOne: false,
-      plusOneName: null,
-      accommodationNeeded: false,
-      notes: '',
-      createdAt: '2025-01-20T00:00:00Z',
-      updatedAt: '2025-01-20T00:00:00Z'
-    },
-    {
-      id: 'guest-4',
-      weddingId: 'demo-wedding-id',
-      firstName: 'Michael',
-      lastName: 'König',
-      email: 'michael@example.com',
-      phone: '+49123456782',
-      groupName: 'Familie Bräutigam',
-      rsvpStatus: 'declined',
-      dietaryRestrictions: [],
-      plusOne: false,
-      plusOneName: null,
-      accommodationNeeded: false,
-      notes: 'Ist im Urlaub',
-      createdAt: '2025-01-20T00:00:00Z',
-      updatedAt: '2025-01-20T00:00:00Z'
-    },
-    {
-      id: 'guest-5',
-      weddingId: 'demo-wedding-id',
-      firstName: 'Anna',
-      lastName: 'Schneider',
-      email: 'anna@example.com',
-      phone: '+49123456783',
-      groupName: 'Freunde',
-      rsvpStatus: 'confirmed',
-      dietaryRestrictions: ['Laktose'],
-      plusOne: false,
-      plusOneName: null,
-      accommodationNeeded: true,
-      notes: '',
-      createdAt: '2025-01-20T00:00:00Z',
-      updatedAt: '2025-01-20T00:00:00Z'
-    }
-  ],
-  
-  // Tische
-  tables: [
-    {
-      id: 'table-1',
-      weddingId: 'demo-wedding-id',
-      name: 'Tisch 1',
-      shape: 'round',
-      capacity: 8,
-      rotation: 0,
-      positionX: 100,
-      positionY: 100,
-      createdAt: '2025-01-25T00:00:00Z',
-      updatedAt: '2025-01-25T00:00:00Z'
-    },
-    {
-      id: 'table-2',
-      weddingId: 'demo-wedding-id',
-      name: 'Tisch 2',
-      shape: 'rectangular',
-      capacity: 6,
-      rotation: 0,
-      positionX: 300,
-      positionY: 100,
-      createdAt: '2025-01-25T00:00:00Z',
-      updatedAt: '2025-01-25T00:00:00Z'
-    }
-  ],
-  
-  // Sitzplätze
-  seats: [
-    // Tisch 1
-    { id: 'seat-1-1', tableId: 'table-1', guestId: 'guest-1', position: 1 },
-    { id: 'seat-1-2', tableId: 'table-1', guestId: 'guest-2', position: 2 },
-    { id: 'seat-1-3', tableId: 'table-1', guestId: 'guest-3', position: 3 },
-    { id: 'seat-1-4', tableId: 'table-1', guestId: null, position: 4 },
-    { id: 'seat-1-5', tableId: 'table-1', guestId: 'guest-4', position: 5 },
-    { id: 'seat-1-6', tableId: 'table-1', guestId: 'guest-5', position: 6 },
-    { id: 'seat-1-7', tableId: 'table-1', guestId: null, position: 7 },
-    { id: 'seat-1-8', tableId: 'table-1', guestId: 'guest-6', position: 8 },
-    
-    // Tisch 2
-    { id: 'seat-2-1', tableId: 'table-2', guestId: 'guest-7', position: 1 },
-    { id: 'seat-2-2', tableId: 'table-2', guestId: 'guest-8', position: 2 },
-    { id: 'seat-2-3', tableId: 'table-2', guestId: null, position: 3 },
-    { id: 'seat-2-4', tableId: 'table-2', guestId: 'guest-9', position: 4 },
-    { id: 'seat-2-5', tableId: 'table-2', guestId: 'guest-10', position: 5 },
-    { id: 'seat-2-6', tableId: 'table-2', guestId: 'guest-11', position: 6 }
-  ],
-  
-  // Budget-Kategorien
-  budgetCategories: [
-    {
-      id: 'category-1',
-      weddingId: 'demo-wedding-id',
-      name: 'Location',
-      plannedAmount: 4500,
-      color: '#FF5733',
-      createdAt: '2025-01-30T00:00:00Z',
-      updatedAt: '2025-01-30T00:00:00Z'
-    },
-    {
-      id: 'category-2',
-      weddingId: 'demo-wedding-id',
-      name: 'Catering',
-      plannedAmount: 3750,
-      color: '#33FF57',
-      createdAt: '2025-01-30T00:00:00Z',
-      updatedAt: '2025-01-30T00:00:00Z'
-    },
-    {
-      id: 'category-3',
-      weddingId: 'demo-wedding-id',
-      name: 'Dekoration',
-      plannedAmount: 2250,
-      color: '#3357FF',
-      createdAt: '2025-01-30T00:00:00Z',
-      updatedAt: '2025-01-30T00:00:00Z'
-    },
-    {
-      id: 'category-4',
-      weddingId: 'demo-wedding-id',
-      name: 'Kleidung',
-      plannedAmount: 3000,
-      color: '#F033FF',
-      createdAt: '2025-01-30T00:00:00Z',
-      updatedAt: '2025-01-30T00:00:00Z'
-    },
-    {
-      id: 'category-5',
-      weddingId: 'demo-wedding-id',
-      name: 'Sonstiges',
-      plannedAmount: 1500,
-      color: '#FF33A8',
-      createdAt: '2025-01-30T00:00:00Z',
-      updatedAt: '2025-01-30T00:00:00Z'
-    }
-  ],
-  
-  // Budget-Ausgaben
-  budgetExpenses: [
-    {
-      id: 'expense-1',
-      categoryId: 'category-1',
-      description: 'Anzahlung Location',
-      amount: 2000,
-      date: '2025-02-01',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-02-01T00:00:00Z',
-      updatedAt: '2025-02-01T00:00:00Z'
-    },
-    {
-      id: 'expense-2',
-      categoryId: 'category-1',
-      description: 'Restzahlung Location',
-      amount: 2500,
-      date: '2025-07-15',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-02-01T00:00:00Z',
-      updatedAt: '2025-02-01T00:00:00Z'
-    },
-    {
-      id: 'expense-3',
-      categoryId: 'category-2',
-      description: 'Anzahlung Catering',
-      amount: 1500,
-      date: '2025-02-15',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-02-15T00:00:00Z',
-      updatedAt: '2025-02-15T00:00:00Z'
-    },
-    {
-      id: 'expense-4',
-      categoryId: 'category-2',
-      description: 'Weinlieferung',
-      amount: 1500,
-      date: '2025-03-01',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-03-01T00:00:00Z',
-      updatedAt: '2025-03-01T00:00:00Z'
-    },
-    {
-      id: 'expense-5',
-      categoryId: 'category-3',
-      description: 'Blumendekoration',
-      amount: 1500,
-      date: '2025-03-15',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-03-15T00:00:00Z',
-      updatedAt: '2025-03-15T00:00:00Z'
-    },
-    {
-      id: 'expense-6',
-      categoryId: 'category-4',
-      description: 'Brautkleid',
-      amount: 2000,
-      date: '2025-02-20',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-02-20T00:00:00Z',
-      updatedAt: '2025-02-20T00:00:00Z'
-    },
-    {
-      id: 'expense-7',
-      categoryId: 'category-4',
-      description: 'Anzug Bräutigam',
-      amount: 500,
-      date: '2025-02-25',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-02-25T00:00:00Z',
-      updatedAt: '2025-02-25T00:00:00Z'
-    },
-    {
-      id: 'expense-8',
-      categoryId: 'category-5',
-      description: 'Einladungskarten',
-      amount: 350,
-      date: '2025-01-10',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-01-10T00:00:00Z',
-      updatedAt: '2025-01-10T00:00:00Z'
-    },
-    {
-      id: 'expense-9',
-      categoryId: 'category-5',
-      description: 'DJ',
-      amount: 400,
-      date: '2025-03-10',
-      paid: true,
-      receiptUrl: null,
-      notes: '',
-      createdAt: '2025-03-10T00:00:00Z',
-      updatedAt: '2025-03-10T00:00:00Z'
-    }
-  ],
-  
-  // Zahlungen
-  payments: [
-    {
-      id: 'payment-1',
-      userId: 'demo-user-id',
-      weddingId: 'demo-wedding-id',
-      amount: 29.99,
-      currency: 'EUR',
-      status: 'completed',
-      method: 'credit_card',
-      date: '2025-01-01T00:00:00Z',
-      plan: 'premium',
-      duration: 'monthly',
-      invoiceUrl: null,
-      receiptUrl: null
-    }
-  ]
-};
-
-// Hilfsfunktionen für die Demo-Daten
+// Demo API for development and testing
 export const demoApi = {
-  // Gäste-Funktionen
+  // Guest Management
   guests: {
     getAll: async () => {
-      return { data: demoData.guests, error: null };
+      try {
+        // For demo purposes, return mock data
+        return {
+          data: [
+            {
+              id: '1',
+              firstName: 'Max',
+              lastName: 'Mustermann',
+              email: 'max@example.com',
+              phone: '+49123456789',
+              rsvpStatus: 'confirmed',
+              dietaryRestrictions: ['vegetarian'],
+              plusOne: true,
+              notes: 'Allergic to nuts',
+              tableAssignment: 'Table 1',
+              group: 'Family',
+            },
+            {
+              id: '2',
+              firstName: 'Anna',
+              lastName: 'Schmidt',
+              email: 'anna@example.com',
+              phone: '+49987654321',
+              rsvpStatus: 'pending',
+              dietaryRestrictions: [],
+              plusOne: false,
+              notes: '',
+              tableAssignment: null,
+              group: 'Friends',
+            },
+            {
+              id: '3',
+              firstName: 'Thomas',
+              lastName: 'Müller',
+              email: 'thomas@example.com',
+              phone: '+49123123123',
+              rsvpStatus: 'declined',
+              dietaryRestrictions: ['gluten-free'],
+              plusOne: false,
+              notes: 'Cannot attend due to prior commitment',
+              tableAssignment: null,
+              group: 'Colleagues',
+            },
+          ],
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
     },
-    getById: async (id: string) => {
-      const guest = demoData.guests.find(g => g.id === id);
-      return { data: guest || null, error: guest ? null : new Error('Guest not found') };
+    create: async (guest) => {
+      try {
+        // For demo purposes, just return the guest with a new ID
+        return {
+          data: { ...guest, id: Date.now().toString() },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
     },
-    create: async (guest: any) => {
-      const newGuest = {
-        ...guest,
-        id: `guest-${demoData.guests.length + 1}`,
-        weddingId: 'demo-wedding-id',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      demoData.guests.push(newGuest);
-      return { data: newGuest, error: null };
+    update: async (id, updates) => {
+      try {
+        // For demo purposes, just return the updated guest
+        return {
+          data: { id, ...updates },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
     },
-    update: async (id: string, updates: any) => {
-      const index = demoData.guests.findIndex(g => g.id === id);
-      if (index === -1) return { data: null, error: new Error('Guest not found') };
-      
-      const updatedGuest = {
-        ...demoData.guests[index],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      demoData.guests[index] = updatedGuest;
-      return { data: updatedGuest, error: null };
+    delete: async (id) => {
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { id },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
     },
-    delete: async (id: string) => {
-      const index = demoData.guests.findIndex(g => g.id === id);
-      if (index === -1) return { data: null, error: new Error('Guest not found') };
-      
-      const deletedGuest = demoData.guests[index];
-      demoData.guests.splice(index, 1);
-      return { data: deletedGuest, error: null };
-    }
   },
-  
-  // Tisch-Funktionen
+
+  // Table Planner
   tables: {
     getAll: async () => {
-      return { data: demoData.tables, error: null };
-    },
-    getById: async (id: string) => {
-      const table = demoData.tables.find(t => t.id === id);
-      return { data: table || null, error: table ? null : new Error('Table not found') };
-    },
-    create: async (table: any) => {
-      const newTable = {
-        ...table,
-        id: `table-${demoData.tables.length + 1}`,
-        weddingId: 'demo-wedding-id',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      demoData.tables.push(newTable);
-      return { data: newTable, error: null };
-    },
-    update: async (id: string, updates: any) => {
-      const index = demoData.tables.findIndex(t => t.id === id);
-      if (index === -1) return { data: null, error: new Error('Table not found') };
-      
-      const updatedTable = {
-        ...demoData.tables[index],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      demoData.tables[index] = updatedTable;
-      return { data: updatedTable, error: null };
-    },
-    delete: async (id: string) => {
-      const index = demoData.tables.findIndex(t => t.id === id);
-      if (index === -1) return { data: null, error: new Error('Table not found') };
-      
-      const deletedTable = demoData.tables[index];
-      demoData.tables.splice(index, 1);
-      return { data: deletedTable, error: null };
-    }
-  },
-  
-  // Budget-Funktionen
-  budget: {
-    getCategories: async () => {
-      return { data: demoData.budgetCategories, error: null };
-    },
-    getExpenses: async () => {
-      return { data: demoData.budgetExpenses, error: null };
-    },
-    createCategory: async (category: any) => {
-      const newCategory = {
-        ...category,
-        id: `category-${demoData.budgetCategories.length + 1}`,
-        weddingId: 'demo-wedding-id',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      demoData.budgetCategories.push(newCategory);
-      return { data: newCategory, error: null };
-    },
-    createExpense: async (expense: any) => {
-      const newExpense = {
-        ...expense,
-        id: `expense-${demoData.budgetExpenses.length + 1}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      demoData.budgetExpenses.push(newExpense);
-      return { data: newExpense, error: null };
-    },
-    updateCategory: async (id: string, updates: any) => {
-      const index = demoData.budgetCategories.findIndex(c => c.id === id);
-      if (index === -1) return { data: null, error: new Error('Category not found') };
-      
-      const updatedCategory = {
-        ...demoData.budgetCategories[index],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      demoData.budgetCategories[index] = updatedCategory;
-      return { data: updatedCategory, error: null };
-    },
-    updateExpense: async (id: string, updates: any) => {
-      const index = demoData.budgetExpenses.findIndex(e => e.id === id);
-      if (index === -1) return { data: null, error: new Error('Expense not found') };
-      
-      const updatedExpense = {
-        ...demoData.budgetExpenses[index],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      demoData.budgetExpenses[index] = updatedExpense;
-      return { data: updatedExpense, error: null };
-    }
-  },
-  
-  // Benutzer-Funktionen
-  auth: {
-    signIn: async (email: string, password: string) => {
-      if (email === 'demo@example.com' && password === 'password') {
-        return { data: { user: demoData.currentUser, session: { access_token: 'demo-token' } }, error: null };
+      try {
+        // For demo purposes, return mock data
+        return {
+          data: [
+            {
+              id: 'table1',
+              type: 'round',
+              seats: 8,
+              position: { x: 200, y: 200 },
+              name: 'Tisch 1',
+            },
+            {
+              id: 'table2',
+              type: 'rectangular',
+              seats: 6,
+              position: { x: 500, y: 200 },
+              name: 'Tisch 2',
+            },
+            {
+              id: 'table3',
+              type: 'oval',
+              seats: 10,
+              position: { x: 350, y: 400 },
+              name: 'Tisch 3',
+            },
+          ],
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
       }
-      return { data: null, error: new Error('Invalid credentials') };
     },
-    signUp: async (email: string, password: string, metadata: any) => {
-      return { data: { user: { ...demoData.currentUser, email, ...metadata }, session: { access_token: 'demo-token' } }, error: null };
+    create: async (table) => {
+      try {
+        // For demo purposes, just return the table with a new ID
+        return {
+          data: { ...table, id: `table${Date.now()}` },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    update: async (id, updates) => {
+      try {
+        // For demo purposes, just return the updated table
+        return {
+          data: { id, ...updates },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    delete: async (id) => {
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { id },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Budget Planner
+  budget: {
+    getItems: async () => {
+      try {
+        // For demo purposes, return mock data
+        return {
+          data: [
+            {
+              id: '1',
+              category: 'Venue',
+              description: 'Wedding Venue',
+              estimatedCost: 5000,
+              actualCost: 5500,
+              paid: 2000,
+              dueDate: '2025-05-01',
+              notes: 'Deposit paid',
+              status: 'in-progress',
+            },
+            {
+              id: '2',
+              category: 'Catering',
+              description: 'Wedding Dinner',
+              estimatedCost: 3000,
+              actualCost: 3200,
+              paid: 1000,
+              dueDate: '2025-05-15',
+              notes: 'Deposit paid',
+              status: 'in-progress',
+            },
+            {
+              id: '3',
+              category: 'Photography',
+              description: 'Photographer',
+              estimatedCost: 1500,
+              actualCost: 1500,
+              paid: 500,
+              dueDate: '2025-04-01',
+              notes: 'Deposit paid',
+              status: 'in-progress',
+            },
+          ],
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    addItem: async (item) => {
+      try {
+        // For demo purposes, just return the item with a new ID
+        return {
+          data: { ...item, id: Date.now().toString() },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    updateItem: async (id, updates) => {
+      try {
+        // For demo purposes, just return the updated item
+        return {
+          data: { id, ...updates },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    deleteItem: async (id) => {
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { id },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Checklists
+  checklists: {
+    getItems: async () => {
+      try {
+        // For demo purposes, return mock data
+        return {
+          data: [
+            {
+              id: '1',
+              title: 'Location buchen',
+              description: 'Vertrag mit Schloss Elmau unterschreiben und anzahlen',
+              dueDate: '2024-12-15',
+              completed: true,
+              priority: 'high',
+              assignedTo: 'Braut',
+              category: 'Venue',
+            },
+            {
+              id: '2',
+              title: 'Fotografen buchen',
+              description: 'Angebote von drei verschiedenen Fotografen einholen und vergleichen',
+              dueDate: '2025-02-01',
+              completed: false,
+              priority: 'medium',
+              assignedTo: 'Bräutigam',
+              category: 'Vendors',
+            },
+            {
+              id: '3',
+              title: 'Einladungen versenden',
+              description: 'Einladungen gestalten, drucken und an alle Gäste versenden',
+              dueDate: '2025-03-15',
+              completed: false,
+              priority: 'low',
+              assignedTo: 'Beide',
+              category: 'Invitations',
+            },
+          ],
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    addItem: async (item) => {
+      try {
+        // For demo purposes, just return the item with a new ID
+        return {
+          data: { ...item, id: Date.now().toString() },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    updateItem: async (id, updates) => {
+      try {
+        // For demo purposes, just return the updated item
+        return {
+          data: { id, ...updates },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    deleteItem: async (id) => {
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { id },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Music Voting
+  music: {
+    getSongs: async () => {
+      try {
+        // For demo purposes, return mock data
+        return {
+          data: [
+            {
+              id: '1',
+              title: 'Dancing Queen',
+              artist: 'ABBA',
+              votes: 24,
+              addedBy: 'Braut',
+              addedAt: '2025-01-15',
+            },
+            {
+              id: '2',
+              title: 'I Gotta Feeling',
+              artist: 'Black Eyed Peas',
+              votes: 18,
+              addedBy: 'Bräutigam',
+              addedAt: '2025-01-16',
+            },
+            {
+              id: '3',
+              title: 'Shut Up and Dance',
+              artist: 'WALK THE MOON',
+              votes: 15,
+              addedBy: 'Gast',
+              addedAt: '2025-01-17',
+            },
+            {
+              id: '4',
+              title: "Don't Stop Me Now",
+              artist: 'Queen',
+              votes: 12,
+              addedBy: 'Gast',
+              addedAt: '2025-01-18',
+            },
+            {
+              id: '5',
+              title: 'Uptown Funk',
+              artist: 'Mark Ronson ft. Bruno Mars',
+              votes: 10,
+              addedBy: 'Gast',
+              addedAt: '2025-01-19',
+            },
+          ],
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    addSong: async (song) => {
+      try {
+        // For demo purposes, just return the song with a new ID
+        return {
+          data: { ...song, id: Date.now().toString(), votes: 0, addedAt: new Date().toISOString() },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    voteSong: async (id, increment = true) => {
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { id, success: true },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    deleteSong: async (id) => {
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { id },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Couple Management
+  couples: {
+    getDetails: async () => {
+      try {
+        // For demo purposes, return mock data
+        return {
+          data: {
+            id: '1',
+            weddingName: 'Anna & Thomas',
+            weddingDate: '2025-06-15',
+            location: 'Schloss Elmau, Bayern',
+            primaryColor: '#ffbd00',
+            secondaryColor: '#ffffff',
+            accentColor: '#333333',
+            websiteEnabled: true,
+            musicVotingEnabled: true,
+            tablePlannerEnabled: true,
+            guestListEnabled: true,
+            budgetEnabled: true,
+            checklistEnabled: true,
+          },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    updateDetails: async (updates) => {
+      try {
+        // For demo purposes, just return the updated details
+        return {
+          data: { id: '1', ...updates },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Authentication
+  auth: {
+    signIn: async (email, password) => {
+      try {
+        // For demo purposes, just return success if email and password are provided
+        if (email && password) {
+          return {
+            data: {
+              user: {
+                id: '1',
+                email,
+                role: 'couple',
+              },
+              session: {
+                token: 'demo-token',
+              },
+            },
+            error: null,
+          };
+        } else {
+          return {
+            data: null,
+            error: 'Invalid email or password',
+          };
+        }
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    signUp: async (email, password) => {
+      try {
+        // For demo purposes, just return success if email and password are provided
+        if (email && password) {
+          return {
+            data: {
+              user: {
+                id: Date.now().toString(),
+                email,
+                role: 'couple',
+              },
+              session: {
+                token: 'demo-token',
+              },
+            },
+            error: null,
+          };
+        } else {
+          return {
+            data: null,
+            error: 'Invalid email or password',
+          };
+        }
+      } catch (error) {
+        return { data: null, error };
+      }
     },
     signOut: async () => {
-      return { error: null };
+      try {
+        // For demo purposes, just return success
+        return {
+          data: { success: true },
+          error: null,
+        };
+      } catch (error) {
+        return { data: null, error };
+      }
     },
-    getUser: async () => {
-      return { data: { user: demoData.currentUser }, error: null };
-    }
+    resetPassword: async (email) => {
+      try {
+        // For demo purposes, just return success if email is provided
+        if (email) {
+          return {
+            data: { success: true },
+            error: null,
+          };
+        } else {
+          return {
+            data: null,
+            error: 'Invalid email',
+          };
+        }
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
   },
-  
-  // Zahlungs-Funktionen
-  payments: {
-    createCheckoutSession: async (priceId: string) => {
-      return { data: { sessionId: 'demo-session-id', url: 'https://example.com/checkout' }, error: null };
-    },
-    getSubscription: async () => {
-      return { data: { status: 'active', plan: 'premium', current_period_end: '2025-04-01T00:00:00Z' }, error: null };
-    }
-  }
 };
+
+// Production API for real data
+export const api = {
+  // Guest Management
+  guests: {
+    getAll: async () => {
+      try {
+        const { data, error } = await supabase.from('guests').select('*');
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    create: async (guest) => {
+      try {
+        const { data, error } = await supabase.from('guests').insert([guest]).select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    update: async (id, updates) => {
+      try {
+        const { data, error } = await supabase
+          .from('guests')
+          .update(updates)
+          .eq('id', id)
+          .select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    delete: async (id) => {
+      try {
+        const { data, error } = await supabase.from('guests').delete().eq('id', id);
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Table Planner
+  tables: {
+    getAll: async () => {
+      try {
+        const { data, error } = await supabase.from('tables').select('*');
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    create: async (table) => {
+      try {
+        const { data, error } = await supabase.from('tables').insert([table]).select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    update: async (id, updates) => {
+      try {
+        const { data, error } = await supabase
+          .from('tables')
+          .update(updates)
+          .eq('id', id)
+          .select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    delete: async (id) => {
+      try {
+        const { data, error } = await supabase.from('tables').delete().eq('id', id);
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Budget Planner
+  budget: {
+    getItems: async () => {
+      try {
+        const { data, error } = await supabase.from('budget_items').select('*');
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    addItem: async (item) => {
+      try {
+        const { data, error } = await supabase.from('budget_items').insert([item]).select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    updateItem: async (id, updates) => {
+      try {
+        const { data, error } = await supabase
+          .from('budget_items')
+          .update(updates)
+          .eq('id', id)
+          .select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    deleteItem: async (id) => {
+      try {
+        const { data, error } = await supabase.from('budget_items').delete().eq('id', id);
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Checklists
+  checklists: {
+    getItems: async () => {
+      try {
+        const { data, error } = await supabase.from('checklist_items').select('*');
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    addItem: async (item) => {
+      try {
+        const { data, error } = await supabase.from('checklist_items').insert([item]).select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    updateItem: async (id, updates) => {
+      try {
+        const { data, error } = await supabase
+          .from('checklist_items')
+          .update(updates)
+          .eq('id', id)
+          .select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    deleteItem: async (id) => {
+      try {
+        const { data, error } = await supabase.from('checklist_items').delete().eq('id', id);
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Music Voting
+  music: {
+    getSongs: async () => {
+      try {
+        const { data, error } = await supabase.from('songs').select('*');
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    addSong: async (song) => {
+      try {
+        const { data, error } = await supabase.from('songs').insert([song]).select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    voteSong: async (id, increment = true) => {
+      try {
+        // Get current votes
+        const { data: currentData } = await supabase.from('songs').select('votes').eq('id', id).single();
+        const currentVotes = currentData?.votes || 0;
+        
+        // Update votes
+        const newVotes = increment ? currentVotes + 1 : Math.max(0, currentVotes - 1);
+        
+        const { data, error } = await supabase
+          .from('songs')
+          .update({ votes: newVotes })
+          .eq('id', id)
+          .select();
+        
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    deleteSong: async (id) => {
+      try {
+        const { data, error } = await supabase.from('songs').delete().eq('id', id);
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Couple Management
+  couples: {
+    getDetails: async () => {
+      try {
+        const { data, error } = await supabase.from('couples').select('*').single();
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    updateDetails: async (updates) => {
+      try {
+        const { data, error } = await supabase
+          .from('couples')
+          .update(updates)
+          .eq('id', updates.id)
+          .select();
+        return { data: data?.[0] || null, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+
+  // Authentication (using Supabase Auth)
+  auth: {
+    signIn: async (email, password) => {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    signUp: async (email, password) => {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    signOut: async () => {
+      try {
+        const { error } = await supabase.auth.signOut();
+        return { data: { success: !error }, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+    resetPassword: async (email) => {
+      try {
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+        return { data, error };
+      } catch (error) {
+        return { data: null, error };
+      }
+    },
+  },
+};
+
+// Use demo API for development and testing
+export default process.env.NODE_ENV === 'production' ? api : demoApi;
