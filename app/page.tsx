@@ -1,11 +1,16 @@
-"use client";
+'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
+  const [demoActive, setDemoActive] = useState({
+    guestlist: false,
+    tableplan: false,
+    budget: false
+  });
 
   // Mock function for handling plan selection
   const handleSelectPlan = (planId: string) => {
@@ -17,6 +22,26 @@ export default function Home() {
   // Toggle theme function
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  // Demo functions
+  const startGuestlistDemo = () => {
+    setDemoActive({...demoActive, guestlist: true});
+    window.alert('Gästeliste-Demo gestartet!');
+  };
+
+  const startTableplanDemo = () => {
+    setDemoActive({...demoActive, tableplan: true});
+    window.alert('Tischplaner-Demo gestartet!');
+  };
+
+  const startBudgetDemo = () => {
+    setDemoActive({...demoActive, budget: true});
+    window.alert('Budgetplaner-Demo gestartet!');
+  };
+
+  const handleContactSubmit = () => {
+    window.alert('Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze bei Ihnen melden.');
   };
 
   return (
@@ -379,7 +404,7 @@ export default function Home() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Gästeliste</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">Verwalten Sie Ihre Gäste und deren Antworten.</p>
                 <button 
-                  onClick={() => alert('Gästeliste-Demo würde hier starten!')}
+                  onClick={startGuestlistDemo}
                   className="px-4 py-2 bg-yellow-500 dark:bg-yellow-600 text-white rounded hover:bg-yellow-600 dark:hover:bg-yellow-700 transition-colors"
                 >
                   Demo starten
@@ -390,7 +415,7 @@ export default function Home() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Tischplaner</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">Erstellen Sie Ihren Sitzplan mit Drag & Drop.</p>
                 <button 
-                  onClick={() => alert('Tischplaner-Demo würde hier starten!')}
+                  onClick={startTableplanDemo}
                   className="px-4 py-2 bg-yellow-500 dark:bg-yellow-600 text-white rounded hover:bg-yellow-600 dark:hover:bg-yellow-700 transition-colors"
                 >
                   Demo starten
@@ -401,7 +426,7 @@ export default function Home() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Budgetplaner</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">Behalten Sie Ihre Ausgaben im Überblick.</p>
                 <button 
-                  onClick={() => alert('Budgetplaner-Demo würde hier starten!')}
+                  onClick={startBudgetDemo}
                   className="px-4 py-2 bg-yellow-500 dark:bg-yellow-600 text-white rounded hover:bg-yellow-600 dark:hover:bg-yellow-700 transition-colors"
                 >
                   Demo starten
