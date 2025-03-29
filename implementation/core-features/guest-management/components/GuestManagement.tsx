@@ -9,73 +9,81 @@ interface GuestProps {
   rsvpStatus: "pending" | "confirmed" | "declined";
   dietaryRestrictions: string[];
   plusOne: boolean;
-  tableId: string | null;
   notes: string;
+  tableAssignment: string | null;
+  group: string;
 }
 
 const GuestManagement: React.FC = () => {
   const [guests, setGuests] = useState<GuestProps[]>([
     {
-      id: "guest1",
+      id: "1",
       firstName: "Max",
       lastName: "Mustermann",
-      email: "max.mustermann@example.com",
-      phone: "+49 123 456789",
+      email: "max@example.com",
+      phone: "+49123456789",
       rsvpStatus: "confirmed",
       dietaryRestrictions: ["vegetarian"],
-      plusOne: false,
-      tableId: null,
-      notes: ""
+      plusOne: true,
+      notes: "Allergic to nuts",
+      tableAssignment: "Table 1",
+      group: "Family",
     },
     {
-      id: "guest2",
+      id: "2",
       firstName: "Anna",
       lastName: "Schmidt",
-      email: "anna.schmidt@example.com",
-      phone: "+49 987 654321",
+      email: "anna@example.com",
+      phone: "+49987654321",
       rsvpStatus: "pending",
       dietaryRestrictions: [],
-      plusOne: true,
-      tableId: null,
-      notes: "Kommt mit Partner"
+      plusOne: false,
+      notes: "",
+      tableAssignment: null,
+      group: "Friends",
     },
     {
-      id: "guest3",
+      id: "3",
       firstName: "Thomas",
       lastName: "Müller",
-      email: "thomas.mueller@example.com",
-      phone: "+49 555 123456",
+      email: "thomas@example.com",
+      phone: "+49123123123",
       rsvpStatus: "declined",
-      dietaryRestrictions: ["lactose-intolerant"],
+      dietaryRestrictions: ["gluten-free"],
       plusOne: false,
-      tableId: null,
-      notes: "Kann leider nicht kommen"
-    }
+      notes: "Cannot attend due to prior commitment",
+      tableAssignment: null,
+      group: "Colleagues",
+    },
   ]);
 
-  const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [currentGuest, setCurrentGuest] = useState<GuestProps | null>(null);
-  const [newGuest, setNewGuest] = useState<Omit<GuestProps, "id">>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    rsvpStatus: "pending",
-    dietaryRestrictions: [],
-    plusOne: false,
-    tableId: null,
-    notes: ""
-  });
-  const [filter, setFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<keyof GuestProps>("lastName");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [currentGuest, setCurrentGuest] = useState<GuestProps | null>(null);
+  const [filterRsvp, setFilterRsvp] = useState<string>("all");
+
+  const handleSort = (column: keyof GuestProps) => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterRsvp(e.target.value);
+  };
 
   const handleAddGuest = () => {
-    const id = `guest${guests.length + 1}`;
-    setGuests([...guests, { id, ...newGuest }]);
-    setShowAddModal(false);
-    setNewGuest({
+    setCurrentGuest({
+      id: `${guests.length + 1}`,
       firstName: "",
       lastName: "",
       email: "",
@@ -83,81 +91,125 @@ const GuestManagement: React.FC = () => {
       rsvpStatus: "pending",
       dietaryRestrictions: [],
       plusOne: false,
-      tableId: null,
-      notes: ""
+      notes: "",
+      tableAssignment: null,
+      group: "",
     });
+    setShowModal(true);
   };
 
-  const handleEditGuest = () => {
+  const handleEditGuest = (guest: GuestProps) => {
+    setCurrentGuest(guest);
+    setShowModal(true);
+  };
+
+  const handleDeleteGuest = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this guest?")) {
+      setGuests(guests.filter((guest) => guest.id !== id));
+    }
+  };
+
+  const handleSaveGuest = (e: React.FormEvent) => {
+    e.preventDefault();
     if (currentGuest) {
-      setGuests(
-        guests.map((guest) =>
-          guest.id === currentGuest.id ? currentGuest : guest
-        )
-      );
-      setShowEditModal(false);
+      const existingIndex = guests.findIndex((g) => g.id === currentGuest.id);
+      if (existingIndex >= 0) {
+        // Update existing guest
+        const updatedGuests = [...guests];
+        updatedGuests[existingIndex] = currentGuest;
+        setGuests(updatedGuests);
+      } else {
+        // Add new guest
+        setGuests([...guests, currentGuest]);
+      }
+      setShowModal(false);
       setCurrentGuest(null);
     }
   };
 
-  const handleDeleteGuest = (id: string) => {
-    setGuests(guests.filter((guest) => guest.id !== id));
-  };
-
-  const handleSort = (key: keyof GuestProps) => {
-    if (sortBy === key) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(key);
-      setSortDirection("asc");
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    if (currentGuest) {
+      const { name, value, type } = e.target;
+      if (type === "checkbox") {
+        const checked = (e.target as HTMLInputElement).checked;
+        setCurrentGuest({
+          ...currentGuest,
+          [name]: checked,
+        });
+      } else {
+        setCurrentGuest({
+          ...currentGuest,
+          [name]: value,
+        });
+      }
     }
   };
 
-  const filteredGuests = guests.filter(
-    (guest) =>
-      guest.firstName.toLowerCase().includes(filter.toLowerCase()) ||
-      guest.lastName.toLowerCase().includes(filter.toLowerCase()) ||
-      guest.email.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredGuests = guests.filter((guest) => {
+    const matchesSearch =
+      guest.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      guest.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      guest.email.toLowerCase().includes(searchTerm.toLowerCase());
 
+    const matchesFilter =
+      filterRsvp === "all" || guest.rsvpStatus === filterRsvp;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  // Fix TypeScript error by safely accessing properties with optional chaining
   const sortedGuests = [...filteredGuests].sort((a, b) => {
-    if (a[sortBy] < b[sortBy]) {
+    // Handle potential null or undefined values with nullish coalescing
+    const aValue = a[sortBy] ?? '';
+    const bValue = b[sortBy] ?? '';
+    
+    if (aValue < bValue) {
       return sortDirection === "asc" ? -1 : 1;
     }
-    if (a[sortBy] > b[sortBy]) {
+    if (aValue > bValue) {
       return sortDirection === "asc" ? 1 : -1;
     }
     return 0;
   });
 
-  const getRsvpStatusColor = (status: "pending" | "confirmed" | "declined") => {
-    switch (status) {
-      case "confirmed":
-        return "bg-green-100 text-green-800";
-      case "declined":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-yellow-100 text-yellow-800";
-    }
-  };
+  const totalGuests = guests.length;
+  const confirmedGuests = guests.filter(
+    (guest) => guest.rsvpStatus === "confirmed"
+  ).length;
+  const pendingGuests = guests.filter(
+    (guest) => guest.rsvpStatus === "pending"
+  ).length;
+  const declinedGuests = guests.filter(
+    (guest) => guest.rsvpStatus === "declined"
+  ).length;
 
   return (
     <div className="guest-management">
       <div className="guest-management__header">
         <h2>Gästeverwaltung</h2>
         <div className="guest-management__actions">
-          <div className="guest-management__search">
-            <input
-              type="text"
-              placeholder="Suchen..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="guest-management__search-input"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Suche nach Gästen..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="guest-management__search-input"
+          />
+          <select
+            value={filterRsvp}
+            onChange={handleFilterChange}
+            className="guest-management__filter-select"
+          >
+            <option value="all">Alle RSVP-Status</option>
+            <option value="confirmed">Bestätigt</option>
+            <option value="pending">Ausstehend</option>
+            <option value="declined">Abgelehnt</option>
+          </select>
           <button
+            onClick={handleAddGuest}
             className="guest-management__add-button"
-            onClick={() => setShowAddModal(true)}
           >
             Gast hinzufügen
           </button>
@@ -166,25 +218,25 @@ const GuestManagement: React.FC = () => {
 
       <div className="guest-management__stats">
         <div className="guest-management__stat">
-          <span className="guest-management__stat-label">Gesamt</span>
-          <span className="guest-management__stat-value">{guests.length}</span>
+          <span className="guest-management__stat-label">Gesamt:</span>
+          <span className="guest-management__stat-value">{totalGuests}</span>
         </div>
         <div className="guest-management__stat">
-          <span className="guest-management__stat-label">Zugesagt</span>
-          <span className="guest-management__stat-value">
-            {guests.filter((g) => g.rsvpStatus === "confirmed").length}
+          <span className="guest-management__stat-label">Bestätigt:</span>
+          <span className="guest-management__stat-value guest-management__stat-value--confirmed">
+            {confirmedGuests}
           </span>
         </div>
         <div className="guest-management__stat">
-          <span className="guest-management__stat-label">Ausstehend</span>
-          <span className="guest-management__stat-value">
-            {guests.filter((g) => g.rsvpStatus === "pending").length}
+          <span className="guest-management__stat-label">Ausstehend:</span>
+          <span className="guest-management__stat-value guest-management__stat-value--pending">
+            {pendingGuests}
           </span>
         </div>
         <div className="guest-management__stat">
-          <span className="guest-management__stat-label">Abgesagt</span>
-          <span className="guest-management__stat-value">
-            {guests.filter((g) => g.rsvpStatus === "declined").length}
+          <span className="guest-management__stat-label">Abgelehnt:</span>
+          <span className="guest-management__stat-value guest-management__stat-value--declined">
+            {declinedGuests}
           </span>
         </div>
       </div>
@@ -196,28 +248,51 @@ const GuestManagement: React.FC = () => {
               <th onClick={() => handleSort("firstName")}>
                 Vorname
                 {sortBy === "firstName" && (
-                  <span>{sortDirection === "asc" ? " ↑" : " ↓"}</span>
+                  <span>
+                    {sortDirection === "asc" ? " ▲" : " ▼"}
+                  </span>
                 )}
               </th>
               <th onClick={() => handleSort("lastName")}>
                 Nachname
                 {sortBy === "lastName" && (
-                  <span>{sortDirection === "asc" ? " ↑" : " ↓"}</span>
+                  <span>
+                    {sortDirection === "asc" ? " ▲" : " ▼"}
+                  </span>
                 )}
               </th>
               <th onClick={() => handleSort("email")}>
                 E-Mail
                 {sortBy === "email" && (
-                  <span>{sortDirection === "asc" ? " ↑" : " ↓"}</span>
+                  <span>
+                    {sortDirection === "asc" ? " ▲" : " ▼"}
+                  </span>
                 )}
               </th>
               <th onClick={() => handleSort("rsvpStatus")}>
                 RSVP
                 {sortBy === "rsvpStatus" && (
-                  <span>{sortDirection === "asc" ? " ↑" : " ↓"}</span>
+                  <span>
+                    {sortDirection === "asc" ? " ▲" : " ▼"}
+                  </span>
                 )}
               </th>
-              <th>Besonderheiten</th>
+              <th onClick={() => handleSort("group")}>
+                Gruppe
+                {sortBy === "group" && (
+                  <span>
+                    {sortDirection === "asc" ? " ▲" : " ▼"}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort("tableAssignment")}>
+                Tisch
+                {sortBy === "tableAssignment" && (
+                  <span>
+                    {sortDirection === "asc" ? " ▲" : " ▼"}
+                  </span>
+                )}
+              </th>
               <th>Aktionen</th>
             </tr>
           </thead>
@@ -229,523 +304,205 @@ const GuestManagement: React.FC = () => {
                 <td>{guest.email}</td>
                 <td>
                   <span
-                    className={`guest-management__rsvp-badge ${getRsvpStatusColor(
-                      guest.rsvpStatus
-                    )}`}
+                    className={`guest-management__rsvp-badge guest-management__rsvp-badge--${guest.rsvpStatus}`}
                   >
                     {guest.rsvpStatus === "confirmed"
-                      ? "Zugesagt"
-                      : guest.rsvpStatus === "declined"
-                      ? "Abgesagt"
-                      : "Ausstehend"}
+                      ? "Bestätigt"
+                      : guest.rsvpStatus === "pending"
+                      ? "Ausstehend"
+                      : "Abgelehnt"}
                   </span>
                 </td>
-                <td>
-                  {guest.dietaryRestrictions.length > 0 && (
-                    <span className="guest-management__dietary">
-                      {guest.dietaryRestrictions.join(", ")}
-                    </span>
-                  )}
-                  {guest.plusOne && (
-                    <span className="guest-management__plus-one">+1</span>
-                  )}
-                </td>
-                <td>
-                  <div className="guest-management__actions-cell">
-                    <button
-                      className="guest-management__edit-button"
-                      onClick={() => {
-                        setCurrentGuest(guest);
-                        setShowEditModal(true);
-                      }}
-                    >
-                      Bearbeiten
-                    </button>
-                    <button
-                      className="guest-management__delete-button"
-                      onClick={() => handleDeleteGuest(guest.id)}
-                    >
-                      Löschen
-                    </button>
-                  </div>
+                <td>{guest.group}</td>
+                <td>{guest.tableAssignment || "-"}</td>
+                <td className="guest-management__actions-cell">
+                  <button
+                    onClick={() => handleEditGuest(guest)}
+                    className="guest-management__edit-button"
+                  >
+                    Bearbeiten
+                  </button>
+                  <button
+                    onClick={() => handleDeleteGuest(guest.id)}
+                    className="guest-management__delete-button"
+                  >
+                    Löschen
+                  </button>
                 </td>
               </tr>
             ))}
+            {sortedGuests.length === 0 && (
+              <tr>
+                <td colSpan={7} className="guest-management__empty-message">
+                  Keine Gäste gefunden.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      {showAddModal && (
+      {showModal && currentGuest && (
         <div className="guest-management__modal">
           <div className="guest-management__modal-content">
             <div className="guest-management__modal-header">
-              <h3>Neuen Gast hinzufügen</h3>
+              <h3>
+                {currentGuest.id === `${guests.length + 1}`
+                  ? "Gast hinzufügen"
+                  : "Gast bearbeiten"}
+              </h3>
               <button
                 className="guest-management__modal-close"
-                onClick={() => setShowAddModal(false)}
+                onClick={() => setShowModal(false)}
               >
                 ×
               </button>
             </div>
-            <div className="guest-management__modal-body">
-              <div className="guest-management__form-group">
-                <label htmlFor="firstName">Vorname</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  value={newGuest.firstName}
-                  onChange={(e) =>
-                    setNewGuest({ ...newGuest, firstName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="lastName">Nachname</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  value={newGuest.lastName}
-                  onChange={(e) =>
-                    setNewGuest({ ...newGuest, lastName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="email">E-Mail</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={newGuest.email}
-                  onChange={(e) =>
-                    setNewGuest({ ...newGuest, email: e.target.value })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="phone">Telefon</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={newGuest.phone}
-                  onChange={(e) =>
-                    setNewGuest({ ...newGuest, phone: e.target.value })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="rsvpStatus">RSVP Status</label>
-                <select
-                  id="rsvpStatus"
-                  value={newGuest.rsvpStatus}
-                  onChange={(e) =>
-                    setNewGuest({
-                      ...newGuest,
-                      rsvpStatus: e.target.value as "pending" | "confirmed" | "declined"
-                    })
-                  }
-                >
-                  <option value="pending">Ausstehend</option>
-                  <option value="confirmed">Zugesagt</option>
-                  <option value="declined">Abgesagt</option>
-                </select>
-              </div>
-              <div className="guest-management__form-group">
-                <label>Besonderheiten</label>
-                <div className="guest-management__checkbox-group">
+            <form onSubmit={handleSaveGuest}>
+              <div className="guest-management__modal-body">
+                <div className="guest-management__form-group">
+                  <label htmlFor="firstName">Vorname</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={currentGuest.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="guest-management__form-group">
+                  <label htmlFor="lastName">Nachname</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={currentGuest.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="guest-management__form-group">
+                  <label htmlFor="email">E-Mail</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={currentGuest.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="guest-management__form-group">
+                  <label htmlFor="phone">Telefon</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={currentGuest.phone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="guest-management__form-group">
+                  <label htmlFor="rsvpStatus">RSVP-Status</label>
+                  <select
+                    id="rsvpStatus"
+                    name="rsvpStatus"
+                    value={currentGuest.rsvpStatus}
+                    onChange={handleInputChange}
+                  >
+                    <option value="pending">Ausstehend</option>
+                    <option value="confirmed">Bestätigt</option>
+                    <option value="declined">Abgelehnt</option>
+                  </select>
+                </div>
+                <div className="guest-management__form-group">
+                  <label htmlFor="group">Gruppe</label>
+                  <input
+                    type="text"
+                    id="group"
+                    name="group"
+                    value={currentGuest.group}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="guest-management__form-group">
+                  <label htmlFor="tableAssignment">Tischzuweisung</label>
+                  <input
+                    type="text"
+                    id="tableAssignment"
+                    name="tableAssignment"
+                    value={currentGuest.tableAssignment || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="guest-management__form-group">
                   <label>
                     <input
                       type="checkbox"
-                      checked={newGuest.dietaryRestrictions.includes("vegetarian")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: [...newGuest.dietaryRestrictions, "vegetarian"]
-                          });
-                        } else {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: newGuest.dietaryRestrictions.filter(
-                              (r) => r !== "vegetarian"
-                            )
-                          });
-                        }
-                      }}
+                      name="plusOne"
+                      checked={currentGuest.plusOne}
+                      onChange={handleInputChange}
                     />
-                    Vegetarisch
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={newGuest.dietaryRestrictions.includes("vegan")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: [...newGuest.dietaryRestrictions, "vegan"]
-                          });
-                        } else {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: newGuest.dietaryRestrictions.filter(
-                              (r) => r !== "vegan"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Vegan
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={newGuest.dietaryRestrictions.includes("gluten-free")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: [...newGuest.dietaryRestrictions, "gluten-free"]
-                          });
-                        } else {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: newGuest.dietaryRestrictions.filter(
-                              (r) => r !== "gluten-free"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Glutenfrei
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={newGuest.dietaryRestrictions.includes("lactose-intolerant")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: [...newGuest.dietaryRestrictions, "lactose-intolerant"]
-                          });
-                        } else {
-                          setNewGuest({
-                            ...newGuest,
-                            dietaryRestrictions: newGuest.dietaryRestrictions.filter(
-                              (r) => r !== "lactose-intolerant"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Laktosefrei
+                    Plus Eins
                   </label>
                 </div>
-              </div>
-              <div className="guest-management__form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={newGuest.plusOne}
-                    onChange={(e) =>
-                      setNewGuest({ ...newGuest, plusOne: e.target.checked })
-                    }
+                <div className="guest-management__form-group">
+                  <label htmlFor="notes">Notizen</label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    value={currentGuest.notes}
+                    onChange={handleInputChange}
                   />
-                  Begleitung (+1)
-                </label>
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="notes">Notizen</label>
-                <textarea
-                  id="notes"
-                  value={newGuest.notes}
-                  onChange={(e) =>
-                    setNewGuest({ ...newGuest, notes: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-            <div className="guest-management__modal-footer">
-              <button
-                className="guest-management__button guest-management__button--secondary"
-                onClick={() => setShowAddModal(false)}
-              >
-                Abbrechen
-              </button>
-              <button
-                className="guest-management__button"
-                onClick={handleAddGuest}
-              >
-                Hinzufügen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showEditModal && currentGuest && (
-        <div className="guest-management__modal">
-          <div className="guest-management__modal-content">
-            <div className="guest-management__modal-header">
-              <h3>Gast bearbeiten</h3>
-              <button
-                className="guest-management__modal-close"
-                onClick={() => {
-                  setShowEditModal(false);
-                  setCurrentGuest(null);
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div className="guest-management__modal-body">
-              <div className="guest-management__form-group">
-                <label htmlFor="editFirstName">Vorname</label>
-                <input
-                  type="text"
-                  id="editFirstName"
-                  value={currentGuest.firstName}
-                  onChange={(e) =>
-                    setCurrentGuest({
-                      ...currentGuest,
-                      firstName: e.target.value
-                    })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="editLastName">Nachname</label>
-                <input
-                  type="text"
-                  id="editLastName"
-                  value={currentGuest.lastName}
-                  onChange={(e) =>
-                    setCurrentGuest({
-                      ...currentGuest,
-                      lastName: e.target.value
-                    })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="editEmail">E-Mail</label>
-                <input
-                  type="email"
-                  id="editEmail"
-                  value={currentGuest.email}
-                  onChange={(e) =>
-                    setCurrentGuest({ ...currentGuest, email: e.target.value })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="editPhone">Telefon</label>
-                <input
-                  type="tel"
-                  id="editPhone"
-                  value={currentGuest.phone}
-                  onChange={(e) =>
-                    setCurrentGuest({ ...currentGuest, phone: e.target.value })
-                  }
-                />
-              </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="editRsvpStatus">RSVP Status</label>
-                <select
-                  id="editRsvpStatus"
-                  value={currentGuest.rsvpStatus}
-                  onChange={(e) =>
-                    setCurrentGuest({
-                      ...currentGuest,
-                      rsvpStatus: e.target.value as "pending" | "confirmed" | "declined"
-                    })
-                  }
-                >
-                  <option value="pending">Ausstehend</option>
-                  <option value="confirmed">Zugesagt</option>
-                  <option value="declined">Abgesagt</option>
-                </select>
-              </div>
-              <div className="guest-management__form-group">
-                <label>Besonderheiten</label>
-                <div className="guest-management__checkbox-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={currentGuest.dietaryRestrictions.includes("vegetarian")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: [...currentGuest.dietaryRestrictions, "vegetarian"]
-                          });
-                        } else {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: currentGuest.dietaryRestrictions.filter(
-                              (r) => r !== "vegetarian"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Vegetarisch
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={currentGuest.dietaryRestrictions.includes("vegan")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: [...currentGuest.dietaryRestrictions, "vegan"]
-                          });
-                        } else {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: currentGuest.dietaryRestrictions.filter(
-                              (r) => r !== "vegan"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Vegan
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={currentGuest.dietaryRestrictions.includes("gluten-free")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: [...currentGuest.dietaryRestrictions, "gluten-free"]
-                          });
-                        } else {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: currentGuest.dietaryRestrictions.filter(
-                              (r) => r !== "gluten-free"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Glutenfrei
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={currentGuest.dietaryRestrictions.includes("lactose-intolerant")}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: [...currentGuest.dietaryRestrictions, "lactose-intolerant"]
-                          });
-                        } else {
-                          setCurrentGuest({
-                            ...currentGuest,
-                            dietaryRestrictions: currentGuest.dietaryRestrictions.filter(
-                              (r) => r !== "lactose-intolerant"
-                            )
-                          });
-                        }
-                      }}
-                    />
-                    Laktosefrei
-                  </label>
                 </div>
               </div>
-              <div className="guest-management__form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={currentGuest.plusOne}
-                    onChange={(e) =>
-                      setCurrentGuest({
-                        ...currentGuest,
-                        plusOne: e.target.checked
-                      })
-                    }
-                  />
-                  Begleitung (+1)
-                </label>
+              <div className="guest-management__modal-footer">
+                <button
+                  type="button"
+                  className="guest-management__button guest-management__button--secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Abbrechen
+                </button>
+                <button type="submit" className="guest-management__button">
+                  Speichern
+                </button>
               </div>
-              <div className="guest-management__form-group">
-                <label htmlFor="editNotes">Notizen</label>
-                <textarea
-                  id="editNotes"
-                  value={currentGuest.notes}
-                  onChange={(e) =>
-                    setCurrentGuest({
-                      ...currentGuest,
-                      notes: e.target.value
-                    })
-                  }
-                />
-              </div>
-            </div>
-            <div className="guest-management__modal-footer">
-              <button
-                className="guest-management__button guest-management__button--secondary"
-                onClick={() => {
-                  setShowEditModal(false);
-                  setCurrentGuest(null);
-                }}
-              >
-                Abbrechen
-              </button>
-              <button
-                className="guest-management__button"
-                onClick={handleEditGuest}
-              >
-                Speichern
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
       <style jsx>{`
         .guest-management {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-          color: #333;
+          padding: 2rem;
           max-width: 1200px;
           margin: 0 auto;
-          padding: 2rem 1rem;
         }
-
         .guest-management__header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
         }
-
         .guest-management__header h2 {
           margin: 0;
-          font-size: 1.8rem;
         }
-
         .guest-management__actions {
           display: flex;
           gap: 1rem;
         }
-
-        .guest-management__search {
-          position: relative;
-        }
-
         .guest-management__search-input {
-          padding: 0.5rem 1rem;
+          padding: 0.5rem;
           border: 1px solid #ddd;
           border-radius: 4px;
           min-width: 250px;
         }
-
+        .guest-management__filter-select {
+          padding: 0.5rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
         .guest-management__add-button {
           padding: 0.5rem 1rem;
           background-color: #ffbd00;
@@ -756,73 +513,62 @@ const GuestManagement: React.FC = () => {
           cursor: pointer;
           transition: background-color 0.2s ease;
         }
-
         .guest-management__add-button:hover {
           background-color: #e6a800;
         }
-
         .guest-management__stats {
           display: flex;
-          gap: 1.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .guest-management__stat {
-          background-color: white;
-          border-radius: 8px;
+          gap: 2rem;
+          margin-bottom: 2rem;
+          background-color: #f8f9fa;
           padding: 1rem;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-          flex: 1;
+          border-radius: 8px;
+        }
+        .guest-management__stat {
           display: flex;
           flex-direction: column;
           align-items: center;
         }
-
         .guest-management__stat-label {
           font-size: 0.9rem;
-          color: #666;
-          margin-bottom: 0.25rem;
+          color: #6c757d;
         }
-
         .guest-management__stat-value {
           font-size: 1.5rem;
           font-weight: 600;
         }
-
+        .guest-management__stat-value--confirmed {
+          color: #198754;
+        }
+        .guest-management__stat-value--pending {
+          color: #fd7e14;
+        }
+        .guest-management__stat-value--declined {
+          color: #dc3545;
+        }
         .guest-management__table-container {
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
           overflow-x: auto;
         }
-
         .guest-management__table {
           width: 100%;
           border-collapse: collapse;
         }
-
-        .guest-management__table th {
-          text-align: left;
-          padding: 1rem;
-          border-bottom: 1px solid #eee;
-          font-weight: 500;
-          cursor: pointer;
-          transition: background-color 0.2s ease;
-        }
-
-        .guest-management__table th:hover {
-          background-color: #f8f9fa;
-        }
-
+        .guest-management__table th,
         .guest-management__table td {
           padding: 1rem;
-          border-bottom: 1px solid #eee;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
         }
-
-        .guest-management__table tr:last-child td {
-          border-bottom: none;
+        .guest-management__table th {
+          background-color: #f8f9fa;
+          cursor: pointer;
         }
-
+        .guest-management__table th:hover {
+          background-color: #e9ecef;
+        }
+        .guest-management__table tbody tr:hover {
+          background-color: #f8f9fa;
+        }
         .guest-management__rsvp-badge {
           display: inline-block;
           padding: 0.25rem 0.5rem;
@@ -830,31 +576,27 @@ const GuestManagement: React.FC = () => {
           font-size: 0.8rem;
           font-weight: 500;
         }
-
-        .guest-management__dietary {
-          display: inline-block;
-          padding: 0.25rem 0.5rem;
-          background-color: #e9ecef;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          margin-right: 0.5rem;
+        .guest-management__rsvp-badge--confirmed {
+          background-color: #d1e7dd;
+          color: #0f5132;
         }
-
-        .guest-management__plus-one {
-          display: inline-block;
-          padding: 0.25rem 0.5rem;
-          background-color: #cff4fc;
-          color: #055160;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          font-weight: 500;
+        .guest-management__rsvp-badge--pending {
+          background-color: #fff3cd;
+          color: #664d03;
         }
-
+        .guest-management__rsvp-badge--declined {
+          background-color: #f8d7da;
+          color: #842029;
+        }
+        .guest-management__empty-message {
+          text-align: center;
+          padding: 2rem;
+          color: #6c757d;
+        }
         .guest-management__actions-cell {
           display: flex;
           gap: 0.5rem;
         }
-
         .guest-management__edit-button {
           padding: 0.25rem 0.5rem;
           background-color: #f8f9fa;
@@ -864,11 +606,9 @@ const GuestManagement: React.FC = () => {
           cursor: pointer;
           transition: background-color 0.2s ease;
         }
-
         .guest-management__edit-button:hover {
           background-color: #e9ecef;
         }
-
         .guest-management__delete-button {
           padding: 0.25rem 0.5rem;
           background-color: #f8d7da;
@@ -879,11 +619,9 @@ const GuestManagement: React.FC = () => {
           cursor: pointer;
           transition: background-color 0.2s ease;
         }
-
         .guest-management__delete-button:hover {
           background-color: #f5c2c7;
         }
-
         .guest-management__modal {
           position: fixed;
           top: 0;
@@ -896,7 +634,6 @@ const GuestManagement: React.FC = () => {
           align-items: center;
           z-index: 1000;
         }
-
         .guest-management__modal-content {
           background-color: white;
           border-radius: 8px;
@@ -906,7 +643,6 @@ const GuestManagement: React.FC = () => {
           overflow-y: auto;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
         .guest-management__modal-header {
           display: flex;
           justify-content: space-between;
@@ -914,12 +650,10 @@ const GuestManagement: React.FC = () => {
           padding: 1rem 1.5rem;
           border-bottom: 1px solid #eee;
         }
-
         .guest-management__modal-header h3 {
           margin: 0;
           font-size: 1.25rem;
         }
-
         .guest-management__modal-close {
           background: none;
           border: none;
@@ -927,21 +661,17 @@ const GuestManagement: React.FC = () => {
           cursor: pointer;
           color: #666;
         }
-
         .guest-management__modal-body {
           padding: 1.5rem;
         }
-
         .guest-management__form-group {
           margin-bottom: 1rem;
         }
-
         .guest-management__form-group label {
           display: block;
           margin-bottom: 0.5rem;
           font-weight: 500;
         }
-
         .guest-management__form-group input[type="text"],
         .guest-management__form-group input[type="email"],
         .guest-management__form-group input[type="tel"],
@@ -952,25 +682,21 @@ const GuestManagement: React.FC = () => {
           border: 1px solid #ddd;
           border-radius: 4px;
         }
-
         .guest-management__form-group textarea {
           min-height: 100px;
           resize: vertical;
         }
-
         .guest-management__checkbox-group {
           display: flex;
           flex-wrap: wrap;
           gap: 1rem;
         }
-
         .guest-management__checkbox-group label {
           display: flex;
           align-items: center;
           gap: 0.5rem;
           font-weight: normal;
         }
-
         .guest-management__modal-footer {
           display: flex;
           justify-content: flex-end;
@@ -978,7 +704,6 @@ const GuestManagement: React.FC = () => {
           padding: 1rem 1.5rem;
           border-top: 1px solid #eee;
         }
-
         .guest-management__button {
           padding: 0.5rem 1rem;
           border: none;
@@ -987,67 +712,53 @@ const GuestManagement: React.FC = () => {
           cursor: pointer;
           transition: background-color 0.2s ease;
         }
-
         .guest-management__button {
           background-color: #ffbd00;
           color: white;
         }
-
         .guest-management__button:hover {
           background-color: #e6a800;
         }
-
         .guest-management__button--secondary {
           background-color: #f8f9fa;
           color: #6c757d;
         }
-
         .guest-management__button--secondary:hover {
           background-color: #e2e6ea;
         }
-
         @media (max-width: 768px) {
           .guest-management {
             padding: 1rem;
           }
-
           .guest-management__header {
             flex-direction: column;
             align-items: flex-start;
             gap: 1rem;
           }
-
           .guest-management__actions {
             width: 100%;
             flex-direction: column;
           }
-
           .guest-management__search-input {
             width: 100%;
           }
-
           .guest-management__add-button {
             width: 100%;
           }
-
           .guest-management__stats {
             flex-direction: column;
             gap: 0.5rem;
           }
-
           .guest-management__table th,
           .guest-management__table td {
             padding: 0.75rem 0.5rem;
           }
-
           .guest-management__actions-cell {
             flex-direction: column;
           }
-
           .guest-management__modal-footer {
             flex-direction: column;
           }
-
           .guest-management__modal-footer button {
             width: 100%;
           }
@@ -1056,5 +767,4 @@ const GuestManagement: React.FC = () => {
     </div>
   );
 };
-
 export default GuestManagement;
