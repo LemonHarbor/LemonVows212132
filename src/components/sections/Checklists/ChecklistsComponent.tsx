@@ -1,432 +1,229 @@
-"use client";
-
 import React, { useState, useEffect } from 'react';
-import { demoApi } from '../../lib/supabase-api';
+import { demoApi } from '../../../lib/supabase-api';
 
 interface ChecklistItem {
   id: string;
   title: string;
+  description: string;
+  dueDate: string;
   completed: boolean;
   priority: 'high' | 'medium' | 'low';
-  dueDate: string;
+  assignedTo: string;
   category: string;
 }
 
-interface ChecklistsProps {
-  // Props can be added as needed
-}
-
-export const ChecklistsComponent: React.FC<ChecklistsProps> = () => {
-  const [checklists, setChecklists] = useState<{[key: string]: ChecklistItem[]}>({
-    'planning': [
-      {
-        id: '1',
-        title: 'Hochzeitsdatum festlegen',
-        completed: true,
-        priority: 'high',
-        dueDate: '12 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '2',
-        title: 'Budget festlegen',
-        completed: true,
-        priority: 'high',
-        dueDate: '12 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '3',
-        title: 'Gästeliste erstellen',
-        completed: true,
-        priority: 'high',
-        dueDate: '10 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '4',
-        title: 'Location besichtigen und buchen',
-        completed: true,
-        priority: 'high',
-        dueDate: '9 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '5',
-        title: 'Catering auswählen',
-        completed: true,
-        priority: 'medium',
-        dueDate: '8 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '6',
-        title: 'Fotografen buchen',
-        completed: true,
-        priority: 'medium',
-        dueDate: '8 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '7',
-        title: 'DJ oder Band buchen',
-        completed: false,
-        priority: 'medium',
-        dueDate: '7 Monate vorher',
-        category: 'planning'
-      },
-      {
-        id: '8',
-        title: 'Hochzeitskleid anprobieren',
-        completed: false,
-        priority: 'high',
-        dueDate: '7 Monate vorher',
-        category: 'planning'
-      }
-    ],
-    'preparation': [
-      {
-        id: '9',
-        title: 'Einladungen versenden',
-        completed: true,
-        priority: 'high',
-        dueDate: '6 Monate vorher',
-        category: 'preparation'
-      },
-      {
-        id: '10',
-        title: 'Eheringe auswählen',
-        completed: false,
-        priority: 'medium',
-        dueDate: '4 Monate vorher',
-        category: 'preparation'
-      },
-      {
-        id: '11',
-        title: 'Menü festlegen',
-        completed: false,
-        priority: 'medium',
-        dueDate: '3 Monate vorher',
-        category: 'preparation'
-      },
-      {
-        id: '12',
-        title: 'Hochzeitstorte bestellen',
-        completed: false,
-        priority: 'medium',
-        dueDate: '3 Monate vorher',
-        category: 'preparation'
-      }
-    ],
-    'lastWeek': [
-      {
-        id: '13',
-        title: 'Finale Gästeliste bestätigen',
-        completed: false,
-        priority: 'high',
-        dueDate: '1 Woche vorher',
-        category: 'lastWeek'
-      },
-      {
-        id: '14',
-        title: 'Sitzplan finalisieren',
-        completed: false,
-        priority: 'high',
-        dueDate: '1 Woche vorher',
-        category: 'lastWeek'
-      },
-      {
-        id: '15',
-        title: 'Zeitplan mit allen Dienstleistern bestätigen',
-        completed: false,
-        priority: 'high',
-        dueDate: '1 Woche vorher',
-        category: 'lastWeek'
-      }
-    ],
-    'weddingDay': [
-      {
-        id: '16',
-        title: 'Ringe mitnehmen',
-        completed: false,
-        priority: 'high',
-        dueDate: 'Am Hochzeitstag',
-        category: 'weddingDay'
-      },
-      {
-        id: '17',
-        title: 'Notfall-Kit vorbereiten',
-        completed: false,
-        priority: 'medium',
-        dueDate: 'Am Hochzeitstag',
-        category: 'weddingDay'
-      },
-      {
-        id: '18',
-        title: 'Dokumente für Standesamt bereithalten',
-        completed: false,
-        priority: 'high',
-        dueDate: 'Am Hochzeitstag',
-        category: 'weddingDay'
-      }
-    ]
-  });
-  
-  const [activeTab, setActiveTab] = useState<string>('planning');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
-  const [newItem, setNewItem] = useState<Partial<ChecklistItem>>({
+const ChecklistsComponent: React.FC = () => {
+  const [items, setItems] = useState<ChecklistItem[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [currentItem, setCurrentItem] = useState<Partial<ChecklistItem>>({
     title: '',
-    priority: 'medium',
+    description: '',
     dueDate: '',
-    category: activeTab,
-    completed: false
+    completed: false,
+    priority: 'medium',
+    assignedTo: '',
+    category: 'Venue',
   });
-  
-  // Calculate progress for active tab
-  const calculateProgress = (category: string) => {
-    const items = checklists[category] || [];
-    if (items.length === 0) return 0;
-    
-    const completedItems = items.filter(item => item.completed).length;
-    return Math.round((completedItems / items.length) * 100);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      const { data, error } = await demoApi.checklists.getItems();
+      if (data && !error) {
+        setItems(data);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  const categories = ['all', ...Array.from(new Set(items.map(item => item.category)))];
+
+  const filteredItems = activeCategory === 'all'
+    ? items
+    : items.filter(item => item.category === activeCategory);
+
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
   };
-  
-  // Handle tab change
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    setNewItem(prev => ({ ...prev, category: tab }));
-  };
-  
-  // Handle checkbox change
-  const handleCheckboxChange = (id: string) => {
-    setChecklists(prev => {
-      const updatedChecklists = { ...prev };
-      
-      // Find the category that contains this item
-      Object.keys(updatedChecklists).forEach(category => {
-        updatedChecklists[category] = updatedChecklists[category].map(item => {
-          if (item.id === id) {
-            return { ...item, completed: !item.completed };
-          }
-          return item;
-        });
-      });
-      
-      return updatedChecklists;
+
+  const handleAddItem = () => {
+    setCurrentItem({
+      title: '',
+      description: '',
+      dueDate: '',
+      completed: false,
+      priority: 'medium',
+      assignedTo: '',
+      category: 'Venue',
     });
+    setShowModal(true);
   };
-  
-  // Handle new item input change
-  const handleNewItemChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNewItem(prev => ({ ...prev, [name]: value }));
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    
+    setCurrentItem(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    }));
   };
-  
-  // Handle add new item
-  const handleAddItem = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newItem.title || !newItem.dueDate) {
-      setError('Bitte füllen Sie alle Pflichtfelder aus.');
-      return;
+    if (currentItem.id) {
+      // Update existing item
+      const { data, error } = await demoApi.checklists.updateItem(currentItem.id, currentItem);
+      if (data && !error) {
+        setItems(items.map(item => item.id === currentItem.id ? data as ChecklistItem : item));
+      }
+    } else {
+      // Add new item
+      const { data, error } = await demoApi.checklists.addItem(currentItem as ChecklistItem);
+      if (data && !error) {
+        setItems([...items, data as ChecklistItem]);
+      }
     }
     
-    const category = newItem.category || activeTab;
-    
-    // Create new item
-    const item: ChecklistItem = {
-      id: `new-${Date.now()}`,
-      title: newItem.title || '',
-      completed: false,
-      priority: newItem.priority as 'high' | 'medium' | 'low' || 'medium',
-      dueDate: newItem.dueDate || '',
-      category
-    };
-    
-    // Add to checklists
-    setChecklists(prev => {
-      const updatedChecklists = { ...prev };
-      if (!updatedChecklists[category]) {
-        updatedChecklists[category] = [];
+    setShowModal(false);
+  };
+
+  const handleToggleComplete = async (id: string, completed: boolean) => {
+    const { data, error } = await demoApi.checklists.updateItem(id, { completed: !completed });
+    if (data && !error) {
+      setItems(items.map(item => item.id === id ? { ...item, completed: !completed } : item));
+    }
+  };
+
+  const handleEditItem = (item: ChecklistItem) => {
+    setCurrentItem(item);
+    setShowModal(true);
+  };
+
+  const handleDeleteItem = async (id: string) => {
+    if (window.confirm('Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?')) {
+      const { error } = await demoApi.checklists.deleteItem(id);
+      if (!error) {
+        setItems(items.filter(item => item.id !== id));
       }
-      updatedChecklists[category] = [...updatedChecklists[category], item];
-      return updatedChecklists;
-    });
-    
-    // Reset form and close modal
-    setNewItem({
-      title: '',
-      priority: 'medium',
-      dueDate: '',
-      category: activeTab,
-      completed: false
-    });
-    setShowAddItemModal(false);
-    setError(null);
+    }
   };
-  
-  // Handle export checklist
-  const handleExportChecklist = () => {
-    alert('Diese Funktion würde die Checkliste als PDF oder CSV exportieren.');
-  };
-  
+
   return (
     <div className="checklists">
-      <div className="checklists__demo-notice">
-        <p>Dies ist eine funktionale Demo-Version der Checklisten. Sie können:</p>
-        <ul>
-          <li>Zwischen verschiedenen Phasen der Hochzeitsplanung wechseln</li>
-          <li>Aufgaben als erledigt markieren</li>
-          <li>Neue Aufgaben hinzufügen</li>
-          <li>Den Fortschritt für jede Phase verfolgen</li>
-          <li>Checklisten exportieren</li>
-        </ul>
+      <div className="checklists__controls">
+        <button className="checklists__button" onClick={handleAddItem}>
+          Aufgabe hinzufügen
+        </button>
       </div>
-      
-      {error && (
-        <div className="checklists__error">
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>Schließen</button>
-        </div>
-      )}
       
       <div className="checklists__tabs">
-        <button 
-          className={`checklists__tab ${activeTab === 'planning' ? 'checklists__tab--active' : ''}`}
-          onClick={() => handleTabChange('planning')}
-        >
-          Planung (12-6 Monate)
-        </button>
-        <button 
-          className={`checklists__tab ${activeTab === 'preparation' ? 'checklists__tab--active' : ''}`}
-          onClick={() => handleTabChange('preparation')}
-        >
-          Vorbereitung (6-2 Monate)
-        </button>
-        <button 
-          className={`checklists__tab ${activeTab === 'lastWeek' ? 'checklists__tab--active' : ''}`}
-          onClick={() => handleTabChange('lastWeek')}
-        >
-          Letzte Woche
-        </button>
-        <button 
-          className={`checklists__tab ${activeTab === 'weddingDay' ? 'checklists__tab--active' : ''}`}
-          onClick={() => handleTabChange('weddingDay')}
-        >
-          Hochzeitstag
-        </button>
+        {categories.map(category => (
+          <button
+            key={category}
+            className={`checklists__tab ${activeCategory === category ? 'checklists__tab--active' : ''}`}
+            onClick={() => handleCategoryChange(category)}
+          >
+            {category === 'all' ? 'Alle Kategorien' : category}
+          </button>
+        ))}
       </div>
       
-      <div className="checklists__content">
-        <div className="checklists__header">
-          <h3>
-            {activeTab === 'planning' && 'Planung (12-6 Monate vor der Hochzeit)'}
-            {activeTab === 'preparation' && 'Vorbereitung (6-2 Monate vor der Hochzeit)'}
-            {activeTab === 'lastWeek' && 'Letzte Woche vor der Hochzeit'}
-            {activeTab === 'weddingDay' && 'Hochzeitstag'}
-          </h3>
-          <div className="checklists__progress">
-            <div className="checklists__progress-bar">
-              <div 
-                className="checklists__progress-fill" 
-                style={{ width: `${calculateProgress(activeTab)}%` }}
-              ></div>
-            </div>
-            <div className="checklists__progress-text">
-              {calculateProgress(activeTab)}% abgeschlossen
-            </div>
+      <div className="checklists__list">
+        {filteredItems.length === 0 ? (
+          <div className="checklists__empty">
+            Keine Aufgaben gefunden.
           </div>
-        </div>
-        
-        <div className="checklists__list">
-          {checklists[activeTab]?.map(item => (
-            <div 
-              key={item.id} 
+        ) : (
+          filteredItems.map(item => (
+            <div
+              key={item.id}
               className={`checklists__item ${item.completed ? 'checklists__item--completed' : ''}`}
             >
               <div className="checklists__item-checkbox">
-                <input 
-                  type="checkbox" 
-                  checked={item.completed} 
-                  onChange={() => handleCheckboxChange(item.id)}
+                <input
+                  type="checkbox"
+                  checked={item.completed}
+                  onChange={() => handleToggleComplete(item.id, item.completed)}
                 />
               </div>
               <div className="checklists__item-content">
                 <div className="checklists__item-title">{item.title}</div>
+                <div className="checklists__item-description">{item.description}</div>
                 <div className="checklists__item-details">
                   <span className={`checklists__item-priority checklists__item-priority--${item.priority}`}>
-                    {item.priority === 'high' && 'Hohe Priorität'}
-                    {item.priority === 'medium' && 'Mittlere Priorität'}
-                    {item.priority === 'low' && 'Niedrige Priorität'}
+                    {item.priority === 'high' ? 'Hoch' : item.priority === 'medium' ? 'Mittel' : 'Niedrig'}
                   </span>
-                  <span className="checklists__item-due">Fällig: {item.dueDate}</span>
+                  <span className="checklists__item-due">
+                    Fällig: {new Date(item.dueDate).toLocaleDateString('de-DE')}
+                  </span>
+                  <span className="checklists__item-assigned">
+                    Zugewiesen an: {item.assignedTo}
+                  </span>
                 </div>
               </div>
+              <div className="checklists__item-actions">
+                <button
+                  className="checklists__button checklists__button--secondary"
+                  onClick={() => handleEditItem(item)}
+                >
+                  Bearbeiten
+                </button>
+                <button
+                  className="checklists__button checklists__button--secondary"
+                  onClick={() => handleDeleteItem(item.id)}
+                >
+                  Löschen
+                </button>
+              </div>
             </div>
-          ))}
-          
-          {checklists[activeTab]?.length === 0 && (
-            <div className="checklists__empty">
-              Keine Aufgaben in dieser Kategorie. Fügen Sie neue Aufgaben hinzu.
-            </div>
-          )}
-        </div>
+          ))
+        )}
       </div>
       
-      <div className="checklists__controls">
-        <button 
-          className="checklists__button"
-          onClick={() => setShowAddItemModal(true)}
-        >
-          Aufgabe hinzufügen
-        </button>
-        <button 
-          className="checklists__button"
-          onClick={() => {
-            const newCategory = prompt('Geben Sie einen Namen für die neue Checkliste ein:');
-            if (newCategory && newCategory.trim() !== '') {
-              setChecklists(prev => ({ ...prev, [newCategory.trim()]: [] }));
-              handleTabChange(newCategory.trim());
-            }
-          }}
-        >
-          Neue Checkliste erstellen
-        </button>
-        <button 
-          className="checklists__button"
-          onClick={handleExportChecklist}
-        >
-          Checkliste exportieren
-        </button>
-      </div>
-      
-      {/* Add Item Modal */}
-      {showAddItemModal && (
+      {showModal && (
         <div className="checklists__modal">
           <div className="checklists__modal-content">
             <div className="checklists__modal-header">
-              <h2>Neue Aufgabe hinzufügen</h2>
-              <button 
+              <h2>{currentItem.id ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2>
+              <button
                 className="checklists__modal-close"
-                onClick={() => {
-                  setShowAddItemModal(false);
-                  setError(null);
-                }}
+                onClick={() => setShowModal(false)}
               >
-                &times;
+                ×
               </button>
             </div>
-            <form onSubmit={handleAddItem}>
+            <form onSubmit={handleSubmit}>
               <div className="checklists__form-group">
-                <label htmlFor="title">Aufgabentitel</label>
+                <label htmlFor="title">Titel</label>
                 <input
                   type="text"
                   id="title"
                   name="title"
-                  value={newItem.title || ''}
-                  onChange={handleNewItemChange}
+                  value={currentItem.title}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="checklists__form-group">
+                <label htmlFor="description">Beschreibung</label>
+                <input
+                  type="text"
+                  id="description"
+                  name="description"
+                  value={currentItem.description}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="checklists__form-group">
+                <label htmlFor="dueDate">Fälligkeitsdatum</label>
+                <input
+                  type="date"
+                  id="dueDate"
+                  name="dueDate"
+                  value={currentItem.dueDate}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -435,8 +232,8 @@ export const ChecklistsComponent: React.FC<ChecklistsProps> = () => {
                 <select
                   id="priority"
                   name="priority"
-                  value={newItem.priority || 'medium'}
-                  onChange={handleNewItemChange}
+                  value={currentItem.priority}
+                  onChange={handleInputChange}
                 >
                   <option value="high">Hoch</option>
                   <option value="medium">Mittel</option>
@@ -444,52 +241,46 @@ export const ChecklistsComponent: React.FC<ChecklistsProps> = () => {
                 </select>
               </div>
               <div className="checklists__form-group">
-                <label htmlFor="dueDate">Fälligkeitsdatum</label>
+                <label htmlFor="assignedTo">Zugewiesen an</label>
                 <input
                   type="text"
-                  id="dueDate"
-                  name="dueDate"
-                  value={newItem.dueDate || ''}
-                  onChange={handleNewItemChange}
-                  placeholder="z.B. 3 Monate vorher"
-                  required
+                  id="assignedTo"
+                  name="assignedTo"
+                  value={currentItem.assignedTo}
+                  onChange={handleInputChange}
                 />
               </div>
               <div className="checklists__form-group">
                 <label htmlFor="category">Kategorie</label>
-                <select
+                <input
+                  type="text"
                   id="category"
                   name="category"
-                  value={newItem.category || activeTab}
-                  onChange={handleNewItemChange}
-                >
-                  {Object.keys(checklists).map(category => (
-                    <option key={category} value={category}>
-                      {category === 'planning' && 'Planung (12-6 Monate)'}
-                      {category === 'preparation' && 'Vorbereitung (6-2 Monate)'}
-                      {category === 'lastWeek' && 'Letzte Woche'}
-                      {category === 'weddingDay' && 'Hochzeitstag'}
-                      {!['planning', 'preparation', 'lastWeek', 'weddingDay'].includes(category) && category}
-                    </option>
-                  ))}
-                </select>
+                  value={currentItem.category}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="checklists__form-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="completed"
+                    checked={currentItem.completed}
+                    onChange={handleInputChange}
+                  />
+                  Abgeschlossen
+                </label>
               </div>
               <div className="checklists__form-actions">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="checklists__button checklists__button--secondary"
-                  onClick={() => {
-                    setShowAddItemModal(false);
-                    setError(null);
-                  }}
+                  onClick={() => setShowModal(false)}
                 >
                   Abbrechen
                 </button>
-                <button 
-                  type="submit" 
-                  className="checklists__button"
-                >
-                  Hinzufügen
+                <button type="submit" className="checklists__button">
+                  Speichern
                 </button>
               </div>
             </form>
@@ -500,124 +291,34 @@ export const ChecklistsComponent: React.FC<ChecklistsProps> = () => {
       <style jsx>{`
         .checklists {
           padding: 2rem;
-          background-color: #f9f9f9;
-          border-radius: 8px;
-        }
-        
-        .checklists__demo-notice {
-          background-color: #fff3cd;
-          border: 1px solid #ffeeba;
-          border-radius: 4px;
-          padding: 1rem;
-          margin-bottom: 2rem;
-        }
-        
-        .checklists__demo-notice p {
-          margin-top: 0;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-        }
-        
-        .checklists__demo-notice ul {
-          margin: 0;
-          padding-left: 1.5rem;
-        }
-        
-        .checklists__error {
-          background-color: #f8d7da;
-          border: 1px solid #f5c6cb;
-          border-radius: 4px;
-          padding: 1rem;
-          margin-bottom: 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        
-        .checklists__error p {
-          margin: 0;
-          color: #721c24;
-        }
-        
-        .checklists__error button {
-          background: none;
-          border: none;
-          color: #721c24;
-          font-weight: bold;
-          cursor: pointer;
+          max-width: 1200px;
+          margin: 0 auto;
         }
         
         .checklists__tabs {
           display: flex;
-          overflow-x: auto;
-          margin-bottom: 1.5rem;
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin: 2rem 0;
         }
         
         .checklists__tab {
-          padding: 1rem 1.5rem;
-          border: none;
+          padding: 0.5rem 1rem;
           background: none;
-          font-size: 0.9rem;
-          color: #666;
+          border: none;
+          border-bottom: 2px solid transparent;
           cursor: pointer;
-          white-space: nowrap;
           transition: all 0.2s ease;
         }
         
         .checklists__tab:hover {
-          color: #333;
+          color: #ffbd00;
         }
         
         .checklists__tab--active {
-          color: #ffbd00;
           border-bottom: 2px solid #ffbd00;
+          color: #ffbd00;
           font-weight: 500;
-        }
-        
-        .checklists__content {
-          background-color: white;
-          border-radius: 8px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .checklists__header {
-          margin-bottom: 1.5rem;
-        }
-        
-        .checklists__header h3 {
-          margin-top: 0;
-          margin-bottom: 1rem;
-          font-size: 1.2rem;
-          color: #333;
-        }
-        
-        .checklists__progress {
-          margin-bottom: 1rem;
-        }
-        
-        .checklists__progress-bar {
-          height: 8px;
-          background-color: #f0f0f0;
-          border-radius: 4px;
-          overflow: hidden;
-          margin-bottom: 0.5rem;
-        }
-        
-        .checklists__progress-fill {
-          height: 100%;
-          background-color: #ffbd00;
-          border-radius: 4px;
-        }
-        
-        .checklists__progress-text {
-          font-size: 0.9rem;
-          color: #666;
-          text-align: right;
         }
         
         .checklists__list {
@@ -629,26 +330,18 @@ export const ChecklistsComponent: React.FC<ChecklistsProps> = () => {
         .checklists__empty {
           padding: 2rem;
           text-align: center;
-          color: #666;
-          background-color: #f9f9f9;
-          border-radius: 4px;
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
         .checklists__item {
           display: flex;
           gap: 1rem;
+          background-color: white;
+          border-radius: 8px;
           padding: 1rem;
-          border-radius: 4px;
-          background-color: #f9f9f9;
-          transition: background-color 0.2s ease;
-        }
-        
-        .checklists__item:hover {
-          background-color: #f5f5f5;
-        }
-        
-        .checklists__item--completed {
-          opacity: 0.7;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
         .checklists__item--completed .checklists__item-title {
@@ -852,5 +545,4 @@ export const ChecklistsComponent: React.FC<ChecklistsProps> = () => {
     </div>
   );
 };
-
 export default ChecklistsComponent;
