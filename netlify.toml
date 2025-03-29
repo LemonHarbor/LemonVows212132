@@ -1,0 +1,44 @@
+# Netlify configuration file
+# This file specifies build settings and redirects for Netlify deployment
+
+# Build settings
+[build]
+  # Directory to publish (the output of the build process)
+  publish = "dist"
+  # Build command
+  command = "npm run build"
+
+# Environment variables
+[build.environment]
+  # Node version
+  NODE_VERSION = "18"
+
+# Redirects and rewrites
+[[redirects]]
+  # SPA fallback - redirects all requests to index.html for client-side routing
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers to set on specific files
+[[headers]]
+  # Define headers for all files
+  for = "/*"
+    [headers.values]
+    # Enable CORS
+    Access-Control-Allow-Origin = "*"
+    # Cache control
+    Cache-Control = "public, max-age=3600"
+
+# Specific headers for assets
+[[headers]]
+  for = "/assets/*"
+    [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Specific headers for API routes
+[[headers]]
+  for = "/api/*"
+    [headers.values]
+    # Disable caching for API routes
+    Cache-Control = "no-cache"
