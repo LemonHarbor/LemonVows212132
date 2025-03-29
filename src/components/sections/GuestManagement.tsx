@@ -1,159 +1,173 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { media } from '../../styles/ResponsiveComponents';
-import TranslatedText from '../TranslatedText';
-import TranslatedButton from '../TranslatedButton';
-import ResponsiveTable from '../ResponsiveTable';
 import { Guest, GuestFormData } from '../../types/Guest';
 import { guestApi, demoApi } from '../../services/guestApi';
+import { TranslatedText } from '../TranslatedText';
+import { TranslatedButton } from '../TranslatedButton';
+import { FormLabel } from '../FormLabel';
+import { ResponsiveTable } from '../ResponsiveTable';
+import { ResponsiveCard } from '../ResponsiveCard';
 
 interface GuestManagementProps {
   isDemo?: boolean;
   weddingId?: string;
 }
 
+// Styled components
 const Container = styled.div`
-  padding: 2rem;
-  background-color: var(--background-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
   
-  ${media.sm} {
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
   }
 `;
 
 const Title = styled.h2`
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   margin: 0;
+  color: var(--text-primary);
 `;
 
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 1rem;
-  
-  ${media.sm} {
-    width: 100%;
-    justify-content: space-between;
-  }
-`;
-
-const Tabs = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--border-color);
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-`;
-
-const Tab = styled.button<{ active: boolean }>`
-  padding: 0.75rem 1.5rem;
-  background-color: ${props => props.active ? 'var(--primary-color)' : 'transparent'};
-  color: ${props => props.active ? 'var(--text-on-primary)' : 'var(--text-color)'};
-  border: ${props => props.active ? 'none' : '1px solid var(--border-color)'};
-  border-radius: var(--border-radius-sm);
-  font-weight: var(--font-weight-medium);
+const ActionButton = styled.button`
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
   cursor: pointer;
-  white-space: nowrap;
+  transition: background-color 0.2s;
   
   &:hover {
-    background-color: ${props => props.active ? 'var(--primary-color)' : 'var(--background-hover)'};
+    background-color: var(--primary-dark);
   }
-`;
-
-const FormContainer = styled.div`
-  background-color: var(--background-light);
-  border-radius: var(--border-radius-sm);
-  padding: 2rem;
-  margin-bottom: 2rem;
-`;
-
-const FormTitle = styled.h3`
-  font-size: 1.25rem;
-  margin: 0 0 1.5rem 0;
+  
+  &:disabled {
+    background-color: var(--disabled);
+    cursor: not-allowed;
+  }
 `;
 
 const Form = styled.form`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  background-color: var(--background-paper);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 `;
 
 const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 `;
 
-const FormLabel = styled.label`
-  margin-bottom: 0.5rem;
-  font-weight: var(--font-weight-medium);
-`;
-
-const FormInput = styled.input`
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
+const Input = styled.input`
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
   font-size: 1rem;
   
   &:focus {
-    border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(249, 202, 36, 0.2);
+    border-color: var(--primary);
   }
 `;
 
-const FormSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
+const Select = styled.select`
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
   font-size: 1rem;
-  background-color: var(--background-color);
+  background-color: white;
   
   &:focus {
-    border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(249, 202, 36, 0.2);
+    border-color: var(--primary);
   }
 `;
 
-const FormTextarea = styled.textarea`
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
   font-size: 1rem;
   min-height: 100px;
   resize: vertical;
   
   &:focus {
-    border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(249, 202, 36, 0.2);
+    border-color: var(--primary);
   }
 `;
 
-const FormCheckbox = styled.div`
+const Checkbox = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 1.5rem;
 `;
 
-const FormActions = styled.div`
-  grid-column: 1 / -1;
+const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+`;
+
+const CancelButton = styled.button`
+  background-color: var(--background-paper);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: var(--background-default);
+  }
+`;
+
+const SubmitButton = styled.button`
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: var(--primary-dark);
+  }
 `;
 
 const StatusBadge = styled.span<{ status: 'pending' | 'confirmed' | 'declined' }>`
@@ -168,40 +182,27 @@ const StatusBadge = styled.span<{ status: 'pending' | 'confirmed' | 'declined' }
       case 'confirmed':
         return `
           background-color: var(--success-light);
-          color: var(--success-color);
+          color: var(--success-dark);
         `;
       case 'declined':
         return `
           background-color: var(--error-light);
-          color: var(--error-color);
+          color: var(--error-dark);
         `;
       default:
         return `
           background-color: var(--warning-light);
-          color: var(--warning-color);
+          color: var(--warning-dark);
         `;
     }
   }}
 `;
 
-const ActionButton = styled.button`
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  cursor: pointer;
-  padding: 0.25rem;
-  margin-right: 0.5rem;
-  
-  &:hover {
-    color: var(--primary-dark);
-  }
-`;
-
 const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddingId = 'demo' }) => {
-  const [activeTab, setActiveTab] = useState<'all' | 'confirmed' | 'pending' | 'declined'>('all');
-  const [showAddForm, setShowAddForm] = useState(false);
+  // State
   const [guests, setGuests] = useState<Guest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<GuestFormData>({
     name: '',
     email: '',
@@ -211,73 +212,49 @@ const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddi
     dietaryRestrictions: '',
     notes: ''
   });
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Choose the appropriate API based on whether this is a demo
+  // Select the appropriate API based on isDemo flag
   const api = isDemo ? demoApi : guestApi;
   
-  // Load guests
+  // Fetch guests on component mount
   useEffect(() => {
-    const loadGuests = async () => {
-      setLoading(true);
+    const fetchGuests = async () => {
       try {
-        const { data, error } = await api.getAll();
+        setLoading(true);
+        const { data, error } = await api.guests.getAll();
+        
         if (error) throw error;
+        
         setGuests(data || []);
-      } catch (error) {
-        console.error('Error loading guests:', error);
+      } catch (err) {
+        console.error('Error fetching guests:', err);
+        setError('Failed to load guests. Please try again.');
       } finally {
         setLoading(false);
       }
     };
     
-    loadGuests();
+    fetchGuests();
   }, [api]);
   
-  // Filter guests based on active tab
-  const filteredGuests = guests.filter(guest => {
-    if (activeTab === 'all') return true;
-    return guest.status === activeTab;
-  });
-  
-  // Format guests for table display
-  const guestsTableData = filteredGuests.map(guest => ({
-    id: guest.id,
-    Name: guest.name,
-    Email: guest.email,
-    Phone: guest.phone,
-    Status: (
-      <StatusBadge status={guest.status}>
-        {guest.status === 'confirmed' ? 'Zugesagt' : 
-         guest.status === 'declined' ? 'Abgesagt' : 'Ausstehend'}
-      </StatusBadge>
-    ),
-    PlusOne: guest.plusOne ? 'Ja' : 'Nein',
-    DietaryRestrictions: guest.dietaryRestrictions || '-',
-    Actions: (
-      <>
-        <ActionButton onClick={() => handleEdit(guest.id)} title="Bearbeiten">
-          ✏️
-        </ActionButton>
-        <ActionButton onClick={() => handleDelete(guest.id)} title="Löschen">
-          🗑️
-        </ActionButton>
-        {guest.status === 'pending' && (
-          <>
-            <ActionButton onClick={() => handleUpdateStatus(guest.id, 'confirmed')} title="Zusagen">
-              ✅
-            </ActionButton>
-            <ActionButton onClick={() => handleUpdateStatus(guest.id, 'declined')} title="Absagen">
-              ❌
-            </ActionButton>
-          </>
-        )}
-      </>
-    )
-  }));
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      status: 'pending',
+      plusOne: false,
+      dietaryRestrictions: '',
+      notes: ''
+    });
+    setEditingId(null);
+  };
   
   // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     
     if (type === 'checkbox') {
@@ -295,7 +272,7 @@ const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddi
     try {
       if (editingId) {
         // Update existing guest
-        const { error } = await api.update(editingId, formData);
+        const { error } = await api.guests.update(editingId, formData);
         if (error) throw error;
         
         // Update local state
@@ -308,7 +285,7 @@ const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddi
         setEditingId(null);
       } else {
         // Create new guest
-        const { data, error } = await api.create(formData);
+        const { data, error } = await api.guests.create(formData);
         if (error) throw error;
         
         // Update local state
@@ -318,33 +295,26 @@ const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddi
       }
       
       // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        status: 'pending',
-        plusOne: false,
-        dietaryRestrictions: '',
-        notes: ''
-      });
-      
-      setShowAddForm(false);
-    } catch (error) {
-      console.error('Error saving guest:', error);
+      resetForm();
+      setShowForm(false);
+    } catch (err) {
+      console.error('Error saving guest:', err);
+      setError('Failed to save guest. Please try again.');
     }
   };
   
-  // Handle edit button click
+  // Handle edit guest
   const handleEdit = async (id: string) => {
     try {
-      const { data, error } = await api.getById(id);
+      const { data, error } = await api.guests.getById(id);
+      
       if (error) throw error;
       
       if (data) {
         setFormData({
           name: data.name,
-          email: data.email,
-          phone: data.phone,
+          email: data.email || '',
+          phone: data.phone || '',
           status: data.status,
           plusOne: data.plusOne,
           dietaryRestrictions: data.dietaryRestrictions || '',
@@ -352,34 +322,38 @@ const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddi
         });
         
         setEditingId(id);
-        setShowAddForm(true);
+        setShowForm(true);
       }
-    } catch (error) {
-      console.error('Error loading guest for edit:', error);
+    } catch (err) {
+      console.error('Error fetching guest details:', err);
+      setError('Failed to load guest details. Please try again.');
     }
   };
   
-  // Handle delete button click
+  // Handle delete guest
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Sind Sie sicher, dass Sie diesen Gast löschen möchten?')) {
+    if (!window.confirm('Are you sure you want to delete this guest?')) {
       return;
     }
     
     try {
-      const { error } = await api.delete(id);
+      const { error } = await api.guests.delete(id);
+      
       if (error) throw error;
       
       // Update local state
       setGuests(prev => prev.filter(guest => guest.id !== id));
-    } catch (error) {
-      console.error('Error deleting guest:', error);
+    } catch (err) {
+      console.error('Error deleting guest:', err);
+      setError('Failed to delete guest. Please try again.');
     }
   };
   
   // Handle status update
-  const handleUpdateStatus = async (id: string, status: 'pending' | 'confirmed' | 'declined') => {
+  const handleStatusUpdate = async (id: string, status: 'pending' | 'confirmed' | 'declined') => {
     try {
-      const { error } = await api.updateStatus(id, status);
+      const { error } = await api.guests.updateStatus(id, status);
+      
       if (error) throw error;
       
       // Update local state
@@ -388,211 +362,220 @@ const GuestManagement: React.FC<GuestManagementProps> = ({ isDemo = false, weddi
           guest.id === id ? { ...guest, status } : guest
         )
       );
-    } catch (error) {
-      console.error('Error updating guest status:', error);
+    } catch (err) {
+      console.error('Error updating guest status:', err);
+      setError('Failed to update guest status. Please try again.');
     }
   };
   
   // Cancel form
-  const handleCancelForm = () => {
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      status: 'pending',
-      plusOne: false,
-      dietaryRestrictions: '',
-      notes: ''
-    });
-    
-    setEditingId(null);
-    setShowAddForm(false);
+  const handleCancel = () => {
+    resetForm();
+    setShowForm(false);
   };
   
-  if (loading) {
+  // Render status badge
+  const renderStatus = (status: 'pending' | 'confirmed' | 'declined') => {
+    return <StatusBadge status={status}>{status}</StatusBadge>;
+  };
+  
+  // Render action buttons
+  const renderActions = (guest: Guest) => {
     return (
-      <Container>
-        <div className="loading">
-          <div className="loading-spinner"></div>
-          <div className="loading-text">
-            <TranslatedText i18nKey="guests.loading" defaultText="Gäste werden geladen..." />
-          </div>
-        </div>
-      </Container>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <ActionButton onClick={() => handleEdit(guest.id)}>
+          <TranslatedText i18nKey="common.edit" defaultText="Edit" />
+        </ActionButton>
+        <ActionButton onClick={() => handleDelete(guest.id)}>
+          <TranslatedText i18nKey="common.delete" defaultText="Delete" />
+        </ActionButton>
+      </div>
     );
-  }
+  };
   
   return (
     <Container>
       <Header>
         <Title>
-          <TranslatedText i18nKey="guests.title" defaultText="Gästeverwaltung" />
+          <TranslatedText i18nKey="guests.title" defaultText="Guest Management" />
         </Title>
-        <ActionButtons>
-          <TranslatedButton
-            i18nKey="guests.addGuest"
-            defaultText="Gast hinzufügen"
-            onClick={() => setShowAddForm(true)}
-            variant="primary"
-          />
-        </ActionButtons>
+        <ActionButton onClick={() => { resetForm(); setShowForm(!showForm); }}>
+          {showForm ? 
+            <TranslatedText i18nKey="common.cancel" defaultText="Cancel" /> : 
+            <TranslatedText i18nKey="guests.addGuest" defaultText="Add Guest" />
+          }
+        </ActionButton>
       </Header>
       
-      {showAddForm && (
-        <FormContainer>
-          <FormTitle>
-            {editingId ? (
-              <TranslatedText i18nKey="guests.editGuest" defaultText="Gast bearbeiten" />
-            ) : (
-              <TranslatedText i18nKey="guests.addGuest" defaultText="Gast hinzufügen" />
-            )}
-          </FormTitle>
-          
-          <Form onSubmit={handleSubmit}>
+      {error && (
+        <ResponsiveCard style={{ marginBottom: '1rem', backgroundColor: 'var(--error-light)', color: 'var(--error-dark)' }}>
+          {error}
+        </ResponsiveCard>
+      )}
+      
+      {showForm && (
+        <Form onSubmit={handleSubmit}>
+          <FormRow>
             <FormGroup>
-              <FormLabel>
-                <TranslatedText i18nKey="guests.name" defaultText="Name" />
+              <FormLabel htmlFor="name">
+                <TranslatedText i18nKey="guests.name" defaultText="Name" />*
               </FormLabel>
-              <FormInput
-                type="text"
+              <Input
+                id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleInputChange}
+                onChange={handleChange}
                 required
               />
             </FormGroup>
-            
             <FormGroup>
-              <FormLabel>
-                <TranslatedText i18nKey="guests.email" defaultText="E-Mail" />
+              <FormLabel htmlFor="email">
+                <TranslatedText i18nKey="guests.email" defaultText="Email" />
               </FormLabel>
-              <FormInput
-                type="email"
+              <Input
+                id="email"
                 name="email"
-                value={formData.email}
-                onChange={handleInputChange}
+                type="email"
+                value={formData.email || ''}
+                onChange={handleChange}
               />
             </FormGroup>
-            
+          </FormRow>
+          
+          <FormRow>
             <FormGroup>
-              <FormLabel>
-                <TranslatedText i18nKey="guests.phone" defaultText="Telefon" />
+              <FormLabel htmlFor="phone">
+                <TranslatedText i18nKey="guests.phone" defaultText="Phone" />
               </FormLabel>
-              <FormInput
-                type="tel"
+              <Input
+                id="phone"
                 name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
+                value={formData.phone || ''}
+                onChange={handleChange}
               />
             </FormGroup>
-            
             <FormGroup>
-              <FormLabel>
-                <TranslatedText i18nKey="guests.status" defaultText="Status" />
+              <FormLabel htmlFor="status">
+                <TranslatedText i18nKey="guests.status" defaultText="Status" />*
               </FormLabel>
-              <FormSelect
+              <Select
+                id="status"
                 name="status"
                 value={formData.status}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               >
-                <option value="pending">Ausstehend</option>
-                <option value="confirmed">Zugesagt</option>
-                <option value="declined">Abgesagt</option>
-              </FormSelect>
+                <option value="pending">
+                  <TranslatedText i18nKey="guests.status.pending" defaultText="Pending" />
+                </option>
+                <option value="confirmed">
+                  <TranslatedText i18nKey="guests.status.confirmed" defaultText="Confirmed" />
+                </option>
+                <option value="declined">
+                  <TranslatedText i18nKey="guests.status.declined" defaultText="Declined" />
+                </option>
+              </Select>
             </FormGroup>
-            
+          </FormRow>
+          
+          <FormRow>
             <FormGroup>
-              <FormLabel>
-                <TranslatedText i18nKey="guests.dietaryRestrictions" defaultText="Ernährungseinschränkungen" />
+              <FormLabel htmlFor="dietaryRestrictions">
+                <TranslatedText i18nKey="guests.dietaryRestrictions" defaultText="Dietary Restrictions" />
               </FormLabel>
-              <FormInput
-                type="text"
+              <Input
+                id="dietaryRestrictions"
                 name="dietaryRestrictions"
-                value={formData.dietaryRestrictions}
-                onChange={handleInputChange}
+                value={formData.dietaryRestrictions || ''}
+                onChange={handleChange}
               />
             </FormGroup>
-            
+          </FormRow>
+          
+          <FormRow>
             <FormGroup>
-              <FormLabel>
-                <TranslatedText i18nKey="guests.notes" defaultText="Notizen" />
+              <FormLabel htmlFor="notes">
+                <TranslatedText i18nKey="guests.notes" defaultText="Notes" />
               </FormLabel>
-              <FormTextarea
+              <Textarea
+                id="notes"
                 name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
+                value={formData.notes || ''}
+                onChange={handleChange}
               />
             </FormGroup>
-            
-            <FormGroup>
-              <FormCheckbox>
-                <FormInput
-                  type="checkbox"
-                  name="plusOne"
-                  checked={formData.plusOne}
-                  onChange={handleInputChange}
-                />
-                <FormLabel>
-                  <TranslatedText i18nKey="guests.plusOne" defaultText="Mit Begleitung" />
-                </FormLabel>
-              </FormCheckbox>
-            </FormGroup>
-            
-            <FormActions>
-              <TranslatedButton
-                i18nKey="guests.cancel"
-                defaultText="Abbrechen"
-                type="button"
-                onClick={handleCancelForm}
-                variant="outline"
-              />
-              <TranslatedButton
-                i18nKey={editingId ? "guests.saveChanges" : "guests.addGuest"}
-                defaultText={editingId ? "Änderungen speichern" : "Gast hinzufügen"}
-                type="submit"
-                variant="primary"
-              />
-            </FormActions>
-          </Form>
-        </FormContainer>
+          </FormRow>
+          
+          <Checkbox>
+            <Input
+              id="plusOne"
+              name="plusOne"
+              type="checkbox"
+              checked={formData.plusOne}
+              onChange={handleChange}
+              style={{ width: 'auto' }}
+            />
+            <FormLabel htmlFor="plusOne" style={{ marginBottom: 0 }}>
+              <TranslatedText i18nKey="guests.plusOne" defaultText="Plus One" />
+            </FormLabel>
+          </Checkbox>
+          
+          <ButtonGroup>
+            <CancelButton type="button" onClick={handleCancel}>
+              <TranslatedText i18nKey="common.cancel" defaultText="Cancel" />
+            </CancelButton>
+            <SubmitButton type="submit">
+              {editingId ? 
+                <TranslatedText i18nKey="common.update" defaultText="Update" /> : 
+                <TranslatedText i18nKey="common.save" defaultText="Save" />
+              }
+            </SubmitButton>
+          </ButtonGroup>
+        </Form>
       )}
       
-      <Tabs>
-        <Tab
-          active={activeTab === 'all'}
-          onClick={() => setActiveTab('all')}
-        >
-          <TranslatedText i18nKey="guests.allGuests" defaultText="Alle Gäste" />
-          {' '}({guests.length})
-        </Tab>
-        <Tab
-          active={activeTab === 'confirmed'}
-          onClick={() => setActiveTab('confirmed')}
-        >
-          <TranslatedText i18nKey="guests.confirmed" defaultText="Zugesagt" />
-          {' '}({guests.filter(g => g.status === 'confirmed').length})
-        </Tab>
-        <Tab
-          active={activeTab === 'pending'}
-          onClick={() => setActiveTab('pending')}
-        >
-          <TranslatedText i18nKey="guests.pending" defaultText="Ausstehend" />
-          {' '}({guests.filter(g => g.status === 'pending').length})
-        </Tab>
-        <Tab
-          active={activeTab === 'declined'}
-          onClick={() => setActiveTab('declined')}
-        >
-          <TranslatedText i18nKey="guests.declined" defaultText="Abgesagt" />
-          {' '}({guests.filter(g => g.status === 'declined').length})
-        </Tab>
-      </Tabs>
-      
-      <ResponsiveTable
-        headers={['Name', 'Email', 'Phone', 'Status', 'PlusOne', 'DietaryRestrictions', 'Actions']}
-        data={guestsTableData}
-        keyField="id"
-      />
+      {loading ? (
+        <p><TranslatedText i18nKey="common.loading" defaultText="Loading..." /></p>
+      ) : guests.length === 0 ? (
+        <ResponsiveCard>
+          <TranslatedText i18nKey="guests.noGuests" defaultText="No guests added yet. Click 'Add Guest' to get started." />
+        </ResponsiveCard>
+      ) : (
+        <ResponsiveTable
+          data={guests}
+          columns={[
+            { 
+              header: <TranslatedText i18nKey="guests.name" defaultText="Name" />, 
+              accessor: 'name' 
+            },
+            { 
+              header: <TranslatedText i18nKey="guests.email" defaultText="Email" />, 
+              accessor: 'email',
+              cell: (value) => value || '-'
+            },
+            { 
+              header: <TranslatedText i18nKey="guests.phone" defaultText="Phone" />, 
+              accessor: 'phone',
+              cell: (value) => value || '-'
+            },
+            { 
+              header: <TranslatedText i18nKey="guests.status" defaultText="Status" />, 
+              accessor: 'status',
+              cell: (value) => renderStatus(value)
+            },
+            { 
+              header: <TranslatedText i18nKey="guests.plusOne" defaultText="Plus One" />, 
+              accessor: 'plusOne',
+              cell: (value) => value ? 'Yes' : 'No'
+            },
+            { 
+              header: <TranslatedText i18nKey="common.actions" defaultText="Actions" />, 
+              accessor: 'id',
+              cell: (_, rowData) => renderActions(rowData as Guest)
+            }
+          ]}
+        />
+      )}
     </Container>
   );
 };

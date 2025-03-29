@@ -3,20 +3,22 @@ import { supabase } from './supabase';
 
 // Define the GuestAPI interface to ensure consistent structure
 interface GuestAPI {
-  getAll: () => Promise<{ data: Guest[] | null; error: any }>;
-  getById: (id: string) => Promise<{ data: Guest | null; error: any }>;
-  create: (guest: GuestFormData) => Promise<{ data: Guest | null; error: any }>;
-  update: (id: string, updates: Partial<Guest>) => Promise<{ data: Guest | null; error: any }>;
-  delete: (id: string) => Promise<{ error: any }>;
-  updateStatus: (id: string, status: 'pending' | 'confirmed' | 'declined') => Promise<{ data: Guest | null; error: any }>;
-  getByTable: (tableId: string) => Promise<{ data: Guest[] | null; error: any }>;
-  getWithoutTable: () => Promise<{ data: Guest[] | null; error: any }>;
-  assignToTable: (guestId: string, tableId: string) => Promise<{ data: Guest | null; error: any }>;
-  removeFromTable: (guestId: string) => Promise<{ data: Guest | null; error: any }>;
+  guests: {
+    getAll: () => Promise<{ data: Guest[] | null; error: any }>;
+    getById: (id: string) => Promise<{ data: Guest | null; error: any }>;
+    create: (guest: GuestFormData) => Promise<{ data: Guest | null; error: any }>;
+    update: (id: string, updates: Partial<Guest>) => Promise<{ data: Guest | null; error: any }>;
+    delete: (id: string) => Promise<{ error: any }>;
+    updateStatus: (id: string, status: 'pending' | 'confirmed' | 'declined') => Promise<{ data: Guest | null; error: any }>;
+    getByTable: (tableId: string) => Promise<{ data: Guest[] | null; error: any }>;
+    getWithoutTable: () => Promise<{ data: Guest[] | null; error: any }>;
+    assignToTable: (guestId: string, tableId: string) => Promise<{ data: Guest | null; error: any }>;
+    removeFromTable: (guestId: string) => Promise<{ data: Guest | null; error: any }>;
+  }
 }
 
 // Real API implementation using Supabase
-export const guestApi: GuestAPI = {
+const guestApiImplementation = {
   getAll: async (): Promise<{ data: Guest[] | null; error: any }> => {
     const { data, error } = await supabase
       .from('guests')
@@ -76,7 +78,7 @@ export const guestApi: GuestAPI = {
   },
   
   updateStatus: async (id: string, status: 'pending' | 'confirmed' | 'declined'): Promise<{ data: Guest | null; error: any }> => {
-    return await guestApi.update(id, { status });
+    return await guestApiImplementation.update(id, { status });
   },
   
   getByTable: async (tableId: string): Promise<{ data: Guest[] | null; error: any }> => {
@@ -100,16 +102,16 @@ export const guestApi: GuestAPI = {
   },
   
   assignToTable: async (guestId: string, tableId: string): Promise<{ data: Guest | null; error: any }> => {
-    return await guestApi.update(guestId, { tableId });
+    return await guestApiImplementation.update(guestId, { tableId });
   },
   
   removeFromTable: async (guestId: string): Promise<{ data: Guest | null; error: any }> => {
-    return await guestApi.update(guestId, { tableId: undefined });
+    return await guestApiImplementation.update(guestId, { tableId: undefined });
   }
 };
 
-// Demo API for the interactive demo
-export const demoApi: GuestAPI = {
+// Demo API implementation for the interactive demo
+const demoApiImplementation = {
   getAll: async (): Promise<{ data: Guest[] | null; error: any }> => {
     // Return mock data for demo
     return {
@@ -185,7 +187,7 @@ export const demoApi: GuestAPI = {
   },
   
   getById: async (id: string): Promise<{ data: Guest | null; error: any }> => {
-    const { data } = await demoApi.getAll();
+    const { data } = await demoApiImplementation.getAll();
     const guest = data?.find(g => g.id === id) || null;
     return { data: guest, error: null };
   },
@@ -204,7 +206,7 @@ export const demoApi: GuestAPI = {
   
   update: async (id: string, updates: Partial<Guest>): Promise<{ data: Guest | null; error: any }> => {
     // Simulate updating a guest
-    const { data: guest } = await demoApi.getById(id);
+    const { data: guest } = await demoApiImplementation.getById(id);
     
     if (!guest) {
       return { data: null, error: 'Guest not found' };
@@ -225,26 +227,35 @@ export const demoApi: GuestAPI = {
   },
   
   updateStatus: async (id: string, status: 'pending' | 'confirmed' | 'declined'): Promise<{ data: Guest | null; error: any }> => {
-    return await demoApi.update(id, { status });
+    return await demoApiImplementation.update(id, { status });
   },
   
   getByTable: async (tableId: string): Promise<{ data: Guest[] | null; error: any }> => {
-    const { data } = await demoApi.getAll();
+    const { data } = await demoApiImplementation.getAll();
     const filteredGuests = data?.filter(guest => guest.tableId === tableId) || [];
     return { data: filteredGuests, error: null };
   },
   
   getWithoutTable: async (): Promise<{ data: Guest[] | null; error: any }> => {
-    const { data } = await demoApi.getAll();
+    const { data } = await demoApiImplementation.getAll();
     const filteredGuests = data?.filter(guest => !guest.tableId) || [];
     return { data: filteredGuests, error: null };
   },
   
   assignToTable: async (guestId: string, tableId: string): Promise<{ data: Guest | null; error: any }> => {
-    return await demoApi.update(guestId, { tableId });
+    return await demoApiImplementation.update(guestId, { tableId });
   },
   
   removeFromTable: async (guestId: string): Promise<{ data: Guest | null; error: any }> => {
-    return await demoApi.update(guestId, { tableId: undefined });
+    return await demoApiImplementation.update(guestId, { tableId: undefined });
   }
+};
+
+// Export the APIs with the nested structure
+export const guestApi: GuestAPI = {
+  guests: guestApiImplementation
+};
+
+export const demoApi: GuestAPI = {
+  guests: demoApiImplementation
 };
