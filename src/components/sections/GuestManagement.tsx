@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from 'react';
 import { demoApi } from '../../lib/supabase-api';
 
@@ -73,7 +72,8 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
     try {
       const { data, error } = await demoApi.guests.getAll();
       if (error) throw error;
-      setGuests(data);
+      // Fix: Handle null data by providing an empty array as fallback
+      setGuests(data || []);
     } catch (err) {
       setError('Failed to load guests');
       console.error(err);
@@ -101,10 +101,32 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
     const { name, value, type } = e.target;
     
     if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData({
+        ...formData,
+        [name]: (e.target as HTMLInputElement).checked
+      });
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
+  };
+  
+  // Handle dietary restrictions changes
+  const handleDietaryChange = (restriction: string, isChecked: boolean) => {
+    const currentRestrictions = formData.dietaryRestrictions || [];
+    
+    if (isChecked) {
+      setFormData({
+        ...formData,
+        dietaryRestrictions: [...currentRestrictions, restriction]
+      });
+    } else {
+      setFormData({
+        ...formData,
+        dietaryRestrictions: currentRestrictions.filter(r => r !== restriction)
+      });
     }
   };
   
@@ -115,18 +137,18 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
     try {
       if (editingGuest) {
         // Update existing guest
-        const { data, error } = await demoApi.guests.update(editingGuest.id, formData);
+        const { data, error } = await demoApi.guests.update(editingGuest.id, formData as Guest);
         if (error) throw error;
         
-        // Update local state
-        setGuests(prev => prev.map(g => g.id === editingGuest.id ? data : g));
+        setGuests(guests.map(g => g.id === editingGuest.id ? { ...g, ...formData } : g));
       } else {
         // Add new guest
-        const { data, error } = await demoApi.guests.create(formData);
+        const { data, error } = await demoApi.guests.create(formData as Guest);
         if (error) throw error;
         
-        // Update local state
-        setGuests(prev => [...prev, data]);
+        if (data) {
+          setGuests([...guests, data as Guest]);
+        }
       }
       
       // Reset form and close modal
@@ -154,19 +176,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
   // Handle edit guest
   const handleEditGuest = (guest: Guest) => {
     setEditingGuest(guest);
-    setFormData({
-      firstName: guest.firstName,
-      lastName: guest.lastName,
-      email: guest.email,
-      phone: guest.phone,
-      groupName: guest.groupName,
-      rsvpStatus: guest.rsvpStatus,
-      dietaryRestrictions: guest.dietaryRestrictions,
-      plusOne: guest.plusOne,
-      plusOneName: guest.plusOneName,
-      accommodationNeeded: guest.accommodationNeeded,
-      notes: guest.notes
-    });
+    setFormData({ ...guest });
     setShowAddGuestModal(true);
   };
   
@@ -176,8 +186,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
       const { error } = await demoApi.guests.delete(id);
       if (error) throw error;
       
-      // Update local state
-      setGuests(prev => prev.filter(g => g.id !== id));
+      setGuests(guests.filter(g => g.id !== id));
       setShowDeleteConfirmation(null);
     } catch (err) {
       setError('Failed to delete guest');
@@ -185,205 +194,221 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
     }
   };
   
-  // Handle sending email to selected guests
-  const handleSendEmail = () => {
-    alert('Diese Funktion würde E-Mails an ausgewählte Gäste senden.');
-  };
-  
-  // Handle exporting guest list
-  const handleExportGuestList = () => {
-    alert('Diese Funktion würde die Gästeliste als CSV oder PDF exportieren.');
+  // Handle RSVP status change
+  const handleRsvpChange = async (id: string, status: 'confirmed' | 'pending' | 'declined') => {
+    try {
+      const { error } = await demoApi.guests.update(id, { rsvpStatus: status });
+      if (error) throw error;
+      
+      setGuests(guests.map(g => g.id === id ? { ...g, rsvpStatus: status } : g));
+    } catch (err) {
+      setError('Failed to update RSVP status');
+      console.error(err);
+    }
   };
   
   return (
     <div className="guest-management">
-      <div className="guest-management__demo-notice">
-        <p>Dies ist eine funktionale Demo-Version der Gästeverwaltung. Sie können:</p>
-        <ul>
-          <li>Gäste hinzufügen, bearbeiten und löschen</li>
-          <li>Nach Gästen suchen und filtern</li>
-          <li>RSVP-Status verfolgen</li>
-          <li>Menüpräferenzen und Allergien erfassen</li>
-          <li>Übernachtungsbedarf verwalten</li>
-        </ul>
-      </div>
-      
       {error && (
         <div className="guest-management__error">
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>Schließen</button>
+          {error}
+          <button onClick={() => setError(null)}>×</button>
         </div>
       )}
       
-      <div className="guest-management__filters">
+      <div className="guest-management__controls">
+        <button 
+          className="guest-management__button"
+          onClick={() => setShowAddGuestModal(true)}
+        >
+          Gast hinzufügen
+        </button>
+        
         <div className="guest-management__search">
-          <input 
-            type="text" 
-            placeholder="Gäste suchen..." 
+          <input
+            type="text"
+            placeholder="Gäste suchen..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="guest-management__search-button">Suchen</button>
         </div>
-        
-        <div className="guest-management__filter-group">
-          <label>RSVP-Status:</label>
+      </div>
+      
+      <div className="guest-management__filters">
+        <div className="guest-management__filter">
+          <label>RSVP Status:</label>
           <select 
             value={rsvpFilter}
             onChange={(e) => setRsvpFilter(e.target.value as any)}
           >
             <option value="all">Alle</option>
             <option value="confirmed">Zugesagt</option>
-            <option value="declined">Abgesagt</option>
             <option value="pending">Ausstehend</option>
+            <option value="declined">Abgesagt</option>
           </select>
         </div>
         
-        <div className="guest-management__filter-group">
+        <div className="guest-management__filter">
           <label>Gruppe:</label>
           <select 
             value={groupFilter}
             onChange={(e) => setGroupFilter(e.target.value)}
           >
-            <option value="all">Alle</option>
+            <option value="all">Alle Gruppen</option>
             {availableGroups.map(group => (
               <option key={group} value={group}>{group}</option>
             ))}
           </select>
         </div>
-        
-        <div className="guest-management__filter-group">
-          <label>Menüpräferenz:</label>
-          <select 
-            value={menuFilter}
-            onChange={(e) => setMenuFilter(e.target.value)}
-          >
-            <option value="all">Alle</option>
-            <option value="meat">Fleisch</option>
-            <option value="fish">Fisch</option>
-            <option value="vegetarian">Vegetarisch</option>
-            <option value="vegan">Vegan</option>
-          </select>
-        </div>
       </div>
       
-      <div className="guest-management__table">
-        {loading ? (
-          <div className="guest-management__loading">Gäste werden geladen...</div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>E-Mail</th>
-                <th>RSVP</th>
-                <th>Gruppe</th>
-                <th>Menüpräferenz</th>
-                <th>Allergien</th>
-                <th>Übernachtung</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredGuests.length === 0 ? (
+      {loading ? (
+        <div className="guest-management__loading">Gäste werden geladen...</div>
+      ) : (
+        <>
+          <div className="guest-management__stats">
+            <div className="guest-management__stat">
+              <span className="guest-management__stat-label">Gesamt:</span>
+              <span className="guest-management__stat-value">{guests.length}</span>
+            </div>
+            <div className="guest-management__stat">
+              <span className="guest-management__stat-label">Zugesagt:</span>
+              <span className="guest-management__stat-value">
+                {guests.filter(g => g.rsvpStatus === 'confirmed').length}
+              </span>
+            </div>
+            <div className="guest-management__stat">
+              <span className="guest-management__stat-label">Ausstehend:</span>
+              <span className="guest-management__stat-value">
+                {guests.filter(g => g.rsvpStatus === 'pending').length}
+              </span>
+            </div>
+            <div className="guest-management__stat">
+              <span className="guest-management__stat-label">Abgesagt:</span>
+              <span className="guest-management__stat-value">
+                {guests.filter(g => g.rsvpStatus === 'declined').length}
+              </span>
+            </div>
+          </div>
+          
+          <div className="guest-management__table-container">
+            <table className="guest-management__table">
+              <thead>
                 <tr>
-                  <td colSpan={8} className="guest-management__no-results">
-                    Keine Gäste gefunden
-                  </td>
+                  <th>Name</th>
+                  <th>Kontakt</th>
+                  <th>Gruppe</th>
+                  <th>RSVP</th>
+                  <th>Besonderheiten</th>
+                  <th>Aktionen</th>
                 </tr>
-              ) : (
-                filteredGuests.map(guest => (
-                  <tr key={guest.id}>
-                    <td>{`${guest.firstName} ${guest.lastName}`}</td>
-                    <td>{guest.email || '-'}</td>
-                    <td>
-                      <span className={`guest-management__status guest-management__status--${guest.rsvpStatus || 'pending'}`}>
-                        {guest.rsvpStatus === 'confirmed' ? 'Zugesagt' : 
-                         guest.rsvpStatus === 'declined' ? 'Abgesagt' : 'Ausstehend'}
-                      </span>
+              </thead>
+              <tbody>
+                {filteredGuests.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="guest-management__empty">
+                      Keine Gäste gefunden.
                     </td>
-                    <td>{guest.groupName || '-'}</td>
-                    <td>-</td> {/* Placeholder for menu preference */}
-                    <td>{guest.dietaryRestrictions?.join(', ') || '-'}</td>
-                    <td>
-                      <span className="guest-management__accommodation">
-                        {guest.accommodationNeeded ? 'Ja' : 'Nein'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="guest-management__actions">
-                        <button 
+                  </tr>
+                ) : (
+                  filteredGuests.map(guest => (
+                    <tr key={guest.id}>
+                      <td>
+                        <div className="guest-management__name">
+                          {guest.firstName} {guest.lastName}
+                          {guest.plusOne && (
+                            <span className="guest-management__plus-one">
+                              +1 {guest.plusOneName && `(${guest.plusOneName})`}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="guest-management__contact">
+                          {guest.email && <div>{guest.email}</div>}
+                          {guest.phone && <div>{guest.phone}</div>}
+                        </div>
+                      </td>
+                      <td>{guest.groupName || '-'}</td>
+                      <td>
+                        <select
+                          value={guest.rsvpStatus || 'pending'}
+                          onChange={(e) => handleRsvpChange(
+                            guest.id, 
+                            e.target.value as 'confirmed' | 'pending' | 'declined'
+                          )}
+                          className={`guest-management__rsvp guest-management__rsvp--${guest.rsvpStatus || 'pending'}`}
+                        >
+                          <option value="confirmed">Zugesagt</option>
+                          <option value="pending">Ausstehend</option>
+                          <option value="declined">Abgesagt</option>
+                        </select>
+                      </td>
+                      <td>
+                        {guest.dietaryRestrictions && guest.dietaryRestrictions.length > 0 && (
+                          <div className="guest-management__dietary">
+                            {guest.dietaryRestrictions.join(', ')}
+                          </div>
+                        )}
+                        {guest.accommodationNeeded && (
+                          <div className="guest-management__accommodation">
+                            Unterkunft benötigt
+                          </div>
+                        )}
+                      </td>
+                      <td className="guest-management__actions">
+                        <button
                           className="guest-management__action-button"
                           onClick={() => handleEditGuest(guest)}
                         >
                           Bearbeiten
                         </button>
-                        <button 
+                        <button
                           className="guest-management__action-button"
                           onClick={() => setShowDeleteConfirmation(guest.id)}
                         >
                           Löschen
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-      
-      <div className="guest-management__controls">
-        <button 
-          className="guest-management__button"
-          onClick={() => {
-            setEditingGuest(null);
-            setFormData({
-              firstName: '',
-              lastName: '',
-              email: '',
-              phone: '',
-              groupName: '',
-              rsvpStatus: 'pending',
-              dietaryRestrictions: [],
-              plusOne: false,
-              plusOneName: '',
-              accommodationNeeded: false,
-              notes: ''
-            });
-            setShowAddGuestModal(true);
-          }}
-        >
-          Gast hinzufügen
-        </button>
-        <button 
-          className="guest-management__button"
-          onClick={handleSendEmail}
-        >
-          E-Mail an ausgewählte Gäste
-        </button>
-        <button 
-          className="guest-management__button"
-          onClick={handleExportGuestList}
-        >
-          Gästeliste exportieren
-        </button>
-      </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
       
       {/* Add/Edit Guest Modal */}
       {showAddGuestModal && (
         <div className="guest-management__modal">
           <div className="guest-management__modal-content">
             <div className="guest-management__modal-header">
-              <h2>{editingGuest ? 'Gast bearbeiten' : 'Gast hinzufügen'}</h2>
-              <button 
+              <h2>{editingGuest ? 'Gast bearbeiten' : 'Neuen Gast hinzufügen'}</h2>
+              <button
                 className="guest-management__modal-close"
-                onClick={() => setShowAddGuestModal(false)}
+                onClick={() => {
+                  setShowAddGuestModal(false);
+                  setEditingGuest(null);
+                  setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phone: '',
+                    groupName: '',
+                    rsvpStatus: 'pending',
+                    dietaryRestrictions: [],
+                    plusOne: false,
+                    plusOneName: '',
+                    accommodationNeeded: false,
+                    notes: ''
+                  });
+                }}
               >
-                &times;
+                ×
               </button>
             </div>
+            
             <form onSubmit={handleSubmit}>
               <div className="guest-management__form-group">
                 <label htmlFor="firstName">Vorname</label>
@@ -396,6 +421,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   required
                 />
               </div>
+              
               <div className="guest-management__form-group">
                 <label htmlFor="lastName">Nachname</label>
                 <input
@@ -407,6 +433,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   required
                 />
               </div>
+              
               <div className="guest-management__form-group">
                 <label htmlFor="email">E-Mail</label>
                 <input
@@ -417,6 +444,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              
               <div className="guest-management__form-group">
                 <label htmlFor="phone">Telefon</label>
                 <input
@@ -427,6 +455,7 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              
               <div className="guest-management__form-group">
                 <label htmlFor="groupName">Gruppe</label>
                 <input
@@ -435,16 +464,17 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   name="groupName"
                   value={formData.groupName || ''}
                   onChange={handleInputChange}
-                  list="groupList"
+                  list="groupSuggestions"
                 />
-                <datalist id="groupList">
+                <datalist id="groupSuggestions">
                   {availableGroups.map(group => (
                     <option key={group} value={group} />
                   ))}
                 </datalist>
               </div>
+              
               <div className="guest-management__form-group">
-                <label htmlFor="rsvpStatus">RSVP-Status</label>
+                <label htmlFor="rsvpStatus">RSVP Status</label>
                 <select
                   id="rsvpStatus"
                   name="rsvpStatus"
@@ -452,37 +482,64 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   onChange={handleInputChange}
                 >
                   <option value="confirmed">Zugesagt</option>
-                  <option value="declined">Abgesagt</option>
                   <option value="pending">Ausstehend</option>
+                  <option value="declined">Abgesagt</option>
                 </select>
               </div>
+              
               <div className="guest-management__form-group">
-                <label htmlFor="dietaryRestrictions">Allergien/Unverträglichkeiten</label>
-                <input
-                  type="text"
-                  id="dietaryRestrictions"
-                  name="dietaryRestrictions"
-                  value={formData.dietaryRestrictions?.join(', ') || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFormData(prev => ({
-                      ...prev,
-                      dietaryRestrictions: value ? value.split(',').map(item => item.trim()) : []
-                    }));
-                  }}
-                  placeholder="Kommagetrennte Liste, z.B. Nüsse, Laktose"
-                />
+                <label>Ernährungsbesonderheiten</label>
+                <div className="guest-management__form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="vegetarian"
+                    checked={(formData.dietaryRestrictions || []).includes('vegetarisch')}
+                    onChange={(e) => handleDietaryChange('vegetarisch', e.target.checked)}
+                  />
+                  <label htmlFor="vegetarian">Vegetarisch</label>
+                </div>
+                <div className="guest-management__form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="vegan"
+                    checked={(formData.dietaryRestrictions || []).includes('vegan')}
+                    onChange={(e) => handleDietaryChange('vegan', e.target.checked)}
+                  />
+                  <label htmlFor="vegan">Vegan</label>
+                </div>
+                <div className="guest-management__form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="glutenFree"
+                    checked={(formData.dietaryRestrictions || []).includes('glutenfrei')}
+                    onChange={(e) => handleDietaryChange('glutenfrei', e.target.checked)}
+                  />
+                  <label htmlFor="glutenFree">Glutenfrei</label>
+                </div>
+                <div className="guest-management__form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="lactoseFree"
+                    checked={(formData.dietaryRestrictions || []).includes('laktosefrei')}
+                    onChange={(e) => handleDietaryChange('laktosefrei', e.target.checked)}
+                  />
+                  <label htmlFor="lactoseFree">Laktosefrei</label>
+                </div>
               </div>
-              <div className="guest-management__form-group guest-management__form-checkbox">
-                <input
-                  type="checkbox"
-                  id="plusOne"
-                  name="plusOne"
-                  checked={formData.plusOne || false}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="plusOne">Begleitung</label>
+              
+              <div className="guest-management__form-group">
+                <div className="guest-management__form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="plusOne"
+                    name="plusOne"
+                    checked={formData.plusOne || false}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="plusOne">Begleitung</label>
+                </div>
               </div>
+              
               {formData.plusOne && (
                 <div className="guest-management__form-group">
                   <label htmlFor="plusOneName">Name der Begleitung</label>
@@ -495,16 +552,20 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   />
                 </div>
               )}
-              <div className="guest-management__form-group guest-management__form-checkbox">
-                <input
-                  type="checkbox"
-                  id="accommodationNeeded"
-                  name="accommodationNeeded"
-                  checked={formData.accommodationNeeded || false}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="accommodationNeeded">Übernachtung benötigt</label>
+              
+              <div className="guest-management__form-group">
+                <div className="guest-management__form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="accommodationNeeded"
+                    name="accommodationNeeded"
+                    checked={formData.accommodationNeeded || false}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="accommodationNeeded">Unterkunft benötigt</label>
+                </div>
               </div>
+              
               <div className="guest-management__form-group">
                 <label htmlFor="notes">Notizen</label>
                 <textarea
@@ -514,16 +575,20 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              
               <div className="guest-management__form-actions">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="guest-management__button guest-management__button--secondary"
-                  onClick={() => setShowAddGuestModal(false)}
+                  onClick={() => {
+                    setShowAddGuestModal(false);
+                    setEditingGuest(null);
+                  }}
                 >
                   Abbrechen
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="guest-management__button"
                 >
                   {editingGuest ? 'Speichern' : 'Hinzufügen'}
@@ -540,27 +605,31 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
           <div className="guest-management__modal-content guest-management__modal-content--small">
             <div className="guest-management__modal-header">
               <h2>Gast löschen</h2>
-              <button 
+              <button
                 className="guest-management__modal-close"
                 onClick={() => setShowDeleteConfirmation(null)}
               >
-                &times;
+                ×
               </button>
             </div>
-            <p>Sind Sie sicher, dass Sie diesen Gast löschen möchten?</p>
-            <div className="guest-management__form-actions">
-              <button 
-                className="guest-management__button guest-management__button--secondary"
-                onClick={() => setShowDeleteConfirmation(null)}
-              >
-                Abbrechen
-              </button>
-              <button 
-                className="guest-management__button guest-management__button--danger"
-                onClick={() => handleDeleteGuest(showDeleteConfirmation)}
-              >
-                Löschen
-              </button>
+            
+            <div style={{ padding: '1.5rem' }}>
+              <p>Sind Sie sicher, dass Sie diesen Gast löschen möchten?</p>
+              
+              <div className="guest-management__form-actions">
+                <button
+                  className="guest-management__button guest-management__button--secondary"
+                  onClick={() => setShowDeleteConfirmation(null)}
+                >
+                  Abbrechen
+                </button>
+                <button
+                  className="guest-management__button guest-management__button--danger"
+                  onClick={() => handleDeleteGuest(showDeleteConfirmation)}
+                >
+                  Löschen
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -569,162 +638,148 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
       <style jsx>{`
         .guest-management {
           padding: 2rem;
-          background-color: #f9f9f9;
-          border-radius: 8px;
-        }
-        
-        .guest-management__demo-notice {
-          background-color: #fff3cd;
-          border: 1px solid #ffeeba;
-          border-radius: 4px;
-          padding: 1rem;
-          margin-bottom: 2rem;
-        }
-        
-        .guest-management__demo-notice p {
-          margin-top: 0;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-        }
-        
-        .guest-management__demo-notice ul {
-          margin: 0;
-          padding-left: 1.5rem;
+          max-width: 1200px;
+          margin: 0 auto;
         }
         
         .guest-management__error {
           background-color: #f8d7da;
-          border: 1px solid #f5c6cb;
-          border-radius: 4px;
+          color: #721c24;
           padding: 1rem;
-          margin-bottom: 2rem;
+          border-radius: 4px;
+          margin-bottom: 1rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
         
-        .guest-management__error p {
-          margin: 0;
-          color: #721c24;
-        }
-        
         .guest-management__error button {
           background: none;
           border: none;
-          color: #721c24;
-          font-weight: bold;
+          font-size: 1.25rem;
           cursor: pointer;
+          color: #721c24;
+        }
+        
+        .guest-management__loading {
+          text-align: center;
+          padding: 2rem;
         }
         
         .guest-management__filters {
           display: flex;
           flex-wrap: wrap;
           gap: 1rem;
-          margin-bottom: 2rem;
-          background-color: white;
-          border-radius: 8px;
-          padding: 1.5rem;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          margin: 1rem 0;
         }
         
-        .guest-management__search {
+        .guest-management__filter {
           display: flex;
-          flex: 1;
-          min-width: 250px;
-        }
-        
-        .guest-management__search input {
-          flex: 1;
-          padding: 0.5rem;
-          border: 1px solid #ddd;
-          border-radius: 4px 0 0 4px;
-        }
-        
-        .guest-management__search-button {
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 0 4px 4px 0;
-          background-color: #ffbd00;
-          color: white;
-          cursor: pointer;
-        }
-        
-        .guest-management__search-button:hover {
-          background-color: #e6a800;
-        }
-        
-        .guest-management__filter-group {
-          display: flex;
-          flex-direction: column;
+          align-items: center;
           gap: 0.5rem;
-          min-width: 150px;
         }
         
-        .guest-management__filter-group label {
-          font-weight: 500;
-          font-size: 0.9rem;
-        }
-        
-        .guest-management__filter-group select {
+        .guest-management__filter select {
           padding: 0.5rem;
           border: 1px solid #ddd;
           border-radius: 4px;
         }
         
+        .guest-management__stats {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+        
+        .guest-management__stat {
+          background-color: white;
+          padding: 0.75rem 1rem;
+          border-radius: 4px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .guest-management__stat-label {
+          font-weight: 500;
+          margin-right: 0.5rem;
+        }
+        
+        .guest-management__table-container {
+          overflow-x: auto;
+        }
+        
         .guest-management__table {
-          margin-bottom: 2rem;
+          width: 100%;
+          border-collapse: collapse;
           background-color: white;
           border-radius: 8px;
           overflow: hidden;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
-        .guest-management__loading,
-        .guest-management__no-results {
-          padding: 2rem;
-          text-align: center;
-          color: #666;
-        }
-        
-        .guest-management__table table {
-          width: 100%;
-          border-collapse: collapse;
+        .guest-management__table th,
+        .guest-management__table td {
+          padding: 1rem;
+          text-align: left;
+          border-bottom: 1px solid #eee;
         }
         
         .guest-management__table th {
-          text-align: left;
-          padding: 1rem;
-          background-color: #f5f5f5;
-          font-weight: 600;
-          color: #333;
+          background-color: #f8f9fa;
+          font-weight: 500;
         }
         
-        .guest-management__table td {
-          padding: 1rem;
-          border-top: 1px solid #eee;
+        .guest-management__empty {
+          text-align: center;
+          padding: 2rem;
+          color: #6c757d;
         }
         
-        .guest-management__status {
+        .guest-management__name {
+          font-weight: 500;
+        }
+        
+        .guest-management__plus-one {
+          display: inline-block;
+          margin-left: 0.5rem;
+          font-size: 0.8rem;
+          color: #6c757d;
+        }
+        
+        .guest-management__contact {
+          font-size: 0.9rem;
+          color: #6c757d;
+        }
+        
+        .guest-management__rsvp {
+          padding: 0.25rem;
+          border-radius: 4px;
+          border: 1px solid #ddd;
+        }
+        
+        .guest-management__rsvp--confirmed {
+          background-color: #d4edda;
+          color: #155724;
+        }
+        
+        .guest-management__rsvp--pending {
+          background-color: #fff3cd;
+          color: #856404;
+        }
+        
+        .guest-management__rsvp--declined {
+          background-color: #f8d7da;
+          color: #721c24;
+        }
+        
+        .guest-management__dietary {
           display: inline-block;
           padding: 0.25rem 0.5rem;
           border-radius: 4px;
           font-size: 0.8rem;
           font-weight: 500;
-        }
-        
-        .guest-management__status--confirmed {
-          background-color: #d4edda;
-          color: #155724;
-        }
-        
-        .guest-management__status--declined {
-          background-color: #f8d7da;
-          color: #721c24;
-        }
-        
-        .guest-management__status--pending {
-          background-color: #fff3cd;
-          color: #856404;
+          background-color: #e2e3e5;
+          color: #383d41;
         }
         
         .guest-management__accommodation {
