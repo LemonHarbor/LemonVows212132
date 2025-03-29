@@ -17,6 +17,21 @@ interface Guest {
   notes: string | null;
 }
 
+// Define the API response type to match what's coming from the server
+interface ApiGuest {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  rsvpStatus: string;
+  dietaryRestrictions: string[];
+  plusOne: boolean;
+  notes: string;
+  tableAssignment?: string;
+  group?: string;
+}
+
 interface GuestManagementProps {
   // Props can be added as needed
 }
@@ -66,15 +81,36 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
     setAvailableGroups(groups);
   }, [guests]);
   
+  // Convert API guest format to our internal Guest format
+  const convertApiGuest = (apiGuest: ApiGuest): Guest => {
+    return {
+      id: apiGuest.id,
+      firstName: apiGuest.firstName,
+      lastName: apiGuest.lastName,
+      email: apiGuest.email || null,
+      phone: apiGuest.phone || null,
+      groupName: apiGuest.group || null,
+      rsvpStatus: apiGuest.rsvpStatus as 'confirmed' | 'pending' | 'declined' | null,
+      dietaryRestrictions: apiGuest.dietaryRestrictions || null,
+      plusOne: apiGuest.plusOne,
+      plusOneName: null, // This field might not be in the API response
+      accommodationNeeded: false, // This field might not be in the API response
+      notes: apiGuest.notes || null
+    };
+  };
+  
   // Load guests from API
   const loadGuests = async () => {
     setLoading(true);
     try {
       const { data, error } = await demoApi.guests.getAll();
       if (error) throw error;
-      // Fix: Handle null data by providing an empty array as fallback
-      // Also add type assertion to ensure compatibility with Guest interface
-      setGuests((data || []) as Guest[]);
+      
+      // Handle null data by providing an empty array as fallback
+      // Convert API response to our internal Guest format
+      const guestData = data || [];
+      const convertedGuests = guestData.map(convertApiGuest);
+      setGuests(convertedGuests);
     } catch (err) {
       setError('Failed to load guests');
       console.error(err);
