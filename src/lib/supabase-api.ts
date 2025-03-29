@@ -14,22 +14,25 @@ export interface Guest {
   id: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
-  rsvpStatus: 'confirmed' | 'declined' | 'pending';
-  dietaryRestrictions: string[];
+  email: string | null;
+  phone: string | null;
+  rsvpStatus: 'confirmed' | 'declined' | 'pending' | null;
+  dietaryRestrictions: string[] | null;
   plusOne: boolean;
-  notes: string;
+  notes: string | null;
   tableAssignment: string | null;
-  group: string;
+  group: string | null;
+  groupName?: string | null;
 }
 
 export interface Table {
   id: string;
   name: string;
-  type: 'round' | 'rectangular' | 'oval';
-  seats: number;
-  position: { x: number; y: number };
+  shape: 'round' | 'rectangular' | 'square' | 'oval' | 'custom';
+  capacity: number;
+  rotation: number;
+  positionX: number;
+  positionY: number;
 }
 
 export interface BudgetItem {
@@ -71,12 +74,11 @@ export interface Couple {
   settings: Record<string, any>;
 }
 
-// Supabase configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jodqliylhmwgpurfzxm.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjIxNmpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJleHAiOjE3MTYyMTZJmpvZHFsaXlsaG13Z3B1cmZ6eG0ifQ.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjIxNmpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJleHAiOjE3MTYyMTZJmpvZHFsaXlsaG13Z3B1cmZ6eG0ifQ';
+// Import Supabase client from centralized configuration
+import { supabase } from './supabase';
 
-// Initialize Supabase client
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+// Export the client for use in this module
+export const supabaseClient = supabase;
 
 // Helper function to handle API responses
 const handleApiResponse = <T>(data: T | null, error: PostgrestError | Error | null): ApiResponse<T> => {
@@ -594,23 +596,29 @@ export const demoApi = {
           {
             id: '1',
             name: 'Table 1',
-            type: 'round',
-            seats: 8,
-            position: { x: 100, y: 100 },
+            shape: 'round',
+            capacity: 8,
+            rotation: 0,
+            positionX: 100,
+            positionY: 100,
           },
           {
             id: '2',
             name: 'Table 2',
-            type: 'rectangular',
-            seats: 6,
-            position: { x: 300, y: 100 },
+            shape: 'rectangular',
+            capacity: 6,
+            rotation: 0,
+            positionX: 300,
+            positionY: 100,
           },
           {
             id: '3',
             name: 'Table 3',
-            type: 'oval',
-            seats: 10,
-            position: { x: 200, y: 300 },
+            shape: 'oval',
+            capacity: 10,
+            rotation: 0,
+            positionX: 200,
+            positionY: 300,
           },
         ];
         return handleApiResponse<Table[]>(mockTables, null);
@@ -636,9 +644,11 @@ export const demoApi = {
         const updatedTable: Table = {
           id,
           name: updates.name || 'Updated Table',
-          type: updates.type || 'round',
-          seats: updates.seats || 8,
-          position: updates.position || { x: 100, y: 100 },
+          shape: updates.shape || 'round',
+          capacity: updates.capacity || 8,
+          rotation: updates.rotation || 0,
+          positionX: updates.positionX || 100,
+          positionY: updates.positionY || 100,
         };
         return handleApiResponse<Table>(updatedTable, null);
       } catch (error) {

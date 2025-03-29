@@ -173,7 +173,12 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
         );
       } else {
         // Add new guest
-        const { data, error } = await demoApi.guests.create(formData as Guest);
+        const guestData = {
+          ...formData,
+          group: formData.groupName || '',
+          tableAssignment: null
+        };
+        const { data, error } = await demoApi.guests.add(guestData as Omit<import('../../lib/supabase-api').Guest, "id">);
         if (error) throw error;
         
         if (data) {

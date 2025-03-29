@@ -200,7 +200,7 @@ export const TablePlanner: React.FC<TablePlannerProps> = () => {
         );
       } else {
         // Add new table
-        const { data, error } = await demoApi.tables.create(tableForm as Table);
+        const { data, error } = await demoApi.tables.add(tableForm as Table);
         if (error) throw error;
         
         if (data) {

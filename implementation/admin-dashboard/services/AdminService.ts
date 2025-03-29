@@ -15,9 +15,9 @@ import {
   ActivityLog
 } from '../models/AdminTypes';
 
-// Supabase connection details
-const supabaseUrl = 'https://jodqliylhmwgpurfzxm.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjk2MzA1OCwiZXhwIjoyMDMyNTM5MDU4fQ.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjk2MzA1OCwiZXhwIjoyMDMyNTM5MDU4fQ.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsaXlsaG13Z3B1cmZ6eG0iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjk2MzA1OCwiZXhwIjoyMDMyNTM5MDU4fQ';
+// Supabase connection details - using environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jodqliylhmwgpurfzxm.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
