@@ -73,7 +73,8 @@ export const GuestManagement: React.FC<GuestManagementProps> = () => {
       const { data, error } = await demoApi.guests.getAll();
       if (error) throw error;
       // Fix: Handle null data by providing an empty array as fallback
-      setGuests(data || []);
+      // Also add type assertion to ensure compatibility with Guest interface
+      setGuests((data || []) as Guest[]);
     } catch (err) {
       setError('Failed to load guests');
       console.error(err);
