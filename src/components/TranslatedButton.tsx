@@ -1,115 +1,148 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { media } from '../styles/ResponsiveComponents';
+import TranslatedText from './TranslatedText';
 
 interface TranslatedButtonProps {
   i18nKey: string;
+  defaultText: string;
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'text';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
   className?: string;
-  icon?: React.ReactNode;
 }
 
 const StyledButton = styled.button<{
-  variant: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant: 'primary' | 'secondary' | 'outline' | 'text';
   size: 'small' | 'medium' | 'large';
 }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border-radius: 4px;
-  font-weight: 500;
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-medium);
   transition: all 0.2s ease;
   cursor: pointer;
   
-  /* Size styles */
-  padding: ${props => {
+  ${props => {
+    switch (props.variant) {
+      case 'primary':
+        return `
+          background-color: var(--primary-color);
+          color: var(--text-on-primary);
+          border: none;
+          
+          &:hover {
+            background-color: var(--primary-dark);
+          }
+          
+          &:disabled {
+            background-color: var(--disabled-color);
+            color: var(--text-light);
+            cursor: not-allowed;
+          }
+        `;
+      case 'secondary':
+        return `
+          background-color: var(--secondary-color);
+          color: var(--text-on-secondary);
+          border: none;
+          
+          &:hover {
+            background-color: var(--secondary-dark);
+          }
+          
+          &:disabled {
+            background-color: var(--disabled-color);
+            color: var(--text-light);
+            cursor: not-allowed;
+          }
+        `;
+      case 'outline':
+        return `
+          background-color: transparent;
+          color: var(--primary-color);
+          border: 1px solid var(--primary-color);
+          
+          &:hover {
+            background-color: var(--primary-light);
+          }
+          
+          &:disabled {
+            border-color: var(--disabled-color);
+            color: var(--text-light);
+            cursor: not-allowed;
+          }
+        `;
+      case 'text':
+        return `
+          background-color: transparent;
+          color: var(--primary-color);
+          border: none;
+          
+          &:hover {
+            background-color: var(--primary-light);
+          }
+          
+          &:disabled {
+            color: var(--text-light);
+            cursor: not-allowed;
+          }
+        `;
+      default:
+        return '';
+    }
+  }}
+  
+  ${props => {
     switch (props.size) {
-      case 'small': return '0.25rem 0.75rem';
-      case 'large': return '0.75rem 1.5rem';
-      default: return '0.5rem 1rem';
+      case 'small':
+        return `
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+        `;
+      case 'medium':
+        return `
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+        `;
+      case 'large':
+        return `
+          padding: 1rem 2rem;
+          font-size: 1.125rem;
+        `;
+      default:
+        return '';
     }
-  }};
+  }}
   
-  font-size: ${props => {
-    switch (props.size) {
-      case 'small': return '0.875rem';
-      case 'large': return '1.125rem';
-      default: return '1rem';
-    }
-  }};
-  
-  /* Variant styles */
-  background-color: ${props => {
-    switch (props.variant) {
-      case 'primary': return '#f9ca24';
-      case 'secondary': return '#4834d4';
-      case 'outline': return 'transparent';
-      case 'danger': return '#eb4d4b';
-      default: return '#f9ca24';
-    }
-  }};
-  
-  color: ${props => {
-    switch (props.variant) {
-      case 'primary': return '#333';
-      case 'secondary': return '#fff';
-      case 'outline': return '#333';
-      case 'danger': return '#fff';
-      default: return '#333';
-    }
-  }};
-  
-  border: ${props => {
-    switch (props.variant) {
-      case 'outline': return '1px solid #ddd';
-      default: return 'none';
-    }
-  }};
-  
-  &:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
+  ${media.xs} {
+    width: 100%;
   }
 `;
 
 const TranslatedButton: React.FC<TranslatedButtonProps> = ({
   i18nKey,
+  defaultText,
   onClick,
-  type = 'button',
   variant = 'primary',
   size = 'medium',
   disabled = false,
-  className,
-  icon
+  type = 'button',
+  className
 }) => {
-  const { t } = useTranslation();
-  
   return (
     <StyledButton
-      type={type}
       onClick={onClick}
       variant={variant}
       size={size}
       disabled={disabled}
+      type={type}
       className={className}
     >
-      {icon && icon}
-      {t(i18nKey)}
+      <TranslatedText i18nKey={i18nKey} defaultText={defaultText} />
     </StyledButton>
   );
 };

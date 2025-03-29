@@ -1,20 +1,16 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import './styles/improved-styles.css';
 import './utils/i18n';
-import { AppProvider } from './context/AppContext';
-import { AuthProvider } from './context/AuthContext';
+import './styles/improved-styles.css';
 
+// Use the correct type assertion for container
 const container = document.getElementById('root');
+if (!container) throw new Error('Failed to find the root element');
 const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </AuthProvider>
+    <App />
   </React.StrictMode>
 );

@@ -1,30 +1,29 @@
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 interface TranslatedTextProps {
   i18nKey: string;
-  ns?: string;
-  values?: Record<string, any>;
+  defaultText: string;
+  values?: Record<string, string | number>;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
 }
 
 const StyledText = styled.span`
   display: inline;
 `;
 
-const TranslatedText: React.FC<TranslatedTextProps> = ({
-  i18nKey,
-  ns,
-  values,
-  className,
-  as = 'span'
+const TranslatedText: React.FC<TranslatedTextProps> = ({ 
+  i18nKey, 
+  defaultText, 
+  values = {}, 
+  className 
 }) => {
-  const { t } = useTranslation(ns);
+  const { t } = useTranslation();
   
   return (
-    <StyledText as={as} className={className}>
-      {t(i18nKey, values)}
+    <StyledText className={className}>
+      {t(i18nKey, { defaultValue: defaultText, ...values })}
     </StyledText>
   );
 };

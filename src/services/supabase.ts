@@ -1,314 +1,335 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use environment variables with fallback values for local development
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jodqlliylhmwgpurfzxm.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsbGl5bGhtd2dwdXJmenhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5ODI4ODgsImV4cCI6MjA1ODU1ODg4OH0.7vcXDTNdjsIpnpe-06qSyuu3K-pQVwtYpLueUuzDzDk';
+// Initialize Supabase client
+const supabaseUrl = 'https://jodqlliylhmwgpurfzxm.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZHFsbGl5bGhtd2dwdXJmenhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5ODI4ODgsImV4cCI6MjA1ODU1ODg4OH0.7vcXDTNdjsIpnpe-06qSyuu3K-pQVwtYpLueUuzDzDk';
 
-// Create a single supabase client for interacting with the database
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Auth functions
-export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  return { data, error };
-};
+// Type definitions
+export interface Wedding {
+  id: string;
+  name: string;
+  date: string;
+  location: string;
+  couple_names: string;
+  theme: string;
+  settings: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
 
-export const signUp = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-  return { data, error };
-};
+export interface Table {
+  id: string;
+  wedding_id: string;
+  name: string;
+  capacity: number;
+  shape: 'round' | 'rectangle' | 'square' | 'oval';
+  position_x: number;
+  position_y: number;
+  created_at: string;
+  updated_at: string;
+}
 
-export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
-};
+export interface BudgetItem {
+  id: string;
+  wedding_id: string;
+  category: string;
+  name: string;
+  estimated_cost: number;
+  actual_cost: number;
+  paid: boolean;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
 
-export const resetPassword = async (email: string) => {
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-  return { data, error };
-};
+export interface MusicRequest {
+  id: string;
+  wedding_id: string;
+  song_title: string;
+  artist: string;
+  requested_by: string;
+  votes: number;
+  created_at: string;
+  updated_at: string;
+}
 
-export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
-  return { data, error };
-};
+export interface GalleryImage {
+  id: string;
+  wedding_id: string;
+  url: string;
+  caption: string;
+  uploaded_by: string;
+  created_at: string;
+  updated_at: string;
+}
 
-// Wedding data functions
-export const createWedding = async (weddingData) => {
+// Wedding API functions
+export const createWedding = async (weddingData: Omit<Wedding, 'id' | 'created_at' | 'updated_at'>) => {
   const { data, error } = await supabase
     .from('weddings')
-    .insert([weddingData])
-    .select();
+    .insert([
+      { 
+        ...weddingData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ])
+    .select()
+    .single();
+  
   return { data, error };
 };
 
-export const getWedding = async (weddingId) => {
+export const getWedding = async (weddingId: string) => {
   const { data, error } = await supabase
     .from('weddings')
     .select('*')
     .eq('id', weddingId)
     .single();
+  
   return { data, error };
 };
 
-export const updateWedding = async (weddingId, weddingData) => {
+export const updateWedding = async (weddingId: string, updates: Partial<Wedding>) => {
   const { data, error } = await supabase
     .from('weddings')
-    .update(weddingData)
+    .update({ 
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', weddingId)
-    .select();
+    .select()
+    .single();
+  
   return { data, error };
 };
 
-// Guest management functions
-export const createGuest = async (guestData) => {
-  const { data, error } = await supabase
-    .from('guests')
-    .insert([guestData])
-    .select();
-  return { data, error };
-};
-
-export const getGuests = async (weddingId) => {
-  const { data, error } = await supabase
-    .from('guests')
-    .select('*')
-    .eq('wedding_id', weddingId);
-  return { data, error };
-};
-
-export const updateGuest = async (guestId, guestData) => {
-  const { data, error } = await supabase
-    .from('guests')
-    .update(guestData)
-    .eq('id', guestId)
-    .select();
-  return { data, error };
-};
-
-export const deleteGuest = async (guestId) => {
-  const { error } = await supabase
-    .from('guests')
-    .delete()
-    .eq('id', guestId);
-  return { error };
-};
-
-export const updateGuestRsvp = async (guestId, rsvpStatus) => {
-  const { data, error } = await supabase
-    .from('guests')
-    .update({ rsvp_status: rsvpStatus })
-    .eq('id', guestId)
-    .select();
-  return { data, error };
-};
-
-// Table planner functions
-export const createTable = async (tableData) => {
+// Table API functions
+export const createTable = async (tableData: Omit<Table, 'id' | 'created_at' | 'updated_at'>) => {
   const { data, error } = await supabase
     .from('tables')
-    .insert([tableData])
-    .select();
+    .insert([
+      { 
+        ...tableData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ])
+    .select()
+    .single();
+  
   return { data, error };
 };
 
-export const getTables = async (weddingId) => {
+export const getTables = async (weddingId: string) => {
   const { data, error } = await supabase
     .from('tables')
     .select('*')
-    .eq('wedding_id', weddingId);
+    .eq('wedding_id', weddingId)
+    .order('name');
+  
   return { data, error };
 };
 
-export const updateTable = async (tableId, tableData) => {
+export const updateTable = async (tableId: string, updates: Partial<Table>) => {
   const { data, error } = await supabase
     .from('tables')
-    .update(tableData)
+    .update({ 
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', tableId)
-    .select();
+    .select()
+    .single();
+  
   return { data, error };
 };
 
-export const deleteTable = async (tableId) => {
+export const deleteTable = async (tableId: string) => {
   const { error } = await supabase
     .from('tables')
     .delete()
     .eq('id', tableId);
+  
   return { error };
 };
 
-export const assignGuestToTable = async (guestId, tableId) => {
-  const { data, error } = await supabase
-    .from('guests')
-    .update({ table_id: tableId })
-    .eq('id', guestId)
-    .select();
-  return { data, error };
-};
-
-// Budget planner functions
-export const createBudgetItem = async (budgetItemData) => {
+// Budget API functions
+export const createBudgetItem = async (budgetItemData: Omit<BudgetItem, 'id' | 'created_at' | 'updated_at'>) => {
   const { data, error } = await supabase
     .from('budget_items')
-    .insert([budgetItemData])
-    .select();
-  return { data, error };
-};
-
-export const getBudgetItems = async (weddingId) => {
-  const { data, error } = await supabase
-    .from('budget_items')
-    .select('*')
-    .eq('wedding_id', weddingId);
-  return { data, error };
-};
-
-export const updateBudgetItem = async (budgetItemId, budgetItemData) => {
-  const { data, error } = await supabase
-    .from('budget_items')
-    .update(budgetItemData)
-    .eq('id', budgetItemId)
-    .select();
-  return { data, error };
-};
-
-export const deleteBudgetItem = async (budgetItemId) => {
-  const { error } = await supabase
-    .from('budget_items')
-    .delete()
-    .eq('id', budgetItemId);
-  return { error };
-};
-
-// Music playlist functions
-export const createMusicRequest = async (musicRequestData) => {
-  const { data, error } = await supabase
-    .from('music_requests')
-    .insert([musicRequestData])
-    .select();
-  return { data, error };
-};
-
-export const getMusicRequests = async (weddingId) => {
-  const { data, error } = await supabase
-    .from('music_requests')
-    .select('*')
-    .eq('wedding_id', weddingId);
-  return { data, error };
-};
-
-export const updateMusicRequest = async (musicRequestId, musicRequestData) => {
-  const { data, error } = await supabase
-    .from('music_requests')
-    .update(musicRequestData)
-    .eq('id', musicRequestId)
-    .select();
-  return { data, error };
-};
-
-export const deleteMusicRequest = async (musicRequestId) => {
-  const { error } = await supabase
-    .from('music_requests')
-    .delete()
-    .eq('id', musicRequestId);
-  return { error };
-};
-
-export const voteMusicRequest = async (musicRequestId, voteType) => {
-  // Get current votes
-  const { data: currentData, error: fetchError } = await supabase
-    .from('music_requests')
-    .select('upvotes, downvotes')
-    .eq('id', musicRequestId)
+    .insert([
+      { 
+        ...budgetItemData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ])
+    .select()
     .single();
   
-  if (fetchError) return { error: fetchError };
+  return { data, error };
+};
+
+export const getBudgetItems = async (weddingId: string) => {
+  const { data, error } = await supabase
+    .from('budget_items')
+    .select('*')
+    .eq('wedding_id', weddingId)
+    .order('category');
   
-  // Update votes
-  const updateData = voteType === 'up' 
-    ? { upvotes: (currentData.upvotes || 0) + 1 }
-    : { downvotes: (currentData.downvotes || 0) + 1 };
+  return { data, error };
+};
+
+export const updateBudgetItem = async (itemId: string, updates: Partial<BudgetItem>) => {
+  const { data, error } = await supabase
+    .from('budget_items')
+    .update({ 
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', itemId)
+    .select()
+    .single();
   
+  return { data, error };
+};
+
+export const deleteBudgetItem = async (itemId: string) => {
+  const { error } = await supabase
+    .from('budget_items')
+    .delete()
+    .eq('id', itemId);
+  
+  return { error };
+};
+
+// Music API functions
+export const createMusicRequest = async (musicRequestData: Omit<MusicRequest, 'id' | 'votes' | 'created_at' | 'updated_at'>) => {
   const { data, error } = await supabase
     .from('music_requests')
-    .update(updateData)
-    .eq('id', musicRequestId)
-    .select();
+    .insert([
+      { 
+        ...musicRequestData,
+        votes: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ])
+    .select()
+    .single();
   
   return { data, error };
 };
 
-// Gallery functions
-export const uploadImage = async (weddingId, file, metadata = {}) => {
-  const fileName = `${weddingId}/${Date.now()}-${file.name}`;
+export const getMusicRequests = async (weddingId: string) => {
+  const { data, error } = await supabase
+    .from('music_requests')
+    .select('*')
+    .eq('wedding_id', weddingId)
+    .order('votes', { ascending: false });
   
-  // Upload image
-  const { data, error } = await supabase.storage
-    .from('gallery')
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
-  
-  if (error) return { error };
-  
-  // Get public URL
-  const { data: urlData } = supabase.storage
-    .from('gallery')
-    .getPublicUrl(fileName);
-  
-  // Create gallery entry
-  const galleryEntry = {
-    wedding_id: weddingId,
-    url: urlData.publicUrl,
-    title: metadata.title || file.name,
-    uploaded_by: metadata.uploaded_by || 'Unknown',
-    is_private: metadata.is_private || false,
-    upload_date: new Date().toISOString(),
-  };
-  
-  const { data: galleryData, error: galleryError } = await supabase
-    .from('gallery_images')
-    .insert([galleryEntry])
-    .select();
-  
-  return { data: galleryData, error: galleryError };
+  return { data, error };
 };
 
-export const getGalleryImages = async (weddingId, includePrivate = false) => {
-  let query = supabase
-    .from('gallery_images')
-    .select('*')
-    .eq('wedding_id', weddingId);
+export const voteMusicRequest = async (requestId: string, currentVotes: number) => {
+  const { data, error } = await supabase
+    .from('music_requests')
+    .update({ 
+      votes: currentVotes + 1,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', requestId)
+    .select()
+    .single();
   
-  if (!includePrivate) {
-    query = query.eq('is_private', false);
+  return { data, error };
+};
+
+export const deleteMusicRequest = async (requestId: string) => {
+  const { error } = await supabase
+    .from('music_requests')
+    .delete()
+    .eq('id', requestId);
+  
+  return { error };
+};
+
+// Gallery API functions
+export const uploadImage = async (weddingId: string, file: File, caption: string, uploadedBy: string) => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+  const filePath = `${weddingId}/${fileName}`;
+  
+  const { error: uploadError } = await supabase.storage
+    .from('gallery')
+    .upload(filePath, file);
+  
+  if (uploadError) {
+    return { data: null, error: uploadError };
   }
   
-  const { data, error } = await query;
-  return { data, error };
-};
-
-export const updateGalleryImage = async (imageId, imageData) => {
+  const { data: urlData } = supabase.storage
+    .from('gallery')
+    .getPublicUrl(filePath);
+  
+  const url = urlData.publicUrl;
+  
   const { data, error } = await supabase
     .from('gallery_images')
-    .update(imageData)
-    .eq('id', imageId)
-    .select();
+    .insert([
+      { 
+        wedding_id: weddingId,
+        url,
+        caption,
+        uploaded_by: uploadedBy,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ])
+    .select()
+    .single();
+  
   return { data, error };
 };
 
-export const deleteGalleryImage = async (imageId, fileName) => {
+export const getGalleryImages = async (weddingId: string) => {
+  const { data, error } = await supabase
+    .from('gallery_images')
+    .select('*')
+    .eq('wedding_id', weddingId)
+    .order('created_at', { ascending: false });
+  
+  return { data, error };
+};
+
+export const deleteGalleryImage = async (imageId: string) => {
+  // First get the image to get the URL
+  const { data: image, error: getError } = await supabase
+    .from('gallery_images')
+    .select('url')
+    .eq('id', imageId)
+    .single();
+  
+  if (getError || !image) {
+    return { error: getError };
+  }
+  
+  // Extract the path from the URL
+  const url = new URL(image.url);
+  const pathParts = url.pathname.split('/');
+  const filePath = pathParts[pathParts.length - 2] + '/' + pathParts[pathParts.length - 1];
+  
   // Delete from storage
   const { error: storageError } = await supabase.storage
     .from('gallery')
-    .remove([fileName]);
+    .remove([filePath]);
+  
+  if (storageError) {
+    return { error: storageError };
+  }
   
   // Delete from database
   const { error } = await supabase
@@ -316,48 +337,38 @@ export const deleteGalleryImage = async (imageId, fileName) => {
     .delete()
     .eq('id', imageId);
   
-  return { error: error || storageError };
+  return { error };
 };
 
-// Admin functions
-export const getUsers = async () => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*');
-  return { data, error };
-};
-
-export const updateUserRole = async (userId, role) => {
-  const { data, error } = await supabase
-    .from('users')
-    .update({ role })
-    .eq('id', userId)
-    .select();
-  return { data, error };
-};
-
-export const getWeddingSettings = async (weddingId) => {
+// Settings API functions
+export const getWeddingSettings = async (weddingId: string) => {
   const { data, error } = await supabase
     .from('weddings')
     .select('settings')
     .eq('id', weddingId)
     .single();
-  return { data, error };
+  
+  return { data: data?.settings, error };
 };
 
-export const updateWeddingSettings = async (weddingId, settings) => {
+export const updateWeddingSettings = async (weddingId: string, settings: Record<string, any>) => {
   const { data, error } = await supabase
     .from('weddings')
-    .update({ settings })
+    .update({ 
+      settings,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', weddingId)
-    .select();
+    .select()
+    .single();
+  
   return { data, error };
 };
 
-// Subscription functions for real-time updates
-export const subscribeToGuests = (weddingId, callback) => {
-  return supabase
-    .channel('guests-channel')
+// Realtime subscriptions
+export const subscribeToGuests = (weddingId: string, callback: (payload: any) => void) => {
+  const subscription = supabase
+    .channel('guests-changes')
     .on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -365,11 +376,13 @@ export const subscribeToGuests = (weddingId, callback) => {
       filter: `wedding_id=eq.${weddingId}`
     }, callback)
     .subscribe();
+  
+  return subscription;
 };
 
-export const subscribeToTables = (weddingId, callback) => {
-  return supabase
-    .channel('tables-channel')
+export const subscribeToTables = (weddingId: string, callback: (payload: any) => void) => {
+  const subscription = supabase
+    .channel('tables-changes')
     .on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -377,11 +390,13 @@ export const subscribeToTables = (weddingId, callback) => {
       filter: `wedding_id=eq.${weddingId}`
     }, callback)
     .subscribe();
+  
+  return subscription;
 };
 
-export const subscribeToBudget = (weddingId, callback) => {
-  return supabase
-    .channel('budget-channel')
+export const subscribeToBudget = (weddingId: string, callback: (payload: any) => void) => {
+  const subscription = supabase
+    .channel('budget-changes')
     .on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -389,11 +404,13 @@ export const subscribeToBudget = (weddingId, callback) => {
       filter: `wedding_id=eq.${weddingId}`
     }, callback)
     .subscribe();
+  
+  return subscription;
 };
 
-export const subscribeToMusicRequests = (weddingId, callback) => {
-  return supabase
-    .channel('music-channel')
+export const subscribeToMusicRequests = (weddingId: string, callback: (payload: any) => void) => {
+  const subscription = supabase
+    .channel('music-changes')
     .on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -401,11 +418,13 @@ export const subscribeToMusicRequests = (weddingId, callback) => {
       filter: `wedding_id=eq.${weddingId}`
     }, callback)
     .subscribe();
+  
+  return subscription;
 };
 
-export const subscribeToGallery = (weddingId, callback) => {
-  return supabase
-    .channel('gallery-channel')
+export const subscribeToGallery = (weddingId: string, callback: (payload: any) => void) => {
+  const subscription = supabase
+    .channel('gallery-changes')
     .on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -413,28 +432,22 @@ export const subscribeToGallery = (weddingId, callback) => {
       filter: `wedding_id=eq.${weddingId}`
     }, callback)
     .subscribe();
-};
-
-// Health check function to verify Supabase connection
-export const checkSupabaseConnection = async () => {
-  try {
-    const { data, error } = await supabase.from('weddings').select('id').limit(1);
-    if (error) throw error;
-    return { connected: true, data };
-  } catch (error) {
-    console.error('Supabase connection error:', error);
-    return { connected: false, error };
-  }
-};
-
-// Function to initialize database schema if needed
-export const initializeDatabase = async () => {
-  // This function would be used to create tables if they don't exist
-  // For Supabase, this is typically done through the Supabase dashboard
-  // But we can check if tables exist and report status
   
-  const tables = ['weddings', 'guests', 'tables', 'budget_items', 'music_requests', 'gallery_images'];
-  const results = {};
+  return subscription;
+};
+
+// Database setup and validation
+export const validateDatabase = async () => {
+  const tables = [
+    'weddings',
+    'guests',
+    'tables',
+    'budget_items',
+    'music_requests',
+    'gallery_images'
+  ];
+  
+  const results: Record<string, { exists: boolean; error: any }> = {};
   
   for (const table of tables) {
     try {
@@ -446,4 +459,46 @@ export const initializeDatabase = async () => {
   }
   
   return results;
+};
+
+// Authentication functions
+export const signUp = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+  
+  return { data, error };
+};
+
+export const signIn = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  
+  return { data, error };
+};
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  return { error };
+};
+
+export const getCurrentUser = async () => {
+  const { data, error } = await supabase.auth.getUser();
+  return { data, error };
+};
+
+export const resetPassword = async (email: string) => {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+  return { data, error };
+};
+
+export const updatePassword = async (password: string) => {
+  const { data, error } = await supabase.auth.updateUser({
+    password,
+  });
+  
+  return { data, error };
 };
