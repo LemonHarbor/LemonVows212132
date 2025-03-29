@@ -1,3 +1,2 @@
-import { ChecklistsComponent } from './ChecklistsComponent';
-
+import ChecklistsComponent from './ChecklistsComponent';
 export { ChecklistsComponent };
