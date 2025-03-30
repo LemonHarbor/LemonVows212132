@@ -127,7 +127,6 @@ export const useLanguage = () => {
 /**
  * i18n/translations.js - Translation utilities
  */
-import { supabase } from '../api/supabase';
 
 // Get all translations
 export const getAllTranslations = async () => {

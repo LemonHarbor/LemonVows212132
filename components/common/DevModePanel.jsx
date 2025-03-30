@@ -130,7 +130,7 @@ const DevModePanel = () => {
     alert(`Logged in as ${account.role}: ${account.email}`);
   };
   
-  const useRsvpCode = (code) => {
+  const handleRsvpCode = (code) => {
     console.log(`Using RSVP code: ${code.code}`);
     // In a real implementation, this would navigate to the RSVP page with the code
     window.location.href = `/demo?code=${code.code}`;
@@ -205,7 +205,7 @@ const DevModePanel = () => {
                   <div><strong>{code.code}</strong></div>
                   <div>{code.guest}</div>
                   <div style={{ fontSize: '0.8rem', marginBottom: '5px' }}>{code.wedding}</div>
-                  <Button onClick={() => useRsvpCode(code)}>Use Code</Button>
+                  <Button onClick={() => handleRsvpCode(code)}>Use Code</Button>
                 </RsvpCodeCard>
               ))}
             </RsvpCodeGrid>
