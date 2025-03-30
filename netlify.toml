@@ -3,7 +3,7 @@
 # Build settings
 [build]
   # Directory to publish (relative to root of your repo)
-  publish = "dist"
+  publish = ".next"
   # Default build command
   command = "npm run build"
 
@@ -16,6 +16,7 @@
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 # Headers for security and caching
 [[headers]]
