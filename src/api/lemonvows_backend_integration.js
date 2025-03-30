@@ -72,7 +72,6 @@ export const authService = {
 /**
  * api/weddings.js - Wedding management services
  */
-import { supabase } from './supabase';
 
 export const weddingService = {
   // Get wedding by ID
@@ -147,7 +146,6 @@ export const weddingService = {
 /**
  * api/guests.js - Guest management services
  */
-import { supabase } from './supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to generate RSVP code
@@ -319,7 +317,6 @@ export const guestService = {
 /**
  * api/rsvp.js - RSVP management services
  */
-import { supabase } from './supabase';
 
 export const rsvpService = {
   // Get RSVP response for a guest
@@ -422,7 +419,6 @@ export const rsvpService = {
 /**
  * api/menu.js - Menu management services
  */
-import { supabase } from './supabase';
 
 export const menuService = {
   // Get all menu options for a wedding
@@ -505,7 +501,6 @@ export const menuService = {
 /**
  * api/tables.js - Table management services
  */
-import { supabase } from './supabase';
 
 export const tableService = {
   // Get all tables for a wedding
@@ -663,7 +658,6 @@ export const tableService = {
 /**
  * api/statistics.js - Statistics services
  */
-import { supabase } from './supabase';
 
 export const statisticsService = {
   // Get statistics for a wedding
@@ -940,7 +934,6 @@ function formatDataForCsv(stats, guests) {
 /**
  * api/translations.js - Translation services
  */
-import { supabase } from './supabase';
 
 export const translationService = {
   // Get all translations
@@ -1004,7 +997,6 @@ export const translationService = {
 /**
  * api/admin.js - Admin services
  */
-import { supabase } from './supabase';
 
 export const adminService = {
   // Get all users
@@ -1180,9 +1172,7 @@ export function useApi(apiFunction) {
 /**
  * hooks/useRsvp.js - Custom hook for RSVP functionality
  */
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { guestService, rsvpService, menuService } from '../api';
 
 export function useRsvp() {
   const { code } = useParams();
@@ -1386,9 +1376,7 @@ export function useRsvp() {
 /**
  * hooks/useGuests.js - Custom hook for guest management
  */
-import { useState, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
-import { guestService, weddingService } from '../api';
 
 export function useGuests() {
   const { userDetails } = useUser();
@@ -1628,9 +1616,6 @@ export function useGuests() {
 /**
  * hooks/useTables.js - Custom hook for table management
  */
-import { useState, useEffect } from 'react';
-import { useUser } from '../contexts/UserContext';
-import { tableService, weddingService } from '../api';
 
 export function useTables() {
   const { userDetails } = useUser();
@@ -1801,9 +1786,6 @@ export function useTables() {
 /**
  * hooks/useMenu.js - Custom hook for menu management
  */
-import { useState, useEffect } from 'react';
-import { useUser } from '../contexts/UserContext';
-import { menuService, weddingService } from '../api';
 
 export function useMenu() {
   const { userDetails } = useUser();
@@ -1951,9 +1933,6 @@ export function useMenu() {
 /**
  * hooks/useStatistics.js - Custom hook for statistics
  */
-import { useState, useEffect } from 'react';
-import { useUser } from '../contexts/UserContext';
-import { statisticsService, weddingService } from '../api';
 
 export function useStatistics() {
   const { userDetails } = useUser();
@@ -2067,9 +2046,6 @@ export function useStatistics() {
 /**
  * hooks/useAdmin.js - Custom hook for admin functionality
  */
-import { useState, useEffect } from 'react';
-import { useUser } from '../contexts/UserContext';
-import { adminService, weddingService } from '../api';
 
 export function useAdmin() {
   const { userDetails } = useUser();

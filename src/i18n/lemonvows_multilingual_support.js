@@ -330,17 +330,7 @@ export const exportTranslations = async () => {
 /**
  * i18n/TranslationManager.js - Admin component for managing translations
  */
-import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useLanguage } from './index';
-import {
-  getAllTranslations,
-  addTranslation,
-  updateTranslation,
-  deleteTranslation,
-  importTranslations,
-  exportTranslations
-} from './translations';
 import Layout from '../components/common/Layout';
 import {
   Button,
@@ -384,7 +374,7 @@ const FormActions = styled.div`
   gap: 0.5rem;
 `;
 
-const TranslationManager = () => {
+export const TranslationManager = () => {
   const { translate } = useLanguage();
   const [translations, setTranslations] = useState([]);
   const [filteredTranslations, setFilteredTranslations] = useState([]);
@@ -777,14 +767,11 @@ const TranslationManager = () => {
   );
 };
 
-export default TranslationManager;
+// export default TranslationManager;
 
 /**
  * components/common/LanguageSelector.js - Language selector component
  */
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useLanguage } from '../../i18n';
 
 const LanguageSelectorContainer = styled.div`
   position: fixed;
@@ -859,7 +846,7 @@ const LanguageOption = styled.button`
   }
 `;
 
-const LanguageSelector = () => {
+export const LanguageSelector = () => {
   const { language, languages, changeLanguage } = useLanguage();
   const [showDropdown, setShowDropdown] = useState(false);
   
@@ -902,13 +889,12 @@ const LanguageSelector = () => {
   );
 };
 
-export default LanguageSelector;
+// export default LanguageSelector;
 
 /**
  * components/common/DateFormatter.js - Date formatter component with localization
  */
 import React from 'react';
-import { useLanguage } from '../../i18n';
 
 // Map of language codes to locale codes
 const LOCALE_MAP = {
@@ -978,21 +964,11 @@ const DateFormatter = ({ date, format = 'medium', includeTime = false, timeForma
   return <span>{formattedDate}</span>;
 };
 
-export default DateFormatter;
+// export default DateFormatter;
 
 /**
  * components/common/NumberFormatter.js - Number formatter component with localization
  */
-import React from 'react';
-import { useLanguage } from '../../i18n';
-
-// Map of language codes to locale codes
-const LOCALE_MAP = {
-  de: 'de-DE',
-  en: 'en-US',
-  fr: 'fr-FR',
-  es: 'es-ES'
-};
 
 // Number format options
 const NUMBER_FORMATS = {
@@ -1029,23 +1005,13 @@ const NumberFormatter = ({ value, format = 'decimal', options = {} }) => {
   return <span>{formattedNumber}</span>;
 };
 
-export default NumberFormatter;
+// export default NumberFormatter;
 
 /**
  * components/rsvp/RsvpForm.js - RSVP form with multilingual support
  */
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { useLanguage } from '../../i18n';
 import { useRsvp } from '../../hooks/useRsvp';
-import {
-  Card,
-  Button,
-  Input,
-  ErrorMessage
-} from '../common/StyledComponents';
-import DateFormatter from '../common/DateFormatter';
 
 // ... (rest of the component implementation)
 
