@@ -10,10 +10,6 @@ const nextConfig = {
   },
   // Ensure static export for Netlify
   output: 'export',
-  // Disable server components for static export
-  experimental: {
-    appDir: false,
-  },
   // Environment variables that will be available at build time
   env: {
     NEXT_PUBLIC_SUPABASE_URL: 'https://jodqlliylhmwgpurfzxm.supabase.co',
