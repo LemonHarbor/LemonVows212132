@@ -3,7 +3,15 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import InvitationView from '@/components/invitations/InvitationView';
 
-export default async function PublicInvitationPage({ params }: { params: { id: string } }) {
+interface PageParams {
+  id: string;
+}
+
+export default async function PublicInvitationPage({
+  params,
+}: {
+  params: PageParams;
+}) {
   const supabase = createServerComponentClient({ cookies });
   
   // Einladung anhand der ID oder benutzerdefinierten URL abrufen
