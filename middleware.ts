@@ -19,7 +19,7 @@ export async function middleware(req: NextRequest) {
   
   // If no cookie, use accept-language header
   if (!locale) {
-    locale = acceptLanguage.get(req.headers.get('Accept-Language'));
+    locale = acceptLanguage.get(req.headers.get('Accept-Language') || '');
   }
   
   // If no accept-language header, use default locale
