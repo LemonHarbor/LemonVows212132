@@ -3,7 +3,7 @@ import { useTranslation as useTranslationOriginal } from 'next-i18next';
 export const i18nConfig = {
   i18n: {
     defaultLocale: 'de',
-    locales: ['de', 'en'],
+    locales: ['de', 'en', 'fr', 'es'],
   },
   localePath: './public/locales',
 };

@@ -2,19 +2,144 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-:root {
-  --foreground-rgb: 7, 59, 76;
-  --background-rgb: 255, 252, 249;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 252, 249;
-    --background-rgb: 7, 59, 76;
+    --color-primary: 14, 165, 233;
+    --color-secondary: 6, 214, 160;
+    --color-accent: 239, 71, 111;
+    --color-background: 255, 252, 249;
+    --color-surface: 255, 255, 255;
+    --color-text: 7, 59, 76;
+    --color-muted: 107, 114, 128;
+    --color-border: 229, 231, 235;
+    --color-card: 255, 255, 255;
+    --color-hover: 243, 244, 246;
+  }
+
+  .dark {
+    --color-primary: 56, 189, 248;
+    --color-secondary: 5, 184, 137;
+    --color-accent: 233, 30, 99;
+    --color-background: 18, 18, 18;
+    --color-surface: 30, 30, 30;
+    --color-text: 224, 224, 224;
+    --color-muted: 156, 163, 175;
+    --color-border: 51, 51, 51;
+    --color-card: 37, 37, 37;
+    --color-hover: 44, 44, 44;
   }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  color: rgb(var(--color-text));
+  background: rgb(var(--color-background));
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Dark mode toggle transition */
+.dark-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Card styling */
+.card {
+  background-color: rgb(var(--color-card));
+  border: 1px solid rgb(var(--color-border));
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: rgb(var(--color-primary));
+  color: white;
+}
+
+.btn-secondary {
+  background-color: rgb(var(--color-secondary));
+  color: white;
+}
+
+.btn-accent {
+  background-color: rgb(var(--color-accent));
+  color: white;
+}
+
+/* Input styling */
+.input {
+  background-color: rgb(var(--color-surface));
+  border: 1px solid rgb(var(--color-border));
+  color: rgb(var(--color-text));
+}
+
+.dark .input {
+  background-color: rgba(var(--color-surface), 0.8);
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50;
+}
+
+.dark .focus-ring {
+  @apply focus:ring-primary-300;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .card {
+    border-radius: 0.375rem;
+  }
+  
+  .mobile-full-width {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+  }
+  
+  .mobile-stack {
+    flex-direction: column;
+  }
+  
+  .mobile-p-4 {
+    padding: 1rem;
+  }
+  
+  .mobile-hidden {
+    display: none;
+  }
+}
+
+/* Touch-friendly targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Improved scrolling */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent text size adjustment on orientation change */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Safe area insets for notched devices */
+.safe-area-inset {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Invitation } from '@/types/invitations';
+import { Invitation } from '@/types/invitations-extended';
 import { createClient } from '@/lib/supabase/client';
 import { format, parseISO } from 'date-fns';
 import { de } from 'date-fns/locale';

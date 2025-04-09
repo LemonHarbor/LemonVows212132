@@ -1,0 +1,59 @@
+{
+  "app": {
+    "title": "LemonVows",
+    "tagline": "Votre planification de mariage simplifiée"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "guests": "Invités",
+    "events": "Événements",
+    "photos": "Photos",
+    "vendors": "Prestataires",
+    "budget": "Budget",
+    "invitations": "Invitations",
+    "registry": "Liste de cadeaux",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "signUp": "S'inscrire maintenant",
+    "signIn": "Se connecter"
+  },
+  "dashboard": {
+    "welcome": "Bienvenue dans votre planification de mariage",
+    "upcomingEvents": "Événements à venir",
+    "guestCount": "Invités confirmés",
+    "budgetStatus": "État du budget",
+    "recentPhotos": "Photos récentes",
+    "quickActions": "Actions rapides"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "all": "Tous",
+    "none": "Aucun",
+    "yes": "Oui",
+    "no": "Non",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "required": "Champ obligatoire"
+  }
+}

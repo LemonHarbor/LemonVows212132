@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Invitation, InvitationInsert } from '@/types/invitations';
+import { Invitation, InvitationInsert } from '@/types/invitations-extended';
 import { createClient } from '@/lib/supabase/client';
 
 interface InvitationFormProps {

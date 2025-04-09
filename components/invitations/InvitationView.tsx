@@ -1,5 +1,5 @@
 import React from 'react';
-import { Invitation } from '@/types/invitations';
+import { Invitation } from '@/types/invitations-extended';
 import { createClient } from '@/lib/supabase/client';
 import { marked } from 'marked';
 
