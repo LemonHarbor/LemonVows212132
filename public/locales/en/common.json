@@ -1,0 +1,75 @@
+{
+  "app": {
+    "title": "LemonVows - Wedding Planning Made Easy",
+    "description": "Plan your wedding simply and stress-free"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "tablePlanner": "Table Planner",
+    "guestManagement": "Guest Management",
+    "budgetPlanner": "Budget Planner",
+    "moodboard": "Moodboard",
+    "gallery": "Photo Gallery",
+    "settings": "Settings"
+  },
+  "tablePlanner": {
+    "title": "Table Planner",
+    "description": "Create and manage your wedding seating plan",
+    "addTable": "Add Table",
+    "tableShape": "Table Shape",
+    "capacity": "Capacity",
+    "export": "Export",
+    "shapes": {
+      "round": "Round",
+      "rectangular": "Rectangular",
+      "square": "Square",
+      "oval": "Oval",
+      "custom": "Custom"
+    }
+  },
+  "guestManagement": {
+    "title": "Guest Management",
+    "description": "Manage your guest list and RSVP status",
+    "addGuest": "Add Guest",
+    "importGuests": "Import Guests",
+    "exportGuestList": "Export Guest List",
+    "generateRSVPLinks": "Generate RSVP Links",
+    "searchGuests": "Search Guests",
+    "filterByRSVP": "Filter by RSVP",
+    "filterByGroup": "Filter by Group",
+    "filterByDietary": "Filter by Dietary",
+    "all": "All",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "declined": "Declined"
+  },
+  "budgetPlanner": {
+    "title": "Budget Planner",
+    "description": "Keep track of your wedding budget",
+    "totalBudget": "Total Budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "addExpense": "Add Expense",
+    "categories": {
+      "venue": "Venue",
+      "catering": "Catering",
+      "attire": "Attire",
+      "photography": "Photography",
+      "music": "Music",
+      "decoration": "Decoration",
+      "invitations": "Invitations",
+      "transportation": "Transportation",
+      "other": "Other"
+    }
+  },
+  "admin": {
+    "logout": "Logout",
+    "sections": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "weddings": "Weddings",
+      "payments": "Payments",
+      "settings": "Settings"
+    }
+  }
+}

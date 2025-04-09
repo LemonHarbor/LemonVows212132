@@ -1,0 +1,167 @@
+{
+  "title": "LemonVows - Moderne Hochzeitsplanung leicht gemacht",
+  "subtitle": "Planen Sie Ihre Traumhochzeit stressfrei und organisiert",
+  "features": {
+    "tablePlanner": {
+      "title": "Interaktiver Tischplan",
+      "description": "Erstellen Sie mühelos den perfekten Sitzplan für Ihre Hochzeit. Ziehen Sie Gäste per Drag & Drop an ihre Plätze, wählen Sie verschiedene Tischformen und exportieren Sie den fertigen Plan.",
+      "highlights": [
+        "Drag & Drop Gästezuweisung",
+        "Verschiedene Tischformen und -größen",
+        "Anzeige von Menüpräferenzen und Allergien",
+        "Export als PDF, PNG oder CSV"
+      ]
+    },
+    "guestManagement": {
+      "title": "Gästeverwaltung",
+      "description": "Behalten Sie den Überblick über alle Ihre Gäste. Verwalten Sie Einladungen, RSVP-Status, Menüpräferenzen und Übernachtungsbedarf an einem zentralen Ort.",
+      "highlights": [
+        "Einfache Einladungsverwaltung mit RSVP-System",
+        "Erfassung von Menüpräferenzen und Allergien",
+        "Übernachtungsbedarf-Tracking",
+        "Filterung und Gruppierung von Gästen"
+      ]
+    },
+    "budgetPlanner": {
+      "title": "Budgetplaner",
+      "description": "Behalten Sie die Kontrolle über Ihre Hochzeitsausgaben. Legen Sie ein Gesamtbudget fest, verfolgen Sie Ausgaben in Echtzeit und sehen Sie visuelle Diagramme zur Budgetverteilung.",
+      "highlights": [
+        "Festlegung von Gesamtbudget und Kategorien",
+        "Echtzeit-Ist-/Soll-Vergleich",
+        "Visuelle Diagramme zur Budgetverteilung",
+        "Ausgabentracking mit Belegupload"
+      ]
+    },
+    "checklists": {
+      "title": "Checklisten",
+      "description": "Vergessen Sie nie wieder wichtige Aufgaben. Nutzen Sie unsere vorgefertigten Checklisten oder erstellen Sie eigene, um Ihre Hochzeitsplanung zu strukturieren.",
+      "highlights": [
+        "Vorgefertigte und anpassbare Checklisten",
+        "Fortschrittsanzeige für jede Planungsphase",
+        "Erinnerungen für wichtige Termine",
+        "Aufgabenzuweisung an Helfer"
+      ]
+    }
+  },
+  "pricing": {
+    "title": "Preispläne",
+    "subtitle": "Wählen Sie das passende Paket für Ihre Hochzeitsplanung",
+    "popular": "Beliebt",
+    "plans": {
+      "free": {
+        "title": "Kostenlos",
+        "price": "€0",
+        "period": "für immer",
+        "features": [
+          "Grundlegende Gästeverwaltung",
+          "Einfacher Tischplan",
+          "Basis-Checklisten",
+          "Einfache Budgetverwaltung"
+        ],
+        "cta": "Jetzt starten"
+      },
+      "basic": {
+        "title": "Standard",
+        "price": "€9,99",
+        "period": "pro Monat",
+        "features": [
+          "Erweiterte Gästeverwaltung",
+          "Interaktiver Tischplan",
+          "Anpassbare Checklisten",
+          "Detaillierte Budgetverwaltung",
+          "Moodboards",
+          "E-Mail-Support"
+        ],
+        "cta": "Jetzt buchen"
+      },
+      "premium": {
+        "title": "Premium",
+        "price": "€19,99",
+        "period": "pro Monat",
+        "features": [
+          "Alle Standard-Features",
+          "Unbegrenzte Gäste",
+          "Gästeportal mit RSVP",
+          "Foto-Galerie für Gäste",
+          "Musikwünsche & Abstimmung",
+          "Prioritäts-Support",
+          "Eigene Domain"
+        ],
+        "cta": "Premium wählen"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Was unsere Kunden sagen",
+    "list": [
+      {
+        "content": "LemonVows hat unsere Hochzeitsplanung so viel einfacher gemacht! Der Tischplan war besonders hilfreich, da wir über 150 Gäste hatten. Alles war perfekt organisiert.",
+        "name": "Julia & Thomas",
+        "location": "München"
+      },
+      {
+        "content": "Die Gästeverwaltung mit RSVP-System hat uns viel Zeit gespart. Unsere Gäste waren begeistert von der einfachen Bedienung und wir hatten immer den Überblick.",
+        "name": "Sarah & Michael",
+        "location": "Hamburg"
+      },
+      {
+        "content": "Der Budgetplaner hat uns geholfen, unsere Ausgaben im Griff zu behalten. Die visuellen Diagramme zeigen sofort, wo wir stehen. Absolut empfehlenswert!",
+        "name": "Lisa & Mark",
+        "location": "Berlin"
+      }
+    ]
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "items": [
+      {
+        "question": "Wie lange kann ich LemonVows nutzen?",
+        "answer": "Sie können LemonVows bis zu einem Jahr nach Ihrer Hochzeit nutzen. So haben Sie genügend Zeit für die Planung und können auch nach der Hochzeit noch auf alle Informationen zugreifen."
+      },
+      {
+        "question": "Kann ich zwischen den Plänen wechseln?",
+        "answer": "Ja, Sie können jederzeit zwischen den Plänen wechseln. Ein Upgrade ist sofort wirksam, bei einem Downgrade wird der neue Plan am Ende der aktuellen Abrechnungsperiode aktiviert."
+      },
+      {
+        "question": "Wie funktioniert das RSVP-System?",
+        "answer": "Ihre Gäste erhalten einen personalisierten Link, über den sie ihre Teilnahme bestätigen, Menüpräferenzen angeben und Übernachtungsbedarf mitteilen können. Sie sehen alle Antworten in Echtzeit in Ihrem Dashboard."
+      },
+      {
+        "question": "Ist meine Daten sicher?",
+        "answer": "Ja, wir nehmen Datenschutz sehr ernst. Alle Daten werden verschlüsselt gespeichert und nicht an Dritte weitergegeben. Sie haben jederzeit die volle Kontrolle über Ihre Daten."
+      }
+    ]
+  },
+  "ctaSection": {
+    "title": "Bereit für eine stressfreie Hochzeitsplanung?",
+    "subtitle": "Starten Sie noch heute mit LemonVows und erleben Sie, wie einfach Hochzeitsplanung sein kann.",
+    "tryFree": "Kostenlos testen",
+    "viewPricing": "Preise ansehen"
+  },
+  "contactForm": {
+    "title": "Kontaktieren Sie uns",
+    "subtitle": "Haben Sie Fragen? Wir helfen Ihnen gerne weiter.",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon (optional)",
+    "weddingDate": "Hochzeitsdatum (optional)",
+    "message": "Ihre Nachricht",
+    "privacyConsent": "Ich stimme der Verarbeitung meiner Daten gemäß der Datenschutzerklärung zu.",
+    "submit": "Nachricht senden",
+    "success": "Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze bei Ihnen melden."
+  },
+  "footer": {
+    "features": "Features",
+    "company": "Unternehmen",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "blog": "Blog",
+    "careers": "Karriere",
+    "legal": "Rechtliches",
+    "terms": "AGB",
+    "privacy": "Datenschutz",
+    "cookies": "Cookies",
+    "social": "Social Media",
+    "copyright": "Alle Rechte vorbehalten."
+  }
+}

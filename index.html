@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LemonVows - Hochzeitsplanung leicht gemacht</title>
+    <style>
+        :root {
+            --primary-color: #0ea5e9;
+            --primary-dark: #0369a1;
+            --secondary-color: #14b8a6;
+            --secondary-dark: #0f766e;
+            --light-bg: #f9fafb;
+            --dark-text: #1f2937;
+            --light-text: #f9fafb;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .logo span {
+            color: var(--secondary-color);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+        }
+        
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: #4b5563;
+        }
+        
+        .features {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title p {
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #e0f2fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-color);
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .demo {
+            padding: 4rem 0;
+            background-color: white;
+        }
+        
+        .demo-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .demo-image {
+            flex: 1;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .demo-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .demo-text {
+            flex: 1;
+        }
+        
+        .demo-text h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-text p {
+            margin-bottom: 1.5rem;
+            color: #4b5563;
+        }
+        
+        .demo-features {
+            margin-bottom: 1.5rem;
+        }
+        
+        .demo-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .demo-feature svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+        
+        .pricing {
+            padding: 4rem 0;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .pricing-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.featured {
+            border: 2px solid var(--primary-color);
+            position: relative;
+        }
+        
+        .pricing-card.featured::before {
+            content: "Beliebt";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pricing-card .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .pricing-card .price span {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+        
+        .pricing-features {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .pricing-feature svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        footer {
+            background-color: #1f2937;
+            color: white;
+            padding: 3rem 0;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-logo span {
+            color: var(--secondary-color);
+        }
+        
+        .footer-links h4 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+        
+        /* RSVP Form Styles */
+        .rsvp-form {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .demo-content {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Developer Mode Panel */
+        .dev-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2c3e50;
+            color: white;
+            z-index: 9999;
+            transition: height 0.3s ease;
+            height: 30px;
+            overflow: hidden;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dev-panel.expanded {
+            height: 300px;
+        }
+        
+        .dev-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 15px;
+            background-color: #34495e;
+            cursor: pointer;
+        }
+        
+        .dev-panel-title {
+            font-weight: bold;
+        }
+        
+        .dev-panel-content {
+            padding: 15px;
+            height: calc(100% - 30px);
+            overflow-y: auto;
+        }
+        
+        .dev-tabs {
+            display: flex;
+            border-bottom: 1px solid #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .dev-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            background-color: transparent;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        
+        .dev-tab.active {
+            background-color: #3498db;
+        }
+        
+        .dev-tab:hover:not(.active) {
+            background-color: #465c6e;
+        }
+        
+        .dev-tab-content {
+            display: none;
+        }
+        
+        .dev-tab-content.active {
+            display: block;
+        }
+        
+        .dev-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        .dev-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .dev-accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .dev-account-card {
+            background-color: #465c6e;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .dev-rsvp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .dev-rsvp-card {
+            background-color: #465c6e;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .dev-info-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .dev-info-row strong {
+            min-width: 120px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Lemon<span>Vows</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#features">Funktionen</a></li>
+                    <li><a href="#demo">Demo</a></li>
+                    <li><a href="#pricing">Preise</a></li>
+                    <li><a href="#contact">Kontakt</a></li>
+                </ul>
+            </nav>
+            <a href="#demo" class="btn">Demo testen</a>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h1>Hochzeitsplanung leicht gemacht</h1>
+            <p>LemonVows hilft Ihnen, Ihre Traumhochzeit zu planen - von der Gästeliste über den Tischplan bis hin zur Menüauswahl.</p>
+            <a href="#pricing" class="btn">Jetzt starten</a>
+            <a href="#features" class="btn btn-secondary">Mehr erfahren</a>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Unsere Funktionen</h2>
+                <p>Entdecken Sie alle Werkzeuge, die Sie für eine stressfreie Hochzeitsplanung benötigen.</p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h3>Gästeverwaltung</h3>
+                    <p>Verwalten Sie Ihre Gästeliste, verfolgen Sie Zu- und Absagen und behalten Sie den Überblick über spezielle Anforderungen.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <h3>Tischplanung</h3>
+                    <p>Erstellen Sie mit unserem intuitiven Drag-and-Drop-Tool mühelos den perfekten Sitzplan für Ihre Hochzeit.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3>Zeitplanung</h3>
+                    <p>Behalten Sie alle wichtigen Termine und Aufgaben im Blick mit unserem übersichtlichen Zeitplaner.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </div>
+                    <h3>Budgetplaner</h3>
+                    <p>Behalten Sie Ihre Ausgaben im Griff und planen Sie Ihr Budget effektiv mit unserem Finanztracker.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <h3>RSVP-System</h3>
+                    <p>Lassen Sie Ihre Gäste einfach online zu- oder absagen und erfassen Sie automatisch ihre Menüwünsche und Allergien.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3>Statistik-Dashboard</h3>
+                    <p>Behalten Sie den Überblick über Zusagen, Absagen und ausstehende Antworten mit unserem übersichtlichen Dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="demo" id="demo">
+        <div class="container">
+            <div class="section-title">
+                <h2>Demo</h2>
+                <p>Testen Sie unsere RSVP-Funktion und erleben Sie, wie einfach die Verwaltung Ihrer Hochzeitsgäste sein kann.</p>
+            </div>
+            
+            <div class="demo-content">
+                <div class="demo-text">
+                    <h2>RSVP-System</h2>
+                    <p>Mit unserem RSVP-System können Ihre Gäste einfach und schnell zu- oder absagen. Gleichzeitig erfassen Sie wichtige Informationen wie Menüwünsche und Allergien.</p>
+                    
+                    <div class="demo-features">
+                        <div class="demo-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Einfache Zu- und Absagen</span>
+                        </div>
+                        <div class="demo-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Erfassung von Menüwünschen</span>
+                        </div>
+                        <div class="demo-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Tracking von Allergien und Unverträglichkeiten</span>
+                        </div>
+                        <div class="demo-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Automatische Statistiken und Übersichten</span>
+                        </div>
+                    </div>
+                    
+                    <p>Probieren Sie es aus! Füllen Sie das Formular aus und sehen Sie, wie einfach es für Ihre Gäste sein wird.</p>
+                </div>
+                
+                <div class="rsvp-form">
+                    <h3>RSVP-Formular Demo</h3>
+                    <p>Bitte geben Sie Ihre Antwort für die Hochzeit von Sarah & Thomas am 15.08.2025.</p>
+                    
+                    <form id="rsvp-demo-form">
+                        <div class="form-group">
+                            <label for="rsvp-code">RSVP-Code</label>
+                            <input type="text" id="rsvp-code" placeholder="z.B. jodo-abc-123" value="jodo-abc-123" readonly>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="guest-name">Name</label>
+                                <input type="text" id="guest-name" value="John Smith" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="guest-response">Antwort</label>
+                                <select id="guest-response">
+                                    <option value="">Bitte wählen...</option>
+                                    <option value="yes">Ich nehme teil</option>
+                                    <option value="no">Ich kann leider nicht teilnehmen</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="guest-menu">Menüauswahl</label>
+                            <select id="guest-menu">
+                                <option value="">Bitte wählen...</option>
+                                <option value="meat">Fleisch: Rinderfilet mit Rotweinsoße</option>
+                                <option value="fish">Fisch: Lachs mit Zitronenbutter</option>
+                                <option value="vegetarian">Vegetarisch: Gemüse-Risotto</option>
+                                <option value="vegan">Vegan: Gefüllte Paprika mit Quinoa</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="guest-allergies">Allergien oder Unverträglichkeiten</label>
+                            <textarea id="guest-allergies" rows="3" placeholder="Bitte geben Sie alle Allergien oder Unverträglichkeiten an"></textarea>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="guest-overnight">
+                            <label for="guest-overnight">Ich benötige eine Übernachtungsmöglichkeit</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="guest-message">Nachricht (optional)</label>
+                            <textarea id="guest-message" rows="3" placeholder="Möchten Sie dem Brautpaar etwas mitteilen?"></textarea>
+                        </div>
+                        
+                        <button type="button" class="btn" onclick="submitRsvpDemo()">Antwort senden</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Preise</h2>
+                <p>Wählen Sie den Plan, der am besten zu Ihrer Hochzeit passt.</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Free</h3>
+                    <div class="price">0€ <span>/ einmalig</span></div>
+                    <div class="pricing-features">
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>RSVP-System für bis zu 20 Gäste</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Einfache Gästeliste</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Basis-Statistiken</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn">Kostenlos starten</a>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <h3>Basic</h3>
+                    <div class="price">89€ <span>/ einmalig</span></div>
+                    <div class="pricing-features">
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>RSVP-System für bis zu 75 Gäste</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Erweiterte Gästeverwaltung</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Tischplanung mit Drag & Drop</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Menü- und Allergiemanagement</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Detaillierte Statistiken</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn">Jetzt kaufen</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3>Premium</h3>
+                    <div class="price">129€ <span>/ einmalig</span></div>
+                    <div class="pricing-features">
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Unbegrenzte Anzahl an Gästen</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Alle Funktionen des Basic-Plans</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Budgetplaner mit Echtzeit-Tracking</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Zeitplaner mit Erinnerungen</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Mehrsprachige Gästeansicht (DE, EN, FR, ES)</span>
+                        </div>
+                        <div class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Premium Support</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn">Jetzt kaufen</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">Lemon<span>Vows</span></div>
+                    <p>Die moderne Lösung für Ihre Hochzeitsplanung. Einfach, stressfrei und effizient.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Funktionen</h4>
+                    <ul>
+                        <li><a href="#features">Gästeverwaltung</a></li>
+                        <li><a href="#features">Tischplanung</a></li>
+                        <li><a href="#features">RSVP-System</a></li>
+                        <li><a href="#features">Budgetplaner</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Unternehmen</h4>
+                    <ul>
+                        <li><a href="#">Über uns</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Karriere</a></li>
+                        <li><a href="#">Kontakt</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Rechtliches</h4>
+                    <ul>
+                        <li><a href="#">AGB</a></li>
+                        <li><a href="#">Datenschutz</a></li>
+                        <li><a href="#">Impressum</a></li>
+                        <li><a href="#">Cookie-Einstellungen</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 LemonVows. Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Developer Mode Panel -->
+    <div class="dev-panel" id="dev-panel">
+        <div class="dev-panel-header" id="dev-panel-header">
+            <div class="dev-panel-title">LemonVows Developer Mode</div>
+            <div id="dev-panel-toggle">▲</div>
+        </div>
+        
+        <div class="dev-panel-content">
+            <div class="dev-tabs">
+                <div class="dev-tab active" data-tab="accounts">Test Accounts</div>
+                <div class="dev-tab" data-tab="rsvp">RSVP Codes</div>
+                <div class="dev-tab" data-tab="language">Language</div>
+                <div class="dev-tab" data-tab="info">System Info</div>
+            </div>
+            
+            <div class="dev-tab-content active" id="tab-accounts">
+                <h3>Test Accounts</h3>
+                <p>Click on an account to log in with these credentials:</p>
+                
+                <div class="dev-accounts-grid">
+                    <div class="dev-account-card">
+                        <div><strong>Admin</strong></div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">
+                            admin@lemonvows.com / TestAdmin2025!
+                        </div>
+                        <button class="dev-button" onclick="loginAs('Admin', 'admin@lemonvows.com')">Login as Admin</button>
+                    </div>
+                    
+                    <div class="dev-account-card">
+                        <div><strong>Brautpaar 1</strong></div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">
+                            couple1@lemonvows.com / TestCouple2025!
+                        </div>
+                        <button class="dev-button" onclick="loginAs('Brautpaar 1', 'couple1@lemonvows.com')">Login as Brautpaar 1</button>
+                    </div>
+                    
+                    <div class="dev-account-card">
+                        <div><strong>Brautpaar 2</strong></div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">
+                            couple2@lemonvows.com / TestCouple2025!
+                        </div>
+                        <button class="dev-button" onclick="loginAs('Brautpaar 2', 'couple2@lemonvows.com')">Login as Brautpaar 2</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dev-tab-content" id="tab-rsvp">
+                <h3>Test RSVP Codes</h3>
+                <p>Click on a code to use it in the RSVP form:</p>
+                
+                <div class="dev-rsvp-grid">
+                    <div class="dev-rsvp-card">
+                        <div><strong>jodo-abc-123</strong></div>
+                        <div>John Smith</div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">Sarah & Thomas</div>
+                        <button class="dev-button" onclick="useRsvpCode('jodo-abc-123', 'John Smith')">Use Code</button>
+                    </div>
+                    
+                    <div class="dev-rsvp-card">
+                        <div><strong>jasn-def-456</strong></div>
+                        <div>Jane Smith</div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">Sarah & Thomas</div>
+                        <button class="dev-button" onclick="useRsvpCode('jasn-def-456', 'Jane Smith')">Use Code</button>
+                    </div>
+                    
+                    <div class="dev-rsvp-card">
+                        <div><strong>rojo-ghi-789</strong></div>
+                        <div>Robert Johnson</div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">Sarah & Thomas</div>
+                        <button class="dev-button" onclick="useRsvpCode('rojo-ghi-789', 'Robert Johnson')">Use Code</button>
+                    </div>
+                    
+                    <div class="dev-rsvp-card">
+                        <div><strong>wijo-klm-789</strong></div>
+                        <div>William Johnson</div>
+                        <div style="font-size: 0.8rem; margin-bottom: 5px;">Emma & Michael</div>
+                        <button class="dev-button" onclick="useRsvpCode('wijo-klm-789', 'William Johnson')">Use Code</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dev-tab-content" id="tab-language">
+                <h3>Change Language</h3>
+                <p>Select a language to change the application interface:</p>
+                
+                <div>
+                    <button class="dev-button" onclick="changeLanguage('de')">Deutsch</button>
+                    <button class="dev-button" onclick="changeLanguage('en')">English</button>
+                    <button class="dev-button" onclick="changeLanguage('fr')">Français</button>
+                    <button class="dev-button" onclick="changeLanguage('es')">Español</button>
+                </div>
+            </div>
+            
+            <div class="dev-tab-content" id="tab-info">
+                <h3>System Information</h3>
+                
+                <div style="background: #465c6e; padding: 10px; border-radius: 4px;">
+                    <div class="dev-info-row">
+                        <strong>Environment:</strong> 
+                        <span>Netlify (production)</span>
+                    </div>
+                    <div class="dev-info-row">
+                        <strong>API Endpoint:</strong> 
+                        <span>/.netlify/functions/api</span>
+                    </div>
+                    <div class="dev-info-row">
+                        <strong>Supabase URL:</strong> 
+                        <span>https://jodqlliylhmwgpurfzxm.supabase.co</span>
+                    </div>
+                    <div class="dev-info-row">
+                        <strong>Version:</strong> 
+                        <span>1.0.0</span>
+                    </div>
+                    <div class="dev-info-row">
+                        <strong>Build Date:</strong> 
+                        <span>2025-03-30</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // RSVP Demo Form Submission
+        function submitRsvpDemo() {
+            const response = document.getElementById('guest-response').value;
+            const menu = document.getElementById('guest-menu').value;
+            
+            if (!response) {
+                alert('Bitte wählen Sie eine Antwort aus.');
+                return;
+            }
+            
+            if (response === 'yes' && !menu) {
+                alert('Bitte wählen Sie eine Menüoption aus.');
+                return;
+            }
+            
+            alert('Vielen Dank für Ihre Antwort! In einer echten Umgebung würden diese Daten jetzt in unserer Datenbank gespeichert werden.');
+            
+            // Reset form
+            document.getElementById('guest-response').value = '';
+            document.getElementById('guest-menu').value = '';
+            document.getElementById('guest-allergies').value = '';
+            document.getElementById('guest-overnight').checked = false;
+            document.getElementById('guest-message').value = '';
+        }
+        
+        // Developer Mode Panel
+        const devPanel = document.getElementById('dev-panel');
+        const devPanelHeader = document.getElementById('dev-panel-header');
+        const devPanelToggle = document.getElementById('dev-panel-toggle');
+        
+        devPanelHeader.addEventListener('click', () => {
+            devPanel.classList.toggle('expanded');
+            devPanelToggle.textContent = devPanel.classList.contains('expanded') ? '▼' : '▲';
+        });
+        
+        // Tab switching
+        const tabs = document.querySelectorAll('.dev-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.dev-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.dev-tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+            });
+        });
+        
+        // Developer functions
+        function loginAs(role, email) {
+            alert(`Logged in as ${role}: ${email}`);
+        }
+        
+        function useRsvpCode(code, name) {
+            document.getElementById('rsvp-code').value = code;
+            document.getElementById('guest-name').value = name;
+            
+            // Scroll to RSVP form
+            document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function changeLanguage(lang) {
+            const languages = {
+                de: 'Deutsch',
+                en: 'English',
+                fr: 'Français',
+                es: 'Español'
+            };
+            
+            alert(`Sprache geändert auf: ${languages[lang]}`);
+        }
+    </script>
+</body>
+</html>
